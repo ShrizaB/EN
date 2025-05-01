@@ -65,6 +65,33 @@ const topicsData = {
       level: "Intermediate",
       ageRange: "7-9",
     },
+    fractions: {
+      title: "Fractions",
+      description: "Learn about parts of a whole",
+      subject: "Mathematics",
+      subjectSlug: "math",
+      subjectColor: "bg-math",
+      level: "Intermediate",
+      ageRange: "8-10",
+    },
+    geometry: {
+      title: "Geometry",
+      description: "Explore shapes and their properties",
+      subject: "Mathematics",
+      subjectSlug: "math",
+      subjectColor: "bg-math",
+      level: "Advanced",
+      ageRange: "9-12",
+    },
+    algebra: {
+      title: "Algebra Basics",
+      description: " Introduction to algebraic concepts",
+      subject: "Mathematics",
+      subjectSlug: "math",
+      subjectColor: "bg-math",
+      level: "Advanced",
+      ageRange: "8-10",
+    },
   },
   science: {
     animals: {
@@ -103,6 +130,43 @@ const topicsData = {
       level: "Intermediate",
       ageRange: "7-10",
     },
+    simple_machines: {
+      title: "Simple Machines",
+      description: "Discover levers, pulleys, and other simple machines",
+      subject: "Science",
+      subjectSlug: " science",
+      subjectColor: "bg-science",
+      level: "Intermediate",
+      ageRange: "8-12",
+    },
+    human_body: {
+      title: "Human Body",
+      description: "  Learn about the human body systems",
+      subject: "Science",
+      subjectSlug: " science",
+      subjectColor: "bg-science",
+      level: "Intermediate",
+      ageRange: "8-12",
+    },
+    chemistry: {
+      title: "Chemistry Basics",
+      description: "Introduction to basic chemistry concepts",
+      subject: "Science",
+      subjectSlug: " science",
+      subjectColor: "bg-science",
+      level: "Advanced",
+      ageRange: "9-12",
+    },
+    ecosystems: {
+      title: "Ecosystems",
+      description: "Explore different ecosystems and their inhabitants",
+      subject: "Science",
+      subjectSlug: "science",
+      subjectColor: "bg-science",
+      level: "Advanced",
+      ageRange: "9-12",
+    },
+
   },
   reading: {
     alphabet: {
@@ -132,6 +196,15 @@ const topicsData = {
       level: "Beginner",
       ageRange: "5-7",
     },
+    vocabulary: {
+      title: "Vocabulary Building",
+      description: "Expand your word knowledge",
+      subject: "Vocabulary",
+      subjectSlug: "vocabulary",
+      subjectColor: "bg-vocabulary",
+      level: "Intermediate",
+      ageRange: "6-9",
+    },
     comprehension: {
       title: "Reading Comprehension",
       description: "Understand what you read",
@@ -140,6 +213,35 @@ const topicsData = {
       subjectColor: "bg-reading",
       level: "Intermediate",
       ageRange: "7-10",
+    },
+    grammar: {
+      title: "Grammar Basics",
+      description: "Learn the rules of language",
+      subject: "Grammar",
+      subjectSlug: "grammar",
+      subjectColor: "bg-grammar",
+      level: "Intermediate",
+      ageRange: "8-10",
+    },
+    
+    writing: {
+      title: "Creative Writing",
+      description: "Express yourself through stories",
+      subject: "Writing",
+      subjectSlug: "writing",
+      subjectColor: "bg-writing",
+      level: "Advanced",
+      ageRange: "9-12",
+    },
+    
+    poetry: {
+      title: "Poetry",
+      description: "Explore rhythm and expression in language",
+      subject: "Poetry",
+      subjectSlug: "poetry",
+      subjectColor: "bg-poetry",
+      level: "Advanced",
+      ageRange: "10-12",
     },
   },
   coding: {
@@ -179,6 +281,46 @@ const topicsData = {
       level: "Intermediate",
       ageRange: "8-10",
     },
+    functions: {
+      title: "Functions",
+      description: "Create and use functions in your code",
+      subject: "Functions",
+      subjectSlug: "functions",
+      subjectColor: "bg-functions",
+      level: "Advanced",
+      ageRange: "9-11",
+    },
+    
+    variables: {
+      title: "Variables",
+      description: "Store and use data in your programs",
+      subject: "Variables",
+      subjectSlug: "variables",
+      subjectColor: "bg-variables",
+      level: "Advanced",
+      ageRange: "9-11",
+    },
+    
+    debugging: {
+      title: "Debugging",
+      description: "Find and fix errors in code",
+      subject: "Debugging",
+      subjectSlug: "debugging",
+      subjectColor: "bg-debugging",
+      level: "Advanced",
+      ageRange: "10-12",
+    },
+    
+    game_design: {
+      title: "Game Design",
+      description: "Build your own simple games with code",
+      subject: "Game Design",
+      subjectSlug: "game-design",
+      subjectColor: "bg-game-design",
+      level: "Advanced",
+      ageRange: "10-12",
+    },
+    
   },
   // New subjects
   music: {
@@ -218,6 +360,46 @@ const topicsData = {
       level: "Advanced",
       ageRange: "8-12",
     },
+    music_history: {
+      title: "Music History",
+      description: "Explore different music styles and famous composers",
+      subject: "Music History",
+      subjectSlug: "music-history",
+      subjectColor: "bg-music-history",
+      level: "Intermediate",
+      ageRange: "7-10",
+    },
+    
+    singing: {
+      title: "Singing Basics",
+      description: "Learn proper singing techniques and vocal exercises",
+      subject: "Singing",
+      subjectSlug: "singing",
+      subjectColor: "bg-singing",
+      level: "Beginner",
+      ageRange: "5-9",
+    },
+    
+    music_theory: {
+      title: "Music Theory",
+      description: "Understand the building blocks of music",
+      subject: "Music Theory",
+      subjectSlug: "music-theory",
+      subjectColor: "bg-music-theory",
+      level: "Advanced",
+      ageRange: "9-12",
+    },
+    
+    world_music: {
+      title: "World Music",
+      description: "Discover music from different cultures around the world",
+      subject: "World Music",
+      subjectSlug: "world-music",
+      subjectColor: "bg-world-music",
+      level: "Intermediate",
+      ageRange: "7-11",
+    },
+    
   },
   art: {
     colors: {
@@ -256,6 +438,46 @@ const topicsData = {
       level: "Advanced",
       ageRange: "9-12",
     },
+    sculpture: {
+      title: "Sculpture Basics",
+      description: "Create three-dimensional art with various materials",
+      subject: "Sculpture",
+      subjectSlug: "sculpture",
+      subjectColor: "bg-sculpture",
+      level: "Intermediate",
+      ageRange: "6-9",
+    },
+    
+    crafts: {
+      title: "Arts & Crafts",
+      description: "Make fun projects using different materials and techniques",
+      subject: "Arts & Crafts",
+      subjectSlug: "crafts",
+      subjectColor: "bg-crafts",
+      level: "Beginner",
+      ageRange: "4-7",
+    },
+    
+    digital_art: {
+      title: "Digital Art",
+      description: "Create art using digital tools and techniques",
+      subject: "Digital Art",
+      subjectSlug: "digital-art",
+      subjectColor: "bg-digital-art",
+      level: "Advanced",
+      ageRange: "8-12",
+    },
+    
+    art_appreciation: {
+      title: "Art Appreciation",
+      description: "Learn to observe, analyze, and appreciate different artworks",
+      subject: "Art Appreciation",
+      subjectSlug: "art-appreciation",
+      subjectColor: "bg-art-appreciation",
+      level: "Intermediate",
+      ageRange: "7-11",
+    },
+    
   },
   geography: {
     continents: {
@@ -294,6 +516,46 @@ const topicsData = {
       level: "Advanced",
       ageRange: "9-12",
     },
+    map_skills: {
+      title: "Map Skills",
+      description: "Learn to read and understand different types of maps",
+      subject: "Map Skills",
+      subjectSlug: "map-skills",
+      subjectColor: "bg-map-skills",
+      level: "Beginner",
+      ageRange: "6-9",
+    },
+    
+    cultures: {
+      title: "World Cultures",
+      description: "Discover traditions, foods, and customs from around the world",
+      subject: "World Cultures",
+      subjectSlug: "cultures",
+      subjectColor: "bg-cultures",
+      level: "Intermediate",
+      ageRange: "7-10",
+    },
+    
+    natural_resources: {
+      title: "Natural Resources",
+      description: "Learn about the Earth's resources and their importance",
+      subject: "Natural Resources",
+      subjectSlug: "natural-resources",
+      subjectColor: "bg-natural-resources",
+      level: "Advanced",
+      ageRange: "9-12",
+    },
+    
+    environmental_geography: {
+      title: "Environmental Geography",
+      description: "Understand how humans interact with and impact the environment",
+      subject: "Environmental Geography",
+      subjectSlug: "environmental-geography",
+      subjectColor: "bg-environmental-geography",
+      level: "Advanced",
+      ageRange: "10-12",
+    },
+    
   },
   logic: {
     patterns: {
@@ -332,6 +594,46 @@ const topicsData = {
       level: "Advanced",
       ageRange: "9-12",
     },
+    brain_teasers: {
+      title: "Brain Teasers",
+      description: "Challenge your mind with fun and tricky problems",
+      subject: "Brain Teasers",
+      subjectSlug: "brain-teasers",
+      subjectColor: "bg-brain-teasers",
+      level: "Intermediate",
+      ageRange: "7-10",
+    },
+    
+    sudoku: {
+      title: "Sudoku & Number Puzzles",
+      description: "Learn to solve number-based logic puzzles",
+      subject: "Sudoku & Number Puzzles",
+      subjectSlug: "sudoku",
+      subjectColor: "bg-sudoku",
+      level: "Advanced",
+      ageRange: "9-12",
+    },
+    
+    critical_thinking: {
+      title: "Critical Thinking",
+      description: "Analyze information and make reasoned judgments",
+      subject: "Critical Thinking",
+      subjectSlug: "critical-thinking",
+      subjectColor: "bg-critical-thinking",
+      level: "Advanced",
+      ageRange: "10-12",
+    },
+    
+    logical_fallacies: {
+      title: "Logical Fallacies",
+      description: "Identify common errors in reasoning",
+      subject: "Logical Fallacies",
+      subjectSlug: "logical-fallacies",
+      subjectColor: "bg-logical-fallacies",
+      level: "Advanced",
+      ageRange: "10-12",
+    },
+    
   },
   // Programming languages
   c_programming: {
@@ -371,6 +673,46 @@ const topicsData = {
       level: "Intermediate",
       ageRange: "11-12",
     },
+    arrays: {
+      title: "Arrays & Strings",
+      description: "Work with collections of data in C",
+      subject: "Arrays & Strings",
+      subjectSlug: "arrays",
+      subjectColor: "bg-arrays",
+      level: "Intermediate",
+      ageRange: "11-12",
+    },
+    
+    pointers: {
+      title: "Pointers",
+      description: "Understand memory addresses and pointers in C",
+      subject: "Pointers",
+      subjectSlug: "pointers",
+      subjectColor: "bg-pointers",
+      level: "Advanced",
+      ageRange: "12",
+    },
+    
+    structures: {
+      title: "Structures",
+      description: "Create custom data types using structures",
+      subject: "Structures",
+      subjectSlug: "structures",
+      subjectColor: "bg-structures",
+      level: "Advanced",
+      ageRange: "12",
+    },
+    
+    file_io: {
+      title: "File Input/Output",
+      description: "Learn to read from and write to files in C",
+      subject: "File Input/Output",
+      subjectSlug: "file-io",
+      subjectColor: "bg-file-io",
+      level: "Advanced",
+      ageRange: "12",
+    },
+    
   },
   python: {
     intro: {
@@ -409,6 +751,46 @@ const topicsData = {
       level: "Intermediate",
       ageRange: "10-12",
     },
+    lists: {
+      title: "Lists & Dictionaries",
+      description: "Work with collections of data in Python",
+      subject: "Lists & Dictionaries",
+      subjectSlug: "lists",
+      subjectColor: "bg-lists",
+      level: "Intermediate",
+      ageRange: "10-12",
+    },
+    
+    file_handling: {
+      title: "File Handling",
+      description: "Learn to read from and write to files in Python",
+      subject: "File Handling",
+      subjectSlug: "file-handling",
+      subjectColor: "bg-file-handling",
+      level: "Intermediate",
+      ageRange: "11-12",
+    },
+    
+    error_handling: {
+      title: "Error Handling",
+      description: "Understand how to handle errors and exceptions in Python",
+      subject: "Error Handling",
+      subjectSlug: "error-handling",
+      subjectColor: "bg-error-handling",
+      level: "Advanced",
+      ageRange: "11-12",
+    },
+    
+    simple_games: {
+      title: "Simple Games",
+      description: "Create fun games using Python",
+      subject: "Simple Games",
+      subjectSlug: "simple-games",
+      subjectColor: "bg-simple-games",
+      level: "Advanced",
+      ageRange: "11-12",
+    },
+    
   },
   java: {
     intro: {
@@ -447,6 +829,46 @@ const topicsData = {
       level: "Advanced",
       ageRange: "11-12",
     },
+    methods: {
+      title: "Methods",
+      description: "Create and use methods in Java programs",
+      subject: "Methods",
+      subjectSlug: "methods",
+      subjectColor: "bg-methods",
+      level: "Intermediate",
+      ageRange: "11-12",
+    },
+    
+    arrays: {
+      title: "Arrays & ArrayLists",
+      description: "Work with collections of data in Java",
+      subject: "Arrays & ArrayLists",
+      subjectSlug: "arrays",
+      subjectColor: "bg-arrays",
+      level: "Intermediate",
+      ageRange: "11-12",
+    },
+    
+    inheritance: {
+      title: "Inheritance & Polymorphism",
+      description: "Learn advanced object-oriented programming concepts",
+      subject: "Inheritance & Polymorphism",
+      subjectSlug: "inheritance",
+      subjectColor: "bg-inheritance",
+      level: "Advanced",
+      ageRange: "12",
+    },
+    
+    exception_handling: {
+      title: "Exception Handling",
+      description: "Understand how to handle errors and exceptions in Java",
+      subject: "Exception Handling",
+      subjectSlug: "exception-handling",
+      subjectColor: "bg-exception-handling",
+      level: "Advanced",
+      ageRange: "12",
+    },
+    
   },
   movies: {
     film_history: {
@@ -485,6 +907,46 @@ const topicsData = {
       level: "Intermediate",
       ageRange: "8-12",
     },
+    famous_directors: {
+      title: "Famous Directors",
+      description: "Learn about influential filmmakers and their unique styles",
+      subject: "Famous Directors",
+      subjectSlug: "famous-directors",
+      subjectColor: "bg-famous-directors",
+      level: "Advanced",
+      ageRange: "10-12",
+    },
+    
+    film_techniques: {
+      title: "Filmmaking Techniques",
+      description: "Understand camera angles, shots, and visual storytelling",
+      subject: "Filmmaking Techniques",
+      subjectSlug: "film-techniques",
+      subjectColor: "bg-film-techniques",
+      level: "Advanced",
+      ageRange: "9-12",
+    },
+    
+    movie_reviews: {
+      title: "Movie Reviews",
+      description: "Learn how to analyze and critique films",
+      subject: "Movie Reviews",
+      subjectSlug: "movie-reviews",
+      subjectColor: "bg-movie-reviews",
+      level: "Intermediate",
+      ageRange: "8-12",
+    },
+    
+    special_effects: {
+      title: "Special Effects",
+      description: "Discover how movie magic is created with special effects",
+      subject: "Special Effects",
+      subjectSlug: "special-effects",
+      subjectColor: "bg-special-effects",
+      level: "Intermediate",
+      ageRange: "7-12",
+    },
+    
   },
 }
 

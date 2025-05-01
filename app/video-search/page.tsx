@@ -16,7 +16,7 @@ const genAI = new GoogleGenerativeAI(GEMINI_API_KEY)
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
 
 // YouTube API key - you'll need to add this to your environment variables
-const YOUTUBE_API_KEY = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY || ""
+const YOUTUBE_API_KEY = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY || "AIzaSyCd4Nl9qskVrhr8J-Xt9pMXUaXInw_NY3k"
 
 interface Message {
   id: string

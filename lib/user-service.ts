@@ -38,12 +38,7 @@ export interface UserProgress {
   // Get user data
   export async function getUserData(userId: string): Promise<UserData | null> {
     try {
-      // Add a timestamp to prevent caching
-      const timestamp = new Date().getTime()
-      const response = await fetch(`/api/user/data?userId=${userId}&t=${timestamp}`, {
-        cache: "no-store",
-        next: { revalidate: 0 },
-      })
+      const response = await fetch(`/api/user/data?userId=${userId}`)
   
       if (!response.ok) {
         throw new Error("Failed to fetch user data")
@@ -85,24 +80,18 @@ export interface UserProgress {
   // Update user progress
   export async function updateUserProgress(subject: string, progress: number): Promise<boolean> {
     try {
-      console.log(`Updating progress for ${subject}: ${progress}%`)
-  
       const response = await fetch("/api/user/progress", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ subject, progress }),
-        cache: "no-store",
       })
   
       if (!response.ok) {
-        console.error("Failed to update progress:", response.status, response.statusText)
         throw new Error("Failed to update progress")
       }
   
-      const data = await response.json()
-      console.log("Progress update response:", data)
       return true
     } catch (error) {
       console.error("Error updating progress:", error)
@@ -111,15 +100,20 @@ export interface UserProgress {
   }
   
   // Log user activity
-  export async function logActivity(userId: string, activity: Partial<UserActivity>): Promise<boolean> {
+  export async function logActivity(
+    userId: string,
+    activityData: {
+      type: string
+      subject?: string
+      topic?: string
+      score?: number
+      totalQuestions?: number
+      timeSpent: number
+      difficulty?: string
+    },
+  ): Promise<boolean> {
     try {
-      console.log("Logging activity:", activity)
-  
-      // Ensure score is a number and properly formatted
-      if (activity.score !== undefined) {
-        // Make sure score is stored as a number
-        activity.score = Number(activity.score)
-      }
+      console.log("Logging activity:", activityData)
   
       const response = await fetch("/api/user/activity", {
         method: "POST",
@@ -128,8 +122,7 @@ export interface UserProgress {
         },
         body: JSON.stringify({
           userId,
-          ...activity,
-          timestamp: new Date().toISOString(),
+          ...activityData,
         }),
       })
   
@@ -148,10 +141,7 @@ export interface UserProgress {
   export async function getUserActivities(): Promise<UserActivity[]> {
     try {
       console.log("Fetching user activities...")
-      const response = await fetch("/api/user/activity", {
-        cache: "no-store",
-        next: { revalidate: 0 },
-      })
+      const response = await fetch("/api/user/activity")
   
       if (!response.ok) {
         console.error("Failed to fetch activities:", response.status, response.statusText)

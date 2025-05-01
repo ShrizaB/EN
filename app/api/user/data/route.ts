@@ -60,18 +60,7 @@ export async function GET(req: NextRequest) {
       updatedAt: user.updatedAt,
     }
 
-    // Add cache control headers to prevent caching
-    return NextResponse.json(
-      { userData },
-      {
-        status: 200,
-        headers: {
-          "Cache-Control": "no-store, max-age=0, must-revalidate",
-          Pragma: "no-cache",
-          Expires: "0",
-        },
-      },
-    )
+    return NextResponse.json({ userData }, { status: 200 })
   } catch (error) {
     console.error("Get user data error:", error)
     return NextResponse.json({ error: "An error occurred while fetching user data." }, { status: 500 })

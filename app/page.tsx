@@ -1,333 +1,165 @@
+import type { Metadata } from "next"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import {
-  Calculator,
-  FlaskRoundIcon as Flask,
-  BookOpen,
-  Code,
-  Trophy,
-  Video,
-  Gamepad2,
-  MessageSquare,
-  Brain,
-  ChevronRight,
-} from "lucide-react"
+import { EduGuideSection } from "@/components/eduguide-section"
 
-export default function Home() {
+export const metadata: Metadata = {
+  title: "EduPlay - Interactive Educational Platform",
+  description: "Learn through interactive games, quizzes, and personalized content.",
+}
+
+export default function HomePage() {
   return (
-    <main className="flex-1">
+    <div className="flex-1">
       {/* Hero Section */}
-      <section className="relative overflow-hidden py-20 md:py-32">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-secondary/10 z-0"></div>
-        <div className="container relative z-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-                Learning Made <span className="text-primary">Fun</span> and{" "}
-                <span className="text-primary">Interactive</span>
-              </h1>
-              <p className="text-xl text-muted-foreground mb-8">
-                Explore subjects, play educational games, and track your progress with our interactive learning
-                platform.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/subjects">
-                  <Button size="lg" className="w-full sm:w-auto">
-                    Start Learning
-                  </Button>
-                </Link>
-                <Link href="/quiz">
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto">
-                    Take a Quiz
-                  </Button>
-                </Link>
+      <section className="py-20 bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-950">
+        <div className="container px-4 md:px-6">
+          <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
+            <div className="flex flex-col justify-center space-y-4">
+              <div className="space-y-2">
+                <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
+                  Learn, Play, and Grow with EduPlay
+                </h1>
+                <p className="max-w-[600px] text-gray-500 md:text-xl dark:text-gray-400">
+                  An interactive educational platform that makes learning fun through games, quizzes, and personalized
+                  content.
+                </p>
+              </div>
+              <div className="flex flex-col gap-2 min-[400px]:flex-row">
+                <Button asChild className="bg-gradient-to-r from-blue-600 to-indigo-600">
+                  <Link href="/subjects">Explore Subjects</Link>
+                </Button>
+                <Button asChild variant="outline">
+                  <Link href="/games">Play Educational Games</Link>
+                </Button>
               </div>
             </div>
-            <div className="relative">
-              <div className="absolute -inset-px bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 rounded-2xl blur-xl"></div>
-              <div className="grid grid-cols-2 gap-4 p-1">
-                <div className="bg-card p-6 rounded-xl shadow-lg">
-                  <Calculator className="h-8 w-8 text-primary mb-3" />
-                  <h3 className="font-bold mb-1">Mathematics</h3>
-                  <p className="text-sm text-muted-foreground">Numbers, shapes, and patterns</p>
-                </div>
-                <div className="bg-card p-6 rounded-xl shadow-lg">
-                  <Flask className="h-8 w-8 text-green-500 mb-3" />
-                  <h3 className="font-bold mb-1">Science</h3>
-                  <p className="text-sm text-muted-foreground">Explore the natural world</p>
-                </div>
-                <div className="bg-card p-6 rounded-xl shadow-lg">
-                  <BookOpen className="h-8 w-8 text-orange-500 mb-3" />
-                  <h3 className="font-bold mb-1">Reading</h3>
-                  <p className="text-sm text-muted-foreground">Words, stories, and language</p>
-                </div>
-                <div className="bg-card p-6 rounded-xl shadow-lg">
-                  <Code className="h-8 w-8 text-indigo-500 mb-3" />
-                  <h3 className="font-bold mb-1">Coding</h3>
-                  <p className="text-sm text-muted-foreground">Logic and problem-solving</p>
-                </div>
-              </div>
-            </div>
+            <img
+              alt="Hero Image"
+              className="mx-auto aspect-video overflow-hidden rounded-xl object-cover sm:w-full lg:order-last"
+              src="/placeholder.svg?height=550&width=800"
+            />
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-secondary/30">
-        <div className="container">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">How EduPlay Works</h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Our platform offers multiple ways to learn and engage with educational content
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-card p-8 rounded-xl shadow-sm">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-6">
-                <BookOpen className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold mb-3">Learn with Subjects</h3>
-              <p className="text-muted-foreground mb-4">
-                Explore educational content across various subjects and topics, with interactive lessons designed for
-                different age groups.
+      <section className="py-12 md:py-24 bg-white dark:bg-gray-950">
+        <div className="container px-4 md:px-6">
+          <div className="flex flex-col items-center justify-center space-y-4 text-center">
+            <div className="space-y-2">
+              <div className="inline-block rounded-lg bg-gray-100 px-3 py-1 text-sm dark:bg-gray-800">Key Features</div>
+              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl">
+                Everything you need to make learning engaging
+              </h2>
+              <p className="max-w-[900px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400">
+                EduPlay combines interactive learning with gamification to create an engaging educational experience.
               </p>
-              <Link href="/subjects">
-                <Button variant="outline" className="w-full">
-                  Explore Subjects
-                </Button>
-              </Link>
-            </div>
-
-            <div className="bg-card p-8 rounded-xl shadow-sm">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-6">
-                <Trophy className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold mb-3">Test Your Knowledge</h3>
-              <p className="text-muted-foreground mb-4">
-                Challenge yourself with quizzes at different difficulty levels, from easy to advanced, and track your
-                progress over time.
-              </p>
-              <Link href="/quiz">
-                <Button variant="outline" className="w-full">
-                  Take Quizzes
-                </Button>
-              </Link>
-            </div>
-
-            <div className="bg-card p-8 rounded-xl shadow-sm">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-6">
-                <Gamepad2 className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold mb-3">Learn Through Play</h3>
-              <p className="text-muted-foreground mb-4">
-                Make learning fun with interactive educational games that reinforce concepts while providing
-                entertainment and engagement.
-              </p>
-              <Link href="/games">
-                <Button variant="outline" className="w-full">
-                  Play Games
-                </Button>
-              </Link>
-            </div>
-            <div className="bg-card p-8 rounded-xl shadow-sm">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-6">
-                <Brain className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold mb-3">Generate Important Questions</h3>
-              <p className="text-muted-foreground mb-4">
-                Upload photos or documents and let our AI generate important questions from the content to help with
-                studying and comprehension.
-              </p>
-              <Link href="/question-generator">
-                <Button variant="outline" className="w-full">
-                  Try Question Generator
-                </Button>
-              </Link>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Video Search Section */}
-      <section className="py-20 bg-secondary/20">
-        <div className="container">
-          <div className="flex flex-col md:flex-row gap-12 items-center">
-            <div className="md:w-1/2">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">Find Educational Videos</h2>
-              <p className="text-xl text-muted-foreground mb-6">
-                Use our AI-powered video search to find the best educational videos for any topic. Perfect for visual
-                learners!
+          <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 py-12 md:grid-cols-3">
+            <div className="flex flex-col items-center space-y-2 rounded-lg border p-6 shadow-sm">
+              <div className="rounded-full bg-blue-100 p-4 dark:bg-blue-900">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-6 w-6 text-blue-600 dark:text-blue-400"
+                >
+                  <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <path d="M12 18v-6" />
+                  <path d="M8 18v-1" />
+                  <path d="M16 18v-3" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold">Interactive Learning</h3>
+              <p className="text-center text-gray-500 dark:text-gray-400">
+                Engage with interactive content that adapts to your learning style and pace.
               </p>
-              <div className="bg-card p-6 rounded-xl mb-6 shadow-sm border border-border">
-                <p className="italic text-muted-foreground">
-                  "The video search feature helped my child find exactly what they needed to understand fractions
-                  better!"
-                </p>
-                <p className="font-medium mt-2">— Parent of 8-year-old</p>
-              </div>
-              <Link href="/video-search">
-                <Button size="lg" className="flex items-center gap-2 w-full sm:w-auto">
-                  <Video className="h-5 w-5" />
-                  Try Video Search
-                </Button>
-              </Link>
             </div>
-            <div className="md:w-1/2">
-              <div className="relative rounded-xl overflow-hidden shadow-lg border border-border">
-                <div className="aspect-video bg-card flex items-center justify-center relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-purple-500/10 opacity-50"></div>
-                  <div className="relative z-10 p-6 text-center">
-                    <Video className="h-16 w-16 text-primary mx-auto mb-4" />
-                    <h3 className="text-xl font-bold mb-2">Educational Videos</h3>
-                    <p className="text-muted-foreground max-w-xs mx-auto">
-                      Find age-appropriate videos on any subject with our AI-powered search
-                    </p>
-                  </div>
-                </div>
-                <div className="absolute bottom-4 left-0 right-0 flex items-center justify-center">
-                  <div className="bg-primary/90 text-primary-foreground px-4 py-2 rounded-full font-medium shadow-lg">
-                    Kid-friendly videos
-                  </div>
-                </div>
+            <div className="flex flex-col items-center space-y-2 rounded-lg border p-6 shadow-sm">
+              <div className="rounded-full bg-blue-100 p-4 dark:bg-blue-900">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-6 w-6 text-blue-600 dark:text-blue-400"
+                >
+                  <path d="m12 8-9.04 9.06a2.82 2.82 0 1 0 3.98 3.98L16 12" />
+                  <circle cx="17" cy="7" r="5" />
+                </svg>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Chatbot Section */}
-      <section className="py-20 bg-primary/5">
-        <div className="container">
-          <div className="flex flex-col md:flex-row gap-12 items-center">
-            <div className="md:w-1/2">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">Ask Our AI Assistant</h2>
-              <p className="text-xl text-muted-foreground mb-6">
-                Have questions about any subject? Our AI chatbot is here to help you learn and understand concepts
-                better.
+              <h3 className="text-xl font-bold">Educational Games</h3>
+              <p className="text-center text-gray-500 dark:text-gray-400">
+                Learn through play with our collection of educational games designed to reinforce concepts.
               </p>
-              <div className="bg-card p-6 rounded-xl mb-6 shadow-sm border border-border">
-                <p className="italic text-muted-foreground">
-                  "The chatbot helped me understand fractions when I was stuck on my homework!"
-                </p>
-                <p className="font-medium mt-2">— Student, age 10</p>
-              </div>
-              <Link href="/chatbot">
-                <Button size="lg" className="flex items-center gap-2 w-full sm:w-auto">
-                  <MessageSquare className="h-5 w-5" />
-                  Chat with AI
-                </Button>
-              </Link>
             </div>
-            <div className="md:w-1/2">
-              <div className="relative rounded-xl overflow-hidden shadow-lg border border-border">
-                <div className="aspect-video bg-card flex items-center justify-center relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-purple-500/10 opacity-50"></div>
-                  <div className="relative z-10 p-6 text-center">
-                    <MessageSquare className="h-16 w-16 text-primary mx-auto mb-4" />
-                    <h3 className="text-xl font-bold mb-2">AI Learning Assistant</h3>
-                    <p className="text-muted-foreground max-w-xs mx-auto">
-                      Get help with homework, learn new concepts, or explore any educational topic
-                    </p>
-                  </div>
-                </div>
-                <div className="absolute bottom-4 left-0 right-0 flex items-center justify-center">
-                  <div className="bg-primary/90 text-primary-foreground px-4 py-2 rounded-full font-medium shadow-lg">
-                    Available 24/7
-                  </div>
-                </div>
+            <div className="flex flex-col items-center space-y-2 rounded-lg border p-6 shadow-sm">
+              <div className="rounded-full bg-blue-100 p-4 dark:bg-blue-900">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-6 w-6 text-blue-600 dark:text-blue-400"
+                >
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
               </div>
+              <h3 className="text-xl font-bold">Personalized Learning</h3>
+              <p className="text-center text-gray-500 dark:text-gray-400">
+                Get personalized recommendations and track your progress across different subjects.
+              </p>
             </div>
           </div>
         </div>
       </section>
 
       {/* EduGuide Section */}
-      <section className="py-20 bg-secondary/10">
-        <div className="container">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">EduGuide</h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Prepare for competitive exams with our comprehensive learning resources and practice tests
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Link href="/eduguide/aptitude-test" className="group">
-              <div className="bg-card p-8 rounded-xl shadow-sm border border-border transition-all duration-300 hover:shadow-md hover:border-primary/50 h-full flex flex-col">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-6">
-                  <Brain className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-xl font-bold mb-3 group-hover:text-primary transition-colors">
-                  Learn and Give Aptitude Test
-                </h3>
-                <p className="text-muted-foreground mb-4 flex-grow">
-                  Master aptitude concepts with interactive lessons and practice with mock tests designed like
-                  competitive exams.
-                </p>
-                <div className="flex justify-between items-center mt-4">
-                  <div className="flex -space-x-2">
-                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-xs font-medium text-blue-600">
-                      M
-                    </div>
-                    <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-xs font-medium text-green-600">
-                      R
-                    </div>
-                    <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-xs font-medium text-amber-600">
-                      CA
-                    </div>
-                  </div>
-                  <span className="text-sm font-medium text-primary flex items-center">
-                    Explore <ChevronRight className="h-4 w-4 ml-1" />
-                  </span>
-                </div>
-              </div>
-            </Link>
-
-            <div className="bg-card p-8 rounded-xl shadow-sm border border-border h-full flex flex-col opacity-70">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-6">
-                <Trophy className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold mb-3">Career Roadmap</h3>
-              <p className="text-muted-foreground mb-4 flex-grow">
-                Discover personalized career paths and get guidance on how to achieve your professional goals.
-              </p>
-              <div className="mt-4 text-sm text-muted-foreground italic">Coming soon</div>
-            </div>
-
-            <div className="bg-card p-8 rounded-xl shadow-sm border border-border h-full flex flex-col opacity-70">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-6">
-                <MessageSquare className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold mb-3">Give Interview</h3>
-              <p className="text-muted-foreground mb-4 flex-grow">
-                Practice with simulated interviews and get feedback to improve your interview skills.
-              </p>
-              <div className="mt-4 text-sm text-muted-foreground italic">Coming soon</div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <EduGuideSection />
 
       {/* CTA Section */}
-      <section className="py-20 bg-primary/5">
-        <div className="container text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Start Learning?</h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
-            Join thousands of children who are learning and having fun with EduPlay's interactive educational platform.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/subjects">
-              <Button size="lg">Explore Subjects</Button>
-            </Link>
-            <Link href="/quiz">
-              <Button size="lg" variant="outline">
-                Take a Quiz
+      <section className="py-12 md:py-24 bg-blue-50 dark:bg-blue-950">
+        <div className="container px-4 md:px-6">
+          <div className="flex flex-col items-center justify-center space-y-4 text-center">
+            <div className="space-y-2">
+              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl">Ready to start learning?</h2>
+              <p className="max-w-[600px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400">
+                Join thousands of students who are already learning with EduPlay.
+              </p>
+            </div>
+            <div className="flex flex-col gap-2 min-[400px]:flex-row">
+              <Button asChild className="bg-gradient-to-r from-blue-600 to-indigo-600">
+                <Link href="/sign-in">Sign In</Link>
               </Button>
-            </Link>
+              <Button asChild variant="outline">
+                <Link href="/signup">Create Account</Link>
+              </Button>
+            </div>
           </div>
         </div>
       </section>
-    </main>
+    </div>
   )
 }

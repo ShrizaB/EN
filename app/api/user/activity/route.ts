@@ -1,32 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server"
-import clientPromise from "@/lib/mongodb"
+import { connectToDatabase } from "@/lib/mongodb"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/auth"
 import { ObjectId } from "mongodb"
-import { getSession } from "@/lib/auth"
-
-export async function GET(req: NextRequest) {
-  try {
-    const session = await getSession(req)
-
-    if (!session) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
-    }
-
-    const userId = session.id
-    console.log("Fetching activities for user:", userId)
-
-    const client = await clientPromise
-    const db = client.db()
-
-    const activities = await db.collection("activities").find({ userId }).sort({ timestamp: -1 }).limit(20).toArray()
-
-    console.log("Found", activities.length, "activities for user", userId)
-
-    return NextResponse.json({ activities }, { status: 200 })
-  } catch (error) {
-    console.error("Get activities error:", error)
-    return NextResponse.json({ error: "An error occurred while fetching activities." }, { status: 500 })
-  }
-}
+import { getSession } from "next-auth/react"
+import clientPromise from "@/lib/mongodb"
 
 export async function POST(req: NextRequest) {
   try {
@@ -39,116 +17,122 @@ export async function POST(req: NextRequest) {
     const userId = session.id
     const activityData = await req.json()
 
+    console.log("Logging activity for user:", userId, activityData)
+
     if (!activityData.type) {
       return NextResponse.json({ error: "Activity type is required" }, { status: 400 })
     }
 
-    console.log("Logging activity for user:", userId, activityData)
-
     const client = await clientPromise
     const db = client.db()
 
-    // Insert the activity
-    const now = new Date()
+    // Create activity record
     const activity = {
       userId,
-      ...activityData,
-      timestamp: activityData.timestamp ? new Date(activityData.timestamp) : now,
-      createdAt: now,
+      type: activityData.type,
+      subject: activityData.subject || null,
+      topic: activityData.topic || null,
+      score: activityData.score || null,
+      totalQuestions: activityData.totalQuestions || null,
+      timeSpent: activityData.timeSpent || 0,
+      difficulty: activityData.difficulty || "standard",
+      timestamp: new Date(),
     }
 
-    const result = await db.collection("activities").insertOne(activity)
-    console.log("Activity logged:", result.insertedId)
+    await db.collection("user_activities").insertOne(activity)
+    console.log("Activity logged successfully:", activity)
 
     // Update user stats
-    await updateUserStats(db, userId, activityData)
+    const userCollection = db.collection("users")
+    const user = await userCollection.findOne({ _id: new ObjectId(userId) })
 
-    // If this is a quiz or learning activity, update subject progress
-    if (
-      (activityData.type === "quiz" || activityData.type === "learning") &&
-      activityData.subject &&
-      activityData.score
-    ) {
-      await updateSubjectProgress(db, userId, activityData.subject, activityData.score)
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
-    return NextResponse.json({ success: true, activityId: result.insertedId }, { status: 200 })
+    // Initialize stats if they don't exist
+    if (!user.stats) {
+      user.stats = {
+        totalQuizzesTaken: 0,
+        totalQuestionsAnswered: 0,
+        correctAnswers: 0,
+        totalTimeSpent: 0,
+        gamesPlayed: 0,
+        lastActive: new Date(),
+      }
+    }
+
+    // Update stats based on activity type
+    const updateData: any = {
+      "stats.lastActive": new Date(),
+      "stats.totalTimeSpent": (user.stats.totalTimeSpent || 0) + (activityData.timeSpent || 0),
+    }
+
+    if (activityData.type === "quiz") {
+      updateData["stats.totalQuizzesTaken"] = (user.stats.totalQuizzesTaken || 0) + 1
+      updateData["stats.totalQuestionsAnswered"] =
+        (user.stats.totalQuestionsAnswered || 0) + (activityData.totalQuestions || 0)
+      updateData["stats.correctAnswers"] = (user.stats.correctAnswers || 0) + (activityData.score || 0)
+    } else if (activityData.type === "game") {
+      updateData["stats.gamesPlayed"] = (user.stats.gamesPlayed || 0) + 1
+    }
+
+    // Update user progress if subject is provided
+    if (
+      activityData.subject &&
+      activityData.type === "quiz" &&
+      activityData.score !== undefined &&
+      activityData.totalQuestions
+    ) {
+      const progressPercentage = Math.round((activityData.score / activityData.totalQuestions) * 100)
+
+      // Initialize progress if it doesn't exist
+      if (!user.progress) {
+        user.progress = {}
+      }
+
+      // Update progress for the subject (keep the higher value)
+      const currentProgress = user.progress[activityData.subject] || 0
+      if (progressPercentage > currentProgress) {
+        updateData[`progress.${activityData.subject}`] = progressPercentage
+      }
+    }
+
+    await userCollection.updateOne({ _id: new ObjectId(userId) }, { $set: updateData })
+    console.log("User stats updated successfully")
+
+    return NextResponse.json({ success: true }, { status: 200 })
   } catch (error) {
     console.error("Log activity error:", error)
     return NextResponse.json({ error: "An error occurred while logging activity." }, { status: 500 })
   }
 }
 
-// Helper function to update user stats
-async function updateUserStats(db: any, userId: string, activity: any) {
+export async function GET(req: NextRequest) {
   try {
-    const updateData: any = {
-      "stats.lastActive": new Date(),
+    const session = await getServerSession(authOptions)
+
+    if (!session || !session.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Update specific stats based on activity type
-    if (activity.type === "quiz") {
-      updateData["$inc"] = {
-        "stats.totalQuizzesTaken": 1,
-        "stats.totalQuestionsAnswered": activity.totalQuestions || 0,
-        "stats.correctAnswers": activity.score
-          ? Math.round((activity.score / 100) * (activity.totalQuestions || 0))
-          : 0,
-        "stats.totalTimeSpent": activity.timeSpent || 0,
-      }
-    } else if (activity.type === "game") {
-      updateData["$inc"] = {
-        "stats.gamesPlayed": 1,
-        "stats.totalTimeSpent": activity.timeSpent || 0,
-      }
-    } else {
-      // For other activity types, just increment time spent
-      updateData["$inc"] = {
-        "stats.totalTimeSpent": activity.timeSpent || 0,
-      }
-    }
+    const { db } = await connectToDatabase()
 
-    const result = await db.collection("users").updateOne({ _id: new ObjectId(userId) }, updateData)
-    console.log("User stats updated:", result.modifiedCount > 0)
-  } catch (error) {
-    console.error("Error updating user stats:", error)
-  }
-}
-
-// Helper function to update the user's overall progress for a subject
-async function updateSubjectProgress(db: any, userId: string, subject: string, score: number) {
-  try {
-    // Get the user document
-    const user = await db.collection("users").findOne({ _id: new ObjectId(userId) })
+    const user = await db
+      .collection("users")
+      .findOne({ _id: new ObjectId(session.user.id) }, { projection: { activities: 1 } })
 
     if (!user) {
-      console.error("User not found for progress update")
-      return
+      return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
-    // Initialize progress object if it doesn't exist
-    if (!user.progress) {
-      user.progress = {}
-    }
+    // Sort activities by timestamp (newest first)
+    const activities = user.activities || []
+    activities.sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
 
-    // Update the progress for this subject
-    // If the new progress is higher than the existing one, use the new progress
-    const currentProgress = user.progress[subject] || 0
-    const newProgress = Math.max(currentProgress, score)
-
-    // Update the user document
-    await db.collection("users").updateOne(
-      { _id: new ObjectId(userId) },
-      {
-        $set: {
-          [`progress.${subject}`]: newProgress,
-          updatedAt: new Date(),
-        },
-      },
-    )
-
-    console.log(`Updated user progress for ${subject}: ${newProgress}%`)
+    return NextResponse.json({ activities })
   } catch (error) {
-    console.error("Error updating subject progress:", error)
+    console.error("Error fetching activities:", error)
+    return NextResponse.json({ error: "Failed to fetch activities" }, { status: 500 })
   }
 }

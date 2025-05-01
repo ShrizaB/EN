@@ -54,17 +54,17 @@ export default function EduGuidePage() {
             <CardFooter>
               <Button
                 asChild
-                className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
               >
                 <Link href="/eduguide/aptitude-test">Get Started</Link>
               </Button>
             </CardFooter>
           </Card>
 
-          <Card className="overflow-hidden border-2 border-gray-200 hover:border-gray-300 transition-colors">
-            <CardHeader className="bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 pb-8">
-              <div className="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
-                <MapPin className="h-6 w-6 text-gray-600 dark:text-gray-400" />
+          <Card className="overflow-hidden border-2 border-green-500/20 hover:border-green-500/50 transition-colors">
+            <CardHeader className="bg-gradient-to-r from-green-500/10 to-teal-500/10 pb-8">
+              <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center mb-4">
+                <MapPin className="h-6 w-6 text-green-600 dark:text-green-400" />
               </div>
               <CardTitle>Career Roadmap</CardTitle>
               <CardDescription>
@@ -74,30 +74,37 @@ export default function EduGuidePage() {
             <CardContent className="pt-6">
               <ul className="space-y-2">
                 <li className="flex items-center gap-2 text-sm">
-                  <div className="w-2 h-2 rounded-full bg-gray-500"></div>
+                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
                   <span>Personalized career paths</span>
                 </li>
                 <li className="flex items-center gap-2 text-sm">
-                  <div className="w-2 h-2 rounded-full bg-gray-500"></div>
+                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
                   <span>Industry-specific requirements</span>
                 </li>
                 <li className="flex items-center gap-2 text-sm">
-                  <div className="w-2 h-2 rounded-full bg-gray-500"></div>
+                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
                   <span>Skill development resources</span>
+                </li>
+                <li className="flex items-center gap-2 text-sm">
+                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                  <span>Job market insights</span>
                 </li>
               </ul>
             </CardContent>
             <CardFooter>
-              <Button asChild className="w-full" variant="outline">
-                <Link href="#">Coming Soon</Link>
+              <Button
+                asChild
+                className="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700"
+              >
+                <Link href="/eduguide/career-roadmap">Explore Careers</Link>
               </Button>
             </CardFooter>
           </Card>
 
-          <Card className="overflow-hidden border-2 border-gray-200 hover:border-gray-300 transition-colors">
-            <CardHeader className="bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 pb-8">
-              <div className="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
-                <Users className="h-6 w-6 text-gray-600 dark:text-gray-400" />
+          <Card className="overflow-hidden border-2 border-amber-500/20 hover:border-amber-500/50 transition-colors">
+            <CardHeader className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 pb-8">
+              <div className="w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-900 flex items-center justify-center mb-4">
+                <Users className="h-6 w-6 text-amber-600 dark:text-amber-400" />
               </div>
               <CardTitle>Give Interview</CardTitle>
               <CardDescription>
@@ -107,26 +114,29 @@ export default function EduGuidePage() {
             <CardContent className="pt-6">
               <ul className="space-y-2">
                 <li className="flex items-center gap-2 text-sm">
-                  <div className="w-2 h-2 rounded-full bg-gray-500"></div>
-                  <span>Mock interview simulations</span>
+                  <div className="w-2 h-2 rounded-full bg-amber-500"></div>
+                  <span>Technical interview questions</span>
                 </li>
                 <li className="flex items-center gap-2 text-sm">
-                  <div className="w-2 h-2 rounded-full bg-gray-500"></div>
-                  <span>Common interview questions</span>
+                  <div className="w-2 h-2 rounded-full bg-amber-500"></div>
+                  <span>Behavioral interview questions</span>
                 </li>
                 <li className="flex items-center gap-2 text-sm">
-                  <div className="w-2 h-2 rounded-full bg-gray-500"></div>
+                  <div className="w-2 h-2 rounded-full bg-amber-500"></div>
                   <span>Personalized feedback</span>
                 </li>
                 <li className="flex items-center gap-2 text-sm">
-                  <div className="w-2 h-2 rounded-full bg-gray-500"></div>
+                  <div className="w-2 h-2 rounded-full bg-amber-500"></div>
                   <span>Industry-specific preparation</span>
                 </li>
               </ul>
             </CardContent>
             <CardFooter>
-              <Button asChild className="w-full">
-                <Link href="/eduguide/interview">Get Started</Link>
+              <Button
+                asChild
+                className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700"
+              >
+                <Link href="/interview">Practice Now</Link>
               </Button>
             </CardFooter>
           </Card>

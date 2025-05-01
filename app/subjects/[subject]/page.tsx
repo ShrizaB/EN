@@ -129,7 +129,7 @@ const subjectsData = {
         questionsCount: 15,
       },
       {
-        id: "solar-system",
+        id: "solar_system",
         title: "Solar System",
         description: "Learn about planets and space",
         level: "Intermediate",
@@ -137,7 +137,7 @@ const subjectsData = {
         questionsCount: 15,
       },
       {
-        id: "simple-machines",
+        id: "simple_machines",
         title: "Simple Machines",
         description: "Discover levers, pulleys, and other simple machines",
         level: "Intermediate",
@@ -145,7 +145,7 @@ const subjectsData = {
         questionsCount: 12,
       },
       {
-        id: "human-body",
+        id: "human_body",
         title: "Human Body",
         description: "Learn about body systems and how they work",
         level: "Intermediate",
@@ -315,7 +315,7 @@ const subjectsData = {
         questionsCount: 10,
       },
       {
-        id: "game-design",
+        id: "game_design",
         title: "Game Design",
         description: "Build your own simple games with code",
         level: "Advanced",
@@ -369,7 +369,7 @@ const subjectsData = {
         questionsCount: 10,
       },
       {
-        id: "music-history",
+        id: "music_history",
         title: "Music History",
         description: "Explore different music styles and famous composers",
         level: "Intermediate",
@@ -385,7 +385,7 @@ const subjectsData = {
         questionsCount: 10,
       },
       {
-        id: "music-theory",
+        id: "music_theory",
         title: "Music Theory",
         description: "Understand the building blocks of music",
         level: "Advanced",
@@ -393,7 +393,7 @@ const subjectsData = {
         questionsCount: 15,
       },
       {
-        id: "world-music",
+        id: "world_music",
         title: "World Music",
         description: "Discover music from different cultures around the world",
         level: "Intermediate",
@@ -462,7 +462,7 @@ const subjectsData = {
         questionsCount: 8,
       },
       {
-        id: "digital-art",
+        id: "digital_art",
         title: "Digital Art",
         description: "Create art using digital tools and techniques",
         level: "Advanced",
@@ -523,7 +523,7 @@ const subjectsData = {
         questionsCount: 10,
       },
       {
-        id: "map-skills",
+        id: "map_skills",
         title: "Map Skills",
         description: "Learn to read and understand different types of maps",
         level: "Beginner",
@@ -539,7 +539,7 @@ const subjectsData = {
         questionsCount: 15,
       },
       {
-        id: "natural-resources",
+        id: "natural_resources",
         title: "Natural Resources",
         description: "Learn about the Earth's resources and their importance",
         level: "Advanced",
@@ -547,7 +547,7 @@ const subjectsData = {
         questionsCount: 10,
       },
       {
-        id: "environmental-geography",
+        id: "environmental_geography",
         title: "Environmental Geography",
         description: "Understand how humans interact with and impact the environment",
         level: "Advanced",
@@ -600,7 +600,7 @@ const subjectsData = {
         questionsCount: 10,
       },
       {
-        id: "brain-teasers",
+        id: "brain_teasers",
         title: "Brain Teasers",
         description: "Challenge your mind with fun and tricky problems",
         level: "Intermediate",
@@ -616,7 +616,7 @@ const subjectsData = {
         questionsCount: 8,
       },
       {
-        id: "critical-thinking",
+        id: "critical_thinking",
         title: "Critical Thinking",
         description: "Analyze information and make reasoned judgments",
         level: "Advanced",
@@ -624,7 +624,7 @@ const subjectsData = {
         questionsCount: 10,
       },
       {
-        id: "logical-fallacies",
+        id: "logical_fallacies",
         title: "Logical Fallacies",
         description: "Identify common errors in reasoning",
         level: "Advanced",
@@ -701,7 +701,7 @@ const subjectsData = {
         questionsCount: 10,
       },
       {
-        id: "file-io",
+        id: "file_io",
         title: "File Input/Output",
         description: "Learn to read from and write to files in C",
         level: "Advanced",
@@ -762,7 +762,7 @@ const subjectsData = {
         questionsCount: 10,
       },
       {
-        id: "file-handling",
+        id: "file_handling",
         title: "File Handling",
         description: "Learn to read from and write to files in Python",
         level: "Intermediate",
@@ -770,7 +770,7 @@ const subjectsData = {
         questionsCount: 8,
       },
       {
-        id: "error-handling",
+        id: "error_handling",
         title: "Error Handling",
         description: "Understand how to handle errors and exceptions in Python",
         level: "Advanced",
@@ -778,7 +778,7 @@ const subjectsData = {
         questionsCount: 10,
       },
       {
-        id: "simple-games",
+        id: "simple_games",
         title: "Simple Games",
         description: "Create fun games using Python",
         level: "Advanced",
@@ -855,7 +855,7 @@ const subjectsData = {
         questionsCount: 10,
       },
       {
-        id: "exception-handling",
+        id: "exception_handling",
         title: "Exception Handling",
         description: "Understand how to handle errors and exceptions in Java",
         level: "Advanced",
@@ -908,7 +908,7 @@ const subjectsData = {
         questionsCount: 15,
       },
       {
-        id: "famous-directors",
+        id: "famous_directors",
         title: "Famous Directors",
         description: "Learn about influential filmmakers and their unique styles",
         level: "Advanced",
@@ -916,7 +916,7 @@ const subjectsData = {
         questionsCount: 12,
       },
       {
-        id: "film-techniques",
+        id: "film_techniques",
         title: "Filmmaking Techniques",
         description: "Understand camera angles, shots, and visual storytelling",
         level: "Advanced",
@@ -924,7 +924,7 @@ const subjectsData = {
         questionsCount: 15,
       },
       {
-        id: "movie-reviews",
+        id: "movie_reviews",
         title: "Movie Reviews",
         description: "Learn how to analyze and critique films",
         level: "Intermediate",
@@ -932,7 +932,7 @@ const subjectsData = {
         questionsCount: 10,
       },
       {
-        id: "special-effects",
+        id: "special_effects",
         title: "Special Effects",
         description: "Discover how movie magic is created with special effects",
         level: "Intermediate",

@@ -9,6 +9,7 @@ import {
   Palette,
   Globe,
   Brain,
+  Film,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
@@ -123,6 +124,16 @@ export default function SubjectsPage() {
       bgColor: "bg-coding/10",
       borderClass: "gradient-border-coding",
       gradientText: "from-coding to-orange-400",
+    },
+    {
+      title: "Movies",
+      description: "Explore the world of cinema and filmmaking",
+      icon: Film,
+      slug: "movies",
+      color: "text-movies",
+      bgColor: "bg-movies/10",
+      borderClass: "gradient-border-movies",
+      gradientText: "from-film to-orange-400",
     },
   ]
 

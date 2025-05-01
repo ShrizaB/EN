@@ -1,14 +1,26 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useParams, notFound } from "next/navigation"
 import Link from "next/link"
-import { notFound } from "next/navigation"
 import { ArrowLeft, Gamepad2, Brain, Palette } from "lucide-react"
-import { MathAsteroidBlaster } from "@/components/games/math-asteroid-blaster"
+import MathAsteroidBlaster from "@/components/games/math-asteroid-blaster/math-asteroid-blaster"
 import { WordScrambleChallenge } from "@/components/games/word-scramble-challenge"
+import MemoryMatch from "@/components/games/memory-match/memory-match"
+import CreativeArtStudio from "@/components/games/creative-art-studio/creative-art-studio"
 
-// Game data
-const gamesData = {
+// Define game data
+interface GameData {
+  title: string;
+  description: string;
+  component: React.ComponentType | null;
+  category: string;
+  skills: string[];
+  instructions: string[];
+  comingSoon?: boolean;
+  color: string;
+}
+
+const gamesData: Record<string, GameData> = {
   "math-asteroid-blaster": {
     title: "Math Asteroid Blaster",
     description: "Blast asteroids by solving math problems in this action-packed space adventure!",
@@ -21,6 +33,7 @@ const gamesData = {
       "Move your ship by moving your mouse or finger across the game area",
       "Don't let the correct answer asteroid reach the bottom, or you'll lose a life!",
     ],
+    color: "purple",
   },
   "word-scramble-challenge": {
     title: "Word Scramble Challenge",
@@ -34,11 +47,12 @@ const gamesData = {
       "Use the 'Reset' button to start over if you make a mistake",
       "Use the 'Hint' button if you're stuck, but it will cost you time!",
     ],
+    color: "red",
   },
   "memory-match": {
     title: "Memory Match",
     description: "Test your memory by matching pairs of cards in this classic concentration game!",
-    component: null, // No component yet
+    component: MemoryMatch,
     category: "Logic",
     skills: ["Memory", "Concentration", "Pattern recognition"],
     instructions: [
@@ -47,12 +61,13 @@ const gamesData = {
       "Remember the positions of cards you've seen",
       "Match all pairs to complete the level",
     ],
-    comingSoon: true,
+    comingSoon: false,
+    color: "green",
   },
   "art-studio": {
     title: "Creative Art Studio",
     description: "Express yourself through digital art with various tools, colors, and templates!",
-    component: null, // No component yet
+    component: CreativeArtStudio,
     category: "Art",
     skills: ["Creativity", "Fine motor skills", "Color theory"],
     instructions: [
@@ -61,32 +76,39 @@ const gamesData = {
       "Use templates as starting points for your creations",
       "Save and share your artwork when finished",
     ],
-    comingSoon: true,
+    comingSoon: false,
+    color: "orange",
   },
 }
 
-export default function GamePage({ params }: { params: { game: string } }) {
-  const [mounted, setMounted] = useState(false)
+export default function GamePage() {
+  const params = useParams() as { game?: string }
+  const gameKey = params.game || ""
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  // Check if the game exists
-  if (mounted && !gamesData[params.game as keyof typeof gamesData]) {
+  if (!gamesData[gameKey]) {
     notFound()
   }
 
-  if (!mounted) {
-    return (
-      <div className="container py-12 flex items-center justify-center min-h-[60vh]">
-        <div className="w-8 h-8 rounded-full border-4 border-primary border-t-transparent animate-spin"></div>
-      </div>
-    )
+  const gameData = gamesData[gameKey]
+  const GameComponent = gameData.component
+
+  // Define color classes based on game color
+  const getColorClass = (color: string) => {
+    switch (color) {
+      case "purple":
+        return "text-purple-500"
+      case "red":
+        return "text-[#fc4949]"
+      case "green":
+        return "text-green-500"
+      case "orange":
+        return "text-[#f59042]"
+      default:
+        return "text-primary"
+    }
   }
 
-  const gameData = gamesData[params.game as keyof typeof gamesData]
-  const GameComponent = gameData.component
+  const headingColorClass = getColorClass(gameData.color)
 
   return (
     <div className="container py-12 md:py-20">
@@ -103,16 +125,16 @@ export default function GamePage({ params }: { params: { game: string } }) {
           <div className="absolute inset-0 pattern-dots opacity-10"></div>
           <div className="relative z-10 flex flex-col md:flex-row gap-6 items-center md:items-start">
             <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-              {params.game === "math-asteroid-blaster" || params.game === "word-scramble-challenge" ? (
+              {gameKey === "math-asteroid-blaster" || gameKey === "word-scramble-challenge" ? (
                 <Gamepad2 className="h-10 w-10 text-primary" />
-              ) : params.game === "memory-match" ? (
+              ) : gameKey === "memory-match" ? (
                 <Brain className="h-10 w-10 text-primary" />
               ) : (
                 <Palette className="h-10 w-10 text-primary" />
               )}
             </div>
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold mb-4 gradient-text from-primary to-purple-500">
+              <h1 className={`text-3xl md:text-4xl font-bold mb-4 ${headingColorClass}`}>
                 {gameData.title}
               </h1>
               <p className="text-lg text-muted-foreground max-w-3xl">{gameData.description}</p>
@@ -129,38 +151,16 @@ export default function GamePage({ params }: { params: { game: string } }) {
         </div>
 
         {gameData.comingSoon ? (
-          <div className="w-full max-w-4xl mx-auto">
-            <div className="relative overflow-hidden rounded-xl bg-secondary/30 border border-secondary h-[400px] flex flex-col items-center justify-center">
-              <div className="absolute inset-0 pattern-diagonal opacity-5"></div>
-              <div className="relative z-10 text-center p-8">
-                <h2 className="text-3xl font-bold mb-4 gradient-text from-primary to-purple-500">Coming Soon!</h2>
-                <p className="text-lg text-muted-foreground max-w-md mx-auto mb-6">
-                  We're working hard to bring you this exciting game. Check back soon!
-                </p>
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-                  {params.game === "memory-match" ? (
-                    <Brain className="h-8 w-8 text-primary" />
-                  ) : (
-                    <Palette className="h-8 w-8 text-primary" />
-                  )}
-                </div>
-              </div>
-            </div>
+          <div className={`mt-5 flex items-center flex-col bg-[#8137dc32] border-[#a256ffe1] border-2 rounded-lg p-8 w-[800px] mx-auto shadow-[0px_0px_46px_-19px_rgba(153,64,255,1)]`}>
+            <h2 className={`text-3xl text-center mb-4 font-bold ${headingColorClass}`}>Coming Soon!</h2>
+            <p className="text-lg text-muted-foreground max-w-3xl text-center">
+              This game is currently under development. Stay tuned for updates!
+            </p>
           </div>
         ) : GameComponent ? (
           <GameComponent />
         ) : (
-          <div className="w-full max-w-4xl mx-auto">
-            <div className="relative overflow-hidden rounded-xl bg-secondary/30 border border-secondary h-[400px] flex flex-col items-center justify-center">
-              <div className="absolute inset-0 pattern-diagonal opacity-5"></div>
-              <div className="relative z-10 text-center p-8">
-                <h2 className="text-3xl font-bold mb-4 gradient-text from-primary to-purple-500">Game Loading Error</h2>
-                <p className="text-lg text-muted-foreground max-w-md mx-auto">
-                  Sorry, we couldn't load this game. Please try again later.
-                </p>
-              </div>
-            </div>
-          </div>
+          <h2 className="text-3xl text-center">Game Loading Error</h2>
         )}
       </div>
     </div>
