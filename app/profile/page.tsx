@@ -10,21 +10,33 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Loader2, UserIcon, Mail, Calendar, LogOut, Cake } from "lucide-react"
+import { getUserData, updateUserProfile } from "@/lib/user-service"
 
 export default function ProfilePage() {
-  const { user, loading, logout, updateProfile } = useAuth()
+  const { user, loading, logout } = useAuth()
   const [displayName, setDisplayName] = useState("")
   const [age, setAge] = useState<string>("")
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
+  const [userData, setUserData] = useState<any>(null)
   const router = useRouter()
 
   useEffect(() => {
     if (user) {
       setDisplayName(user.name || "")
-      setAge(user.age?.toString() || "")
+
+      // Fetch additional user data
+      const fetchData = async () => {
+        const data = await getUserData(user.id)
+        if (data) {
+          setUserData(data)
+          setAge(data.age?.toString() || "")
+        }
+      }
+
+      fetchData()
     }
   }, [user])
 
@@ -36,8 +48,9 @@ export default function ProfilePage() {
     setSuccess(null)
 
     try {
-      // Update profile via auth context
-      await updateProfile(displayName, age ? Number.parseInt(age) : undefined)
+      // Update profile via API
+      await updateUserProfile(displayName, age ? Number.parseInt(age) : undefined)
+
       setSuccess("Profile updated successfully")
       setIsEditing(false)
     } catch (error: any) {
@@ -62,7 +75,7 @@ export default function ProfilePage() {
 
   // If not logged in, redirect to sign in page
   if (!user) {
-    router.push("/sign-in")
+    router.push("/signin")
     return (
       <div className="container py-12 md:py-20 flex flex-col items-center justify-center min-h-[60vh]">
         <div className="text-center max-w-md">
@@ -70,7 +83,7 @@ export default function ProfilePage() {
           <p className="text-muted-foreground mb-8">You need to be signed in to view and edit your profile.</p>
           <div className="flex gap-4 justify-center">
             <Button asChild>
-              <a href="/sign-in">Sign In</a>
+              <a href="/signin">Sign In</a>
             </Button>
             <Button asChild variant="outline">
               <a href="/signup">Create Account</a>
@@ -141,7 +154,7 @@ export default function ProfilePage() {
                         placeholder="Enter your age"
                       />
                     ) : (
-                      <p className="text-lg">{user.age || "Not set"}</p>
+                      <p className="text-lg">{userData?.age || "Not set"}</p>
                     )}
                   </div>
 
@@ -159,7 +172,7 @@ export default function ProfilePage() {
                       <Label>Account Created</Label>
                     </div>
                     <p className="text-lg">
-                      {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "Unknown"}
+                      {userData?.createdAt ? new Date(userData.createdAt).toLocaleDateString() : "Unknown"}
                     </p>
                   </div>
                 </div>
@@ -203,25 +216,25 @@ export default function ProfilePage() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="p-4 bg-secondary/30 rounded-lg text-center">
                   <p className="text-sm text-muted-foreground">Quizzes Taken</p>
-                  <p className="text-2xl font-bold">{user.stats?.totalQuizzesTaken || 0}</p>
+                  <p className="text-2xl font-bold">{userData?.stats?.totalQuizzesTaken || 0}</p>
                 </div>
                 <div className="p-4 bg-secondary/30 rounded-lg text-center">
                   <p className="text-sm text-muted-foreground">Correct Answers</p>
                   <p className="text-2xl font-bold">
-                    {user.stats?.totalQuestionsAnswered
-                      ? Math.round((user.stats.correctAnswers / user.stats.totalQuestionsAnswered) * 100) + "%"
+                    {userData?.stats?.totalQuestionsAnswered
+                      ? Math.round((userData.stats.correctAnswers / userData.stats.totalQuestionsAnswered) * 100) + "%"
                       : "0%"}
                   </p>
                 </div>
                 <div className="p-4 bg-secondary/30 rounded-lg text-center">
                   <p className="text-sm text-muted-foreground">Games Played</p>
-                  <p className="text-2xl font-bold">{user.stats?.gamesPlayed || 0}</p>
+                  <p className="text-2xl font-bold">{userData?.stats?.gamesPlayed || 0}</p>
                 </div>
                 <div className="p-4 bg-secondary/30 rounded-lg text-center">
                   <p className="text-sm text-muted-foreground">Total Time</p>
                   <p className="text-2xl font-bold">
-                    {user.stats?.totalTimeSpent
-                      ? `${Math.floor(user.stats.totalTimeSpent / 60)}h ${user.stats.totalTimeSpent % 60}m`
+                    {userData?.stats?.totalTimeSpent
+                      ? `${Math.floor(userData.stats.totalTimeSpent / 60)}h ${userData.stats.totalTimeSpent % 60}m`
                       : "0h 0m"}
                   </p>
                 </div>

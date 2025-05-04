@@ -48,23 +48,9 @@ export async function GET(req: NextRequest) {
     }
 
     // Otherwise, get all history entries for the user, sorted by most recent first
-    // Group by subject and topic to avoid duplicates in the response
-    const pipeline = [
-      { $match: { userId } },
-      { $sort: { lastAccessed: -1 } },
-      {
-        $group: {
-          _id: { subject: "$subject", topic: "$topic" },
-          doc: { $first: "$$ROOT" },
-        },
-      },
-      { $replaceRoot: { newRoot: "$doc" } },
-      { $sort: { lastAccessed: -1 } },
-    ]
+    const history = await db.collection("learning_history").find({ userId }).sort({ lastAccessed: -1 }).toArray()
 
-    const history = await db.collection("learning_history").aggregate(pipeline).toArray()
-
-    console.log("Found", history.length, "unique history items for user", userId)
+    console.log("Found", history.length, "history items for user", userId)
 
     return NextResponse.json(
       { history },

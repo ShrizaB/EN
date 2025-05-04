@@ -1,4 +1,4 @@
-import { generateContent } from "@/lib/gemini-api"
+import { GoogleGenerativeAI } from "@google/generative-ai"
 
 export interface MockTestQuestion {
   id: number
@@ -6,6 +6,16 @@ export interface MockTestQuestion {
   options: string[]
   correctAnswer: number
   explanation: string
+}
+
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "AIzaSyCgYno9IqtTqF3rmxQpsV4gIypk7tWtbD4"
+const genAI = new GoogleGenerativeAI(GEMINI_API_KEY)
+
+async function generateContent(prompt: string): Promise<string> {
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
+  const result = await model.generateContent(prompt)
+  const response = await result.response
+  return response.text()
 }
 
 export async function generateMockTest(topic: string, subject: string, count = 20): Promise<MockTestQuestion[]> {
@@ -28,11 +38,12 @@ Make sure the questions are diverse and cover different aspects of ${topic}.`
 
     const response = await generateContent(prompt)
 
-    try {
-      // Try to parse the response as JSON
-      const parsedQuestions = JSON.parse(response)
+    // Remove potential Markdown code block formatting
+    const cleanJson = response.replace(/```(?:json)?\n?([\s\S]*?)```/, "$1")
 
-      // Validate and format the questions
+    try {
+      const parsedQuestions = JSON.parse(cleanJson)
+
       return parsedQuestions.map((q: any, index: number) => ({
         id: index + 1,
         question: q.question,
@@ -42,8 +53,6 @@ Make sure the questions are diverse and cover different aspects of ${topic}.`
       }))
     } catch (parseError) {
       console.error("Failed to parse generated questions:", parseError)
-
-      // Fallback to a simpler format if JSON parsing fails
       return generateFallbackQuestions(topic, count)
     }
   } catch (error) {

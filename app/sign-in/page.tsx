@@ -11,7 +11,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { AlertCircle, Loader2 } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { useAuth } from "@/contexts/auth-context"
-import { useRouter } from "next/navigation"
 
 export default function SignInPage() {
   const { login, signup, error: authError, setError } = useAuth()
@@ -22,39 +21,32 @@ export default function SignInPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [localError, setLocalError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState("signin")
-  const router = useRouter()
 
   // Use either local error or auth context error
   const error = localError || authError
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Clear previous errors
+    setIsLoading(true)
     setLocalError(null)
     setError(null)
-    setIsLoading(true)
 
     try {
       if (activeTab === "signin") {
-        // Handle sign in
+        // Handle sign in using auth context
         await login(email, password)
-        console.log("Login successful, redirecting...")
-        router.push("/dashboard")
       } else {
-        // Handle sign up
-        if (!name || !email || !password) {
+        // Handle sign up using auth context
+        if (!name || !email || !password || !age) {
           throw new Error("All fields are required")
         }
 
         await signup(name, email, password, age)
-        console.log("Signup successful, redirecting...")
-        router.push("/dashboard")
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred"
       setLocalError(errorMessage)
-      console.error("Auth error:", errorMessage)
     } finally {
       setIsLoading(false)
     }
@@ -83,7 +75,7 @@ export default function SignInPage() {
               </Alert>
             )}
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSignIn}>
               <TabsContent value="signin" className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
@@ -146,7 +138,14 @@ export default function SignInPage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="age">Age</Label>
-                  <Input id="age" type="number" placeholder="25" value={age} onChange={(e) => setAge(e.target.value)} />
+                  <Input
+                    id="age"
+                    type="number"
+                    placeholder="25"
+                    value={age}
+                    onChange={(e) => setAge(e.target.value)}
+                    required
+                  />
                 </div>
               </TabsContent>
 

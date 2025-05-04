@@ -7,31 +7,21 @@ interface User {
   id: string
   name: string
   email: string
-  age?: number
-  createdAt?: string
-  stats?: {
-    totalQuizzesTaken: number
-    totalQuestionsAnswered: number
-    correctAnswers: number
-    gamesPlayed: number
-    totalTimeSpent: number
-  }
+  image?: string
 }
 
 interface AuthContextType {
   user: User | null
   loading: boolean
+  login: (email: string, password: string, age?: number) => Promise<void>
+  signup: (name: string, email: string, password: string, age: string) => Promise<void>
+  logout: () => Promise<void>
   error: string | null
   setError: (error: string | null) => void
-  login: (email: string, password: string) => Promise<void>
-  signup: (name: string, email: string, password: string, age?: string) => Promise<void>
-  logout: () => Promise<void>
-  updateProfile: (name: string, age?: number) => Promise<void>
+  refreshUser: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
-
-const STORAGE_KEY = "eduplay_user_data"
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
@@ -39,157 +29,116 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
 
-  // Load user from localStorage on initial render
-  useEffect(() => {
-    const loadUser = () => {
-      try {
-        const storedUser = localStorage.getItem(STORAGE_KEY)
-        if (storedUser) {
-          setUser(JSON.parse(storedUser))
-        }
-      } catch (err) {
-        console.error("Failed to load user from storage:", err)
-      } finally {
-        setLoading(false)
+  const refreshUser = async () => {
+    try {
+      const response = await fetch("/api/auth/session")
+      const data = await response.json()
+
+      if (data.user) {
+        console.log("Session found:", data.user)
+        setUser(data.user)
+        return true
+      } else {
+        console.log("No session found")
+        setUser(null)
+        return false
       }
+    } catch (error) {
+      console.error("Failed to fetch session:", error)
+      return false
+    }
+  }
+
+  useEffect(() => {
+    const checkUserLoggedIn = async () => {
+      await refreshUser()
+      setLoading(false)
     }
 
-    loadUser()
+    checkUserLoggedIn()
   }, [])
 
-  // Simple login function that works immediately
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string, age?: number) => {
+    setLoading(true)
+    setError(null)
+
     try {
-      setLoading(true)
-      setError(null)
-
-      // For demo purposes, we'll just check if the email contains "@"
-      if (!email.includes("@")) {
-        throw new Error("Invalid email format")
-      }
-
-      if (password.length < 4) {
-        throw new Error("Password must be at least 4 characters")
-      }
-
-      // Create a mock user
-      const newUser: User = {
-        id: Date.now().toString(),
-        name: email.split("@")[0],
-        email,
-        createdAt: new Date().toISOString(),
-        stats: {
-          totalQuizzesTaken: Math.floor(Math.random() * 10),
-          totalQuestionsAnswered: Math.floor(Math.random() * 50),
-          correctAnswers: Math.floor(Math.random() * 40),
-          gamesPlayed: Math.floor(Math.random() * 5),
-          totalTimeSpent: Math.floor(Math.random() * 120),
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
+        body: JSON.stringify({ email, password, age }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to login")
       }
 
-      // Save to localStorage
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(newUser))
-      setUser(newUser)
+      console.log("Login successful:", data.user)
+      setUser(data.user)
 
-      // Redirect to dashboard
-      router.push("/dashboard")
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed")
-      throw err
-    } finally {
-      setLoading(false)
-    }
-  }
+      // Force a refresh to ensure the session is loaded
+      await refreshUser()
 
-  // Simple signup function that works immediately
-  const signup = async (name: string, email: string, password: string, age?: string) => {
-    try {
-      setLoading(true)
-      setError(null)
-
-      // Basic validation
-      if (!name || !email || !password) {
-        throw new Error("All fields are required")
-      }
-
-      if (!email.includes("@")) {
-        throw new Error("Invalid email format")
-      }
-
-      if (password.length < 4) {
-        throw new Error("Password must be at least 4 characters")
-      }
-
-      // Create a new user
-      const newUser: User = {
-        id: Date.now().toString(),
-        name,
-        email,
-        age: age ? Number.parseInt(age) : undefined,
-        createdAt: new Date().toISOString(),
-        stats: {
-          totalQuizzesTaken: 0,
-          totalQuestionsAnswered: 0,
-          correctAnswers: 0,
-          gamesPlayed: 0,
-          totalTimeSpent: 0,
-        },
-      }
-
-      // Save to localStorage
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(newUser))
-      setUser(newUser)
-
-      // Redirect to dashboard
-      router.push("/dashboard")
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Signup failed")
-      throw err
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  // Simple logout function
-  const logout = async () => {
-    try {
-      setLoading(true)
-      localStorage.removeItem(STORAGE_KEY)
+      // Use window.location for a full page refresh to ensure session is recognized
+      window.location.href = "/dashboard"
+    } catch (error: any) {
+      console.error("Login error:", error)
+      setError(error.message)
       setUser(null)
-      router.push("/")
-    } catch (err) {
-      console.error("Logout error:", err)
-    } finally {
       setLoading(false)
     }
   }
 
-  // Update profile function
-  const updateProfile = async (name: string, age?: number) => {
+  const signup = async (name: string, email: string, password: string, age: string) => {
+    setLoading(true)
+    setError(null)
+
     try {
-      setLoading(true)
-      setError(null)
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+          age: Number.parseInt(age),
+        }),
+      })
 
-      if (!user) {
-        throw new Error("No user logged in")
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || "Signup failed")
       }
 
-      const updatedUser = {
-        ...user,
-        name,
-        age,
-      }
-
-      // Save to localStorage
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedUser))
-      setUser(updatedUser)
-
-      return updatedUser
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to update profile")
-      throw err
-    } finally {
+      console.log("Signup successful, logging in...")
+      // Auto login after signup
+      await login(email, password)
+    } catch (error: any) {
+      console.error("Signup error:", error)
+      setError(error.message)
       setLoading(false)
+    }
+  }
+
+  const logout = async () => {
+    setError(null)
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+      })
+
+      setUser(null)
+      // Use window.location for a full page refresh
+      window.location.href = "/"
+    } catch (error: any) {
+      setError(error.message)
     }
   }
 
@@ -198,12 +147,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         user,
         loading,
-        error,
-        setError,
         login,
         signup,
         logout,
-        updateProfile,
+        error,
+        setError,
+        refreshUser,
       }}
     >
       {children}

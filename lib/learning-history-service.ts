@@ -17,133 +17,81 @@ export interface LearningHistory {
   visitDate?: Date // Date of this specific visit
 }
 
-interface LearningHistoryItem {
-  userId: string
-  subject: string
-  topic: string
-  content: string
-  progress: number
-  level: string
-  score?: number
-  timeSpent?: number
-  timestamp: Date
-}
-
-// Mock data for learning history
-const mockLearningHistory = [
-  {
-    id: "1",
-    userId: "user1",
-    subject: "math",
-    topic: "Algebra Basics",
-    content: "Introduction to algebra",
-    progress: 85,
-    level: "intermediate",
-    score: 90,
-    timeSpent: 1200,
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
-  },
-  {
-    id: "2",
-    userId: "user1",
-    subject: "science",
-    topic: "The Solar System",
-    content: "Planets and stars",
-    progress: 75,
-    level: "beginner",
-    score: 80,
-    timeSpent: 900,
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
-  },
-  {
-    id: "3",
-    userId: "user1",
-    subject: "coding",
-    topic: "Introduction to Python",
-    content: "Basic Python syntax",
-    progress: 60,
-    level: "beginner",
-    score: 70,
-    timeSpent: 1500,
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2), // 2 days ago
-  },
-  {
-    id: "4",
-    userId: "user1",
-    subject: "math",
-    topic: "Geometry",
-    content: "Shapes and angles",
-    progress: 90,
-    level: "intermediate",
-    score: 95,
-    timeSpent: 1800,
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3), // 3 days ago
-  },
-  {
-    id: "5",
-    userId: "user1",
-    subject: "reading",
-    topic: "Shakespeare",
-    content: "Romeo and Juliet",
-    progress: 70,
-    level: "advanced",
-    score: 85,
-    timeSpent: 2100,
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 4), // 4 days ago
-  },
-]
-
 // Get learning history for a specific topic
 export async function getTopicLearningHistory(subject: string, topic: string): Promise<LearningHistory | null> {
   try {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 500))
+    const timestamp = Date.now()
+    const response = await fetch(`/api/user/learning-history?subject=${subject}&topic=${topic}&t=${timestamp}`, {
+      method: "GET",
+      cache: "no-store",
+      headers: {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache",
+        Expires: "0",
+      },
+    })
 
-    const history = mockLearningHistory.find((item) => item.subject === subject && item.topic === topic)
+    if (!response.ok) {
+      throw new Error("Failed to fetch learning history")
+    }
 
-    return history || null
+    const data = await response.json()
+    return data.history
   } catch (error) {
     console.error("Error fetching learning history:", error)
     return null
   }
 }
 
+// Update learning history for a topic
 export async function updateLearningHistory(
   subject: string,
   topic: string,
   content: string,
   progress: number,
-  level = "beginner",
-  score?: number,
-  timeSpent?: number,
-) {
+  difficulty: string,
+): Promise<boolean> {
   try {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 500))
+    console.log("Updating learning history:", { subject, topic, progress, difficulty })
 
-    const newId = (mockLearningHistory.length + 1).toString()
+    // Generate a unique visitId for this update
+    const visitId = `${subject}-${topic}-${Date.now()}`
 
-    const historyItem = {
-      id: newId,
-      userId: "user1", // Simulated user ID
-      subject,
-      topic,
-      content,
-      progress,
-      level,
-      score,
-      timeSpent,
-      timestamp: new Date(),
+    const response = await fetch("/api/user/learning-history", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache",
+        Expires: "0",
+      },
+      body: JSON.stringify({
+        subject,
+        topic,
+        content,
+        progress,
+        difficulty,
+        visitId,
+        visitDate: new Date().toISOString(),
+      }),
+      cache: "no-store",
+    })
+
+    if (!response.ok) {
+      console.error("Failed to update learning history:", response.status, response.statusText)
+      throw new Error("Failed to update learning history")
     }
 
-    // In a real app, this would be saved to a database
-    mockLearningHistory.push(historyItem as any)
+    const data = await response.json()
+    console.log("Learning history update response:", data)
 
-    console.log("Learning history updated with ID: ", newId)
-    return newId
+    // Trigger dashboard refresh
+    triggerDashboardRefresh()
+
+    return true
   } catch (error) {
     console.error("Error updating learning history:", error)
-    throw error
+    return false
   }
 }
 
@@ -151,25 +99,31 @@ export async function updateLearningHistory(
 export async function getAllLearningHistory(cacheParam?: string): Promise<LearningHistory[]> {
   try {
     console.log("Fetching all learning history...")
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 500))
+    // Add timestamp to prevent caching
+    const timestamp = Date.now()
+    const queryParam = cacheParam || `t=${timestamp}`
+    const response = await fetch(`/api/user/learning-history?${queryParam}`, {
+      method: "GET",
+      cache: "no-store",
+      headers: {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache",
+        Expires: "0",
+      },
+      next: { revalidate: 0 },
+    })
 
-    return mockLearningHistory as LearningHistory[]
+    if (!response.ok) {
+      console.error("Failed to fetch learning history:", response.status, response.statusText)
+      throw new Error("Failed to fetch learning history")
+    }
+
+    const data = await response.json()
+    console.log("Learning history fetched:", data.history?.length || 0, "items")
+    return data.history || []
   } catch (error) {
     console.error("Error fetching all learning history:", error)
     return []
-  }
-}
-
-export async function getUserLearningHistory() {
-  try {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 500))
-
-    return mockLearningHistory
-  } catch (error) {
-    console.error("Error getting learning history:", error)
-    throw error
   }
 }
 
@@ -178,22 +132,33 @@ export function triggerDashboardRefresh(): void {
   if (typeof window !== "undefined") {
     console.log("Triggering dashboard refresh event")
 
-    // Use a small timeout to ensure the event fires after the current execution context
-    setTimeout(() => {
-      // Dispatch a custom event that the dashboard listens for
-      window.dispatchEvent(new CustomEvent("learning-history-updated"))
+    // Use multiple methods to ensure the dashboard updates
 
-      // Force reload of dashboard data
+    // 1. Dispatch a custom event immediately
+    window.dispatchEvent(new CustomEvent("learning-history-updated"))
+
+    // 2. Try to find and click any refresh button on the dashboard
+    setTimeout(() => {
       try {
-        // Try to find and click the refresh button on the dashboard
-        const refreshButton = document.querySelector('[title="Refresh dashboard data"]') as HTMLButtonElement
-        if (refreshButton) {
-          console.log("Found refresh button, clicking it")
-          refreshButton.click()
+        const refreshButtons = document.querySelectorAll('button[title="Refresh dashboard data"]')
+        if (refreshButtons.length > 0) {
+          console.log("Found dashboard refresh button, clicking it")
+          ;(refreshButtons[0] as HTMLElement).click()
         }
-      } catch (e) {
-        console.error("Error trying to auto-refresh dashboard:", e)
+      } catch (error) {
+        console.error("Error trying to click refresh button:", error)
       }
     }, 500)
+
+    // 3. Dispatch another event after a delay to ensure it's caught
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent("learning-history-updated"))
+
+      // 4. If on the dashboard page, try to force a refresh
+      if (window.location.pathname.includes("/dashboard")) {
+        console.log("On dashboard page, forcing additional refresh")
+        window.dispatchEvent(new CustomEvent("force-dashboard-refresh"))
+      }
+    }, 1500)
   }
 }

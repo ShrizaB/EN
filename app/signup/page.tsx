@@ -4,7 +4,6 @@ import type React from "react"
 
 import { useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -20,8 +19,7 @@ export default function SignUpPage() {
   const [confirmPassword, setConfirmPassword] = useState("")
   const [passwordError, setPasswordError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const { signup, error, setError } = useAuth()
-  const router = useRouter()
+  const { signup, error } = useAuth()
 
   const validatePassword = () => {
     if (password !== confirmPassword) {
@@ -41,14 +39,9 @@ export default function SignUpPage() {
     if (!validatePassword()) return
 
     setIsSubmitting(true)
-    setError(null)
 
     try {
       await signup(name, email, password)
-      console.log("Signup successful, redirecting...")
-      router.push("/dashboard")
-    } catch (err) {
-      console.error("Signup error:", err)
     } finally {
       setIsSubmitting(false)
     }
@@ -128,7 +121,7 @@ export default function SignUpPage() {
         <CardFooter className="flex justify-center">
           <p className="text-sm text-muted-foreground">
             Already have an account?{" "}
-            <Link href="/sign-in" className="text-primary hover:underline">
+            <Link href="/signin" className="text-primary hover:underline">
               Sign in
             </Link>
           </p>
