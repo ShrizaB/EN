@@ -1,5 +1,9 @@
+"use client"
+
 import Link from "next/link"
+import { useRef } from "react"
 import { notFound } from "next/navigation"
+import './style.css'
 import {
   ArrowLeft,
   ArrowRight,
@@ -944,64 +948,86 @@ const subjectsData = {
 }
 
 export default function SubjectPage({ params }: { params: { subject: string } }) {
-  const subject = params.subject
+  const subject = params.subject;
 
-  // Check if the subject exists in our data
   if (!subjectsData[subject as keyof typeof subjectsData]) {
-    notFound()
+    notFound();
   }
 
-  const subjectData = subjectsData[subject as keyof typeof subjectsData]
-  const SubjectIcon = subjectData.icon
+  const subjectData = subjectsData[subject as keyof typeof subjectsData];
+  const SubjectIcon = subjectData.icon;
+
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const playSound = () => {
+  if (audioRef.current) {
+    audioRef.current.currentTime = 0;
+    audioRef.current.volume = .15; // Set volume to 20%
+    audioRef.current.play();
+  }
+};
+
 
   return (
-    <div className="container py-12 md:py-20">
-      <div className="mb-8">
+    <div className="relative bg-gradient-to-bl from-[#0d3c0d] via-black to-[#440303] text-green-100 min-h-screen hulk-particles">
+      <img
+        src="https://i.postimg.cc/PrbLMy46/Red-Hulk-No-Background.png"
+        alt="background"
+        className=" absolute bottom-[-80px] left-0 w-[600px] h-auto opacity-70"
+      />
+      <img
+        src="https://i.postimg.cc/X7bsZLxj/f9ad028ac76eb967349c888bfb355495.png"
+        alt="background"
+        className=" absolute top-20 right-0 w-[600px] h-auto opacity-50 scale-x-[-1]"
+      />
+      <img
+        src="https://i.postimg.cc/RZGLH2zk/hulk-marvel-rivals-png-by-joaolucasvingaprimos-di6otfx.png"
+        alt="background"
+        className=" absolute bottom-0 right-0 w-[270px] h-auto opacity-100 scale-x-[-1] animate-float"
+      />
+
+      <div className="container py-12 md:py-20 relative z-10">
         <Link
           href="/subjects"
-          className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-4"
+          className="inline-flex items-center text-sm font-medium text-green-400 hover:text-green-300 transition-colors mb-8"
         >
           <ArrowLeft className="mr-1 h-4 w-4" />
           Back to Subjects
         </Link>
 
-        <div className="relative overflow-hidden rounded-xl bg-secondary/30 border border-secondary p-8 mb-12">
-          <div className="absolute inset-0 pattern-diagonal opacity-10"></div>
-          <div className="relative z-10 flex flex-col md:flex-row gap-6 items-center md:items-start">
-            <div className={`w-20 h-20 rounded-full ${subjectData.bgColor} flex items-center justify-center shrink-0`}>
-              <SubjectIcon className={`h-10 w-10 ${subjectData.color}`} />
-            </div>
-            <div>
-              <h1 className={`text-3xl md:text-4xl font-bold mb-4 gradient-text ${subjectData.gradientText}`}>
-                {subjectData.title}
-              </h1>
-              <p className="text-lg text-muted-foreground max-w-3xl">{subjectData.longDescription}</p>
-            </div>
+        {/* Subject header with glowing border and bounce icon */}
+        <div className="rounded-xl p-8 mb-12 hulk-glow-box border-green-700 border bg-gradient-to-br from-green-950 to-black transition-shadow duration-300 hover:shadow-[0_0_20px_rgba(34,197,94,0.3)]">
+          <div className="w-20 h-20 rounded-full icon-glow flex items-center justify-center animate-bounce-slow mb-4">
+            <SubjectIcon className="h-10 w-10 text-black" />
           </div>
+          <h1 className="text-3xl md:text-4xl font-bold mb-4 hulk-heading">
+            {subjectData.title}
+          </h1>
+          <p className="text-lg text-green-400 max-w-3xl">{subjectData.longDescription}</p>
         </div>
 
+        {/* Learning Topics section */}
         <div className="space-y-6 mb-8">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-              <h2 className="text-2xl font-bold">Learning Topics</h2>
-              <p className="text-muted-foreground">Choose a topic to start learning and test your knowledge</p>
+              <h2 className="text-2xl font-bold hulk-heading text-green-300">Learning Topics</h2>
+              <p className="text-green-500">Pick a topic and get smarter the Hulk way!</p>
             </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                <span>Beginner</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                <span>Intermediate</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                <span>Advanced</span>
-              </div>
+            <div className="flex items-center gap-4 text-sm text-green-400">
+              {[
+                { label: "Beginner", color: "bg-green-500" },
+                { label: "Intermediate", color: "bg-yellow-500" },
+                { label: "Advanced", color: "bg-red-500" },
+              ].map((level) => (
+                <div key={level.label} className="flex items-center gap-1">
+                  <div className={`w-3 h-3 rounded-full ${level.color} level-dot animate-pulse`} />
+                  <span>{level.label}</span>
+                </div>
+              ))}
             </div>
           </div>
 
+          {/* Topics grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {subjectData.topics.map((topic) => {
               const levelColor =
@@ -1009,34 +1035,45 @@ export default function SubjectPage({ params }: { params: { subject: string } })
                   ? "bg-green-500"
                   : topic.level === "Intermediate"
                     ? "bg-yellow-500"
-                    : "bg-red-500"
+                    : "bg-red-500";
 
               return (
                 <Link key={topic.id} href={`/subjects/${subject}/topics/${topic.id}`} className="group">
-                  <div className="relative overflow-hidden rounded-xl bg-secondary/30 border border-secondary hover:border-primary/50 p-6 h-full transition-all duration-300">
-                    <div className="absolute -inset-px bg-gradient-to-r from-primary/0 to-primary/0 group-hover:from-primary/5 group-hover:to-primary/10 rounded-xl transition-all duration-300"></div>
-                    <div className="relative z-10">
-                      <div className="flex justify-between items-start mb-4">
-                        <h3 className="text-xl font-bold group-hover:text-primary transition-colors">{topic.title}</h3>
-                        <div className={`w-2.5 h-2.5 rounded-full ${levelColor} mt-2`}></div>
+                  <div
+                    className="relative overflow-hidden rounded-xl topic-card p-6 h-full transition-transform duration-300 hover:scale-105 hover:border-green-500 border border-green-800"
+                    onMouseEnter={playSound}
+                  >
+                    <div className="relative z-10 ">
+                      <div className="flex justify-between items-start mb-4 ">
+                        <h3 className="text-xl font-semibold text-green-200 group-hover:text-green-100 transition-colors">
+                          {topic.title}
+                        </h3>
+                        <div className={`w-2.5 h-2.5 rounded-full ${levelColor} mt-2`} />
                       </div>
-                      <p className="text-muted-foreground mb-4">{topic.description}</p>
-                      <div className="flex justify-between items-center text-sm text-muted-foreground">
+                      <p className="text-green-400 mb-4">{topic.description}</p>
+                      <div className="flex justify-between items-center text-sm text-green-500">
                         <div>Ages {topic.ageRange}</div>
                         <div>{topic.questionsCount} questions</div>
                       </div>
-                      <div className="mt-4 flex items-center text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="mt-4 flex items-center text-sm font-medium text-green-300 opacity-0 group-hover:opacity-100 cta-text transition-opacity duration-300">
                         <span>Start Learning</span>
                         <ArrowRight className="ml-1 h-4 w-4" />
                       </div>
                     </div>
                   </div>
                 </Link>
-              )
+              );
             })}
           </div>
         </div>
       </div>
+      {/* Hidden audio element */}
+      <audio
+        ref={audioRef}
+        src="/sounds/hulk-smash-hover.mp3" 
+        preload="auto"
+        style={{ display: "none" }}
+      />
     </div>
-  )
+  );
 }

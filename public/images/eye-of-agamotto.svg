@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500">
+          <defs>
+            <radialGradient id="goldMetal" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#fffbe6" />
+              <stop offset="45%" stop-color="#ffd700" />
+              <stop offset="100%" stop-color="#7f6000" />
+            </radialGradient>
+
+            <radialGradient id="timeGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#ccffcc" />
+              <stop offset="40%" stop-color="#00ff66" />
+              <stop offset="100%" stop-color="#003300" stop-opacity="0.3" />
+            </radialGradient>
+
+            <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+              <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#000" flood-opacity="0.4" />
+            </filter>
+
+                        <filter id="innerBevel">
+              <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
+              <feSpecularLighting in="blur" surfaceScale="3" specularConstant="1.2" specularExponent="25" lighting-color="#fff" result="spec">
+                <fePointLight x="-200" y="-200" z="400" />
+              </feSpecularLighting>
+              <feComposite in="spec" in2="SourceAlpha" operator="in" result="lit" />
+              <feComposite in="SourceGraphic" in2="lit" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" />
+            </filter>
+          </defs>
+
+          <path d="M50,250 Q250,30 450,250 Q250,470 50,250 Z"
+            fill="url(#goldMetal)"
+            stroke="#5a4500"
+            stroke-width="8"
+            filter="url(#innerBevel)" />
+
+          <ellipse cx="250" cy="250" rx="130" ry="130"
+            fill="#2a2a2a"
+            stroke="#4a4a4a" stroke-width="5"
+            filter="url(#softShadow)" />
+
+          <circle cx="250" cy="250" r="55"
+            fill="url(#timeGlow)"
+            stroke="#00ff99"
+            stroke-width="6"
+            filter="url(#softShadow)" />
+
+          <circle cx="250" cy="250" r="85"
+            fill="none"
+            stroke="#00ffcc"
+            stroke-width="3"
+            stroke-dasharray="8,5"
+            opacity="0.6" />
+
+          <path d="M110,250 Q250,120 390,250" fill="none"
+            stroke="#ffd700" stroke-width="4" />
+          <path d="M110,250 Q250,380 390,250" fill="none"
+            stroke="#ffd700" stroke-width="4" />
+
+          <g stroke="#6b4d00" stroke-width="2">
+            <circle cx="250" cy="90" r="4" />
+            <circle cx="390" cy="160" r="4" />
+            <circle cx="410" cy="250" r="4" />
+            <circle cx="390" cy="340" r="4" />
+            <circle cx="250" cy="410" r="4" />
+            <circle cx="110" cy="340" r="4" />
+            <circle cx="90" cy="250" r="4" />
+            <circle cx="110" cy="160" r="4" />
+          </g>
+
+          <circle cx="250" cy="250" r="40"
+            fill="none"
+            stroke="#00aa55"
+            stroke-width="2.5"
+            stroke-dasharray="5,4"
+            opacity="0.8" />
+
+          <path d="M240,35 Q250,10 260,35 Q250,60 240,35 Z"
+            fill="url(#goldMetal)"
+            stroke="#5a4500" stroke-width="2" />
+
+          <g fill="#66ffcc" opacity="0.5">
+            <circle cx="150" cy="390" r="3" />
+            <circle cx="350" cy="120" r="3" />
+            <circle cx="320" cy="400" r="2.5" />
+            <circle cx="170" cy="80" r="2.5" />
+            <circle cx="90" cy="320" r="2" />
+            <circle cx="410" cy="180" r="2" />
+          </g>
+        </svg>

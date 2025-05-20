@@ -1,4 +1,7 @@
-import Link from "next/link"
+'use client';
+
+import Link from "next/link";
+import SpiderWebBackground from "./spider-man-web-bg";
 import {
   ArrowRight,
   BookOpen,
@@ -10,205 +13,194 @@ import {
   Globe,
   Brain,
   Film,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
+  Images,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import './subject.css';
+
+const subjects = [
+  {
+    title: "Mathematics",
+    description: "Learn about numbers, counting, and problem-solving.",
+    icon: Calculator,
+    slug: "math",
+  },
+  {
+    title: "Science",
+    description: "Discover the natural world with engaging content.",
+    icon: Flask,
+    slug: "science",
+  },
+  {
+    title: "Reading",
+    description: "Build literacy skills with rich reading materials.",
+    icon: BookOpen,
+    slug: "reading",
+  },
+  {
+    title: "Coding",
+    description: "Understand programming with clear explanations.",
+    icon: Code,
+    slug: "coding",
+  },
+  {
+    title: "Art",
+    description: "Explore creative techniques and visual expression.",
+    icon: Palette,
+    slug: "art",
+  },
+  {
+    title: "Music",
+    description: "Learn about rhythm, sounds, and music.",
+    icon: Music,
+    slug: "music",
+  },
+  {
+    title: "Geography",
+    description: "Study countries, cultures, and landscapes.",
+    icon: Globe,
+    slug: "geography",
+  },
+  {
+    title: "Logic",
+    description: "Sharpen your reasoning and problem-solving skills.",
+    icon: Brain,
+    slug: "logic",
+  },
+  {
+    title: "C Programming",
+    description: "Study the C programming language fundamentals.",
+    icon: Code,
+    slug: "c_programming",
+  },
+  {
+    title: "Python",
+    description: "Master Python with hands-on examples.",
+    icon: Code,
+    slug: "python",
+  },
+  {
+    title: "Java",
+    description: "Dive into Java and OOP design concepts.",
+    icon: Code,
+    slug: "java",
+  },
+  {
+    title: "Movies",
+    description: "Explore filmmaking and cinematic worlds.",
+    icon: Film,
+    slug: "movies",
+  },
+];
+
+const Imgaes = [
+  {
+    src: "https://i.postimg.cc/zvTTYvwp/48834ee7eed27d8e62b3d9e6c6d3bd36.png",
+    className: "opacity-100 w-[100px] h-auto mb-80 absolute left-0 top-56 sm:left-72 sm:top-auto",
+  },
+  {
+    src: "https://i.postimg.cc/mgxcYTsy/b415c94fec168772ce2d8a7633c5befa.png",
+    className: "absolute opacity-50 w-[300px] sm:w-[700px] h-auto invisible sm:visible mb-80 top-[600px] sm:top-[400px]",
+  },
+  {
+    src: "https://i.postimg.cc/900sx3GW/e7dae6ded592f59cbf5302012c96b24e.png",
+    className: "opacity-100 w-[100px] h-auto mb-80 absolute right-0 top-56 sm:right-72 sm:top-auto",
+  },
+];
 
 export default function SubjectsPage() {
-  const subjects = [
-    {
-      title: "Mathematics",
-      description: "Learn about numbers, counting, and problem-solving with interactive lessons.",
-      icon: Calculator,
-      slug: "math",
-      color: "text-math",
-      bgColor: "bg-math/10",
-      borderClass: "gradient-border-math",
-      gradientText: "from-math to-blue-400",
-    },
-    {
-      title: "Science",
-      description: "Discover the natural world through engaging educational content.",
-      icon: Flask,
-      slug: "science",
-      color: "text-science",
-      bgColor: "bg-science/10",
-      borderClass: "gradient-border-science",
-      gradientText: "from-science to-green-400",
-    },
-    {
-      title: "Reading",
-      description: "Build literacy skills with comprehensive reading materials.",
-      icon: BookOpen,
-      slug: "reading",
-      color: "text-reading",
-      bgColor: "bg-reading/10",
-      borderClass: "gradient-border-reading",
-      gradientText: "from-reading to-pink-400",
-    },
-    {
-      title: "Coding",
-      description: "Understand programming concepts with detailed explanations.",
-      icon: Code,
-      slug: "coding",
-      color: "text-coding",
-      bgColor: "bg-coding/10",
-      borderClass: "gradient-border-coding",
-      gradientText: "from-coding to-yellow-400",
-    },
-    {
-      title: "Art",
-      description: "Explore artistic concepts, techniques, and creative expression.",
-      icon: Palette,
-      slug: "art",
-      color: "text-art",
-      bgColor: "bg-art/10",
-      borderClass: "gradient-border-math",
-      gradientText: "from-art to-purple-400",
-    },
-    {
-      title: "Music",
-      description: "Learn about rhythm, sounds, and musical concepts.",
-      icon: Music,
-      slug: "music",
-      color: "text-music",
-      bgColor: "bg-music/10",
-      borderClass: "gradient-border-science",
-      gradientText: "from-music to-amber-400",
-    },
-    {
-      title: "Geography",
-      description: "Study countries, cultures, and natural wonders around the world.",
-      icon: Globe,
-      slug: "geography",
-      color: "text-geography",
-      bgColor: "bg-geography/10",
-      borderClass: "gradient-border-reading",
-      gradientText: "from-geography to-teal-400",
-    },
-    {
-      title: "Logic",
-      description: "Develop critical thinking and reasoning skills.",
-      icon: Brain,
-      slug: "logic",
-      color: "text-logic",
-      bgColor: "bg-logic/10",
-      borderClass: "gradient-border-coding",
-      gradientText: "from-logic to-indigo-400",
-    },
-    {
-      title: "C Programming",
-      description: "Study the fundamentals of C programming language.",
-      icon: Code,
-      slug: "c_programming",
-      color: "text-coding",
-      bgColor: "bg-coding/10",
-      borderClass: "gradient-border-coding",
-      gradientText: "from-coding to-blue-400",
-    },
-    {
-      title: "Python",
-      description: "Learn Python programming with comprehensive lessons.",
-      icon: Code,
-      slug: "python",
-      color: "text-coding",
-      bgColor: "bg-coding/10",
-      borderClass: "gradient-border-coding",
-      gradientText: "from-coding to-green-400",
-    },
-    {
-      title: "Java",
-      description: "Explore Java programming concepts and object-oriented design.",
-      icon: Code,
-      slug: "java",
-      color: "text-coding",
-      bgColor: "bg-coding/10",
-      borderClass: "gradient-border-coding",
-      gradientText: "from-coding to-orange-400",
-    },
-    {
-      title: "Movies",
-      description: "Explore the world of cinema and filmmaking",
-      icon: Film,
-      slug: "movies",
-      color: "text-movies",
-      bgColor: "bg-movies/10",
-      borderClass: "gradient-border-movies",
-      gradientText: "from-film to-orange-400",
-    },
-  ]
-
   return (
-    <div className="container py-12 md:py-20">
-      <div className="relative mb-12 pb-12 border-b">
-        <div className="absolute inset-0 pattern-dots opacity-10"></div>
-        <div className="relative z-10 flex flex-col items-center justify-center space-y-4 text-center">
-          <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium mb-2">
-            <BookOpen className="h-3.5 w-3.5 mr-1.5" />
-            <span>Learning Explorer</span>
-          </div>
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight gradient-text from-primary via-purple-500 to-pink-500">
-            Explore Our Subjects
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl">
-            Discover a world of knowledge with our comprehensive subject offerings. Each subject features educational
-            content followed by timed quizzes to test your understanding.
-          </p>
-        </div>
-      </div>
+    <>
+      <div className="relative bg-gray-950 text-white min-h-screen overflow-hidden visible font-sans">
+        <SpiderWebBackground />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {subjects.map((subject) => (
-          <Link key={subject.slug} href={`/subjects/${subject.slug}`} className="group">
-            <div
-              className={`relative overflow-hidden rounded-xl gradient-border ${subject.borderClass} bg-secondary/30 p-6 h-full transition-all duration-300 hover:bg-secondary/50`}
-            >
-              <div className="flex flex-col h-full">
-                <div className={`w-12 h-12 rounded-full ${subject.bgColor} flex items-center justify-center mb-4`}>
-                  <subject.icon className={`h-6 w-6 ${subject.color}`} />
-                </div>
-                <h3 className={`text-xl font-bold mb-2 group-hover:${subject.color} transition-colors`}>
-                  {subject.title}
-                </h3>
-                <p className="text-muted-foreground flex-grow">{subject.description}</p>
-                <div className="mt-4 flex items-center text-sm font-medium">
-                  <span
-                    className={`gradient-text ${subject.gradientText} opacity-0 group-hover:opacity-100 transition-opacity`}
-                  >
-                    Learn {subject.title}
-                  </span>
-                  <ArrowRight
-                    className={`ml-1 h-4 w-4 ${subject.color} opacity-0 group-hover:opacity-100 transition-opacity`}
-                  />
-                </div>
-              </div>
+        {/* Spider-Man Images */}
+        <div className="absolute inset-0 flex justify-center items-center h-auto bottom-[780px]">
+          {Imgaes.map((image, index) => (
+            <img
+              key={index}
+              src={image.src}
+              alt="background"
+              className={image.className}
+            />
+          ))}
+        </div>
+
+        <div className="container py-12 md:py-20 relative z-10">
+          {/* Header */}
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center px-4 py-1 rounded-full bg-gradient-to-r from-amber-600/40 to-rose-600/40 border border-amber-500/30 text-amber-300 text-sm font-bold shadow-md shadow-amber-800/20">
+              <BookOpen className="h-4 w-4 mr-1" />
+              Knowledge Universe
             </div>
-          </Link>
-        ))}
-      </div>
-      <div className="mt-16 relative overflow-hidden rounded-xl bg-gradient-to-br from-primary/20 to-purple-600/20 p-8 pattern-diagonal">
-        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              <Brain className="h-5 w-5 text-primary" />
-              <span className="text-primary font-medium">Want to test your knowledge?</span>
-            </div>
-            <h3 className="text-2xl font-bold mb-2">Take a Quiz Instead</h3>
-            <p className="text-muted-foreground">
-              If you're ready to test your knowledge, try our interactive quizzes on various subjects.
+            <h1 className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-rose-500 to-rose-600 mt-4 mb-4 tracking-tight font-marvel">
+              EXPLORE OUR SUBJECTS
+            </h1>
+            <p className="text-gray-300 text-lg max-w-2xl mx-auto">
+              Assemble your knowledge across disciplines. Each subject features lessons and interactive quizzes to test your understanding.
             </p>
           </div>
-          <Button
-            asChild
-            size="lg"
-            className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90"
-          >
-            <Link href="/quiz">
-              Go to Quizzes
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
+
+          {/* Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {subjects.map((subject, index) => (
+              <Link
+                key={index}
+                href={`/subjects/${subject.slug}`}
+                className="group relative block rounded-xl p-6 bg-gradient-to-br from-gray-900/80 to-gray-950 border border-amber-600/30 shadow-md shadow-amber-900/20 overflow-hidden transform transition-transform duration-300 hover:scale-105 hover:shadow-rose-700/30 hover:border-rose-500/40 main-cont"
+              >
+                <div className="absolute inset-0 flex justify-center items-center h-auto logo-bg-spider">
+                  <img
+                    src="https://i.postimg.cc/wBmjcfQ8/bedd6ea8aa453b0af921ca2b2dbb106f.png"
+                    alt="background"
+                    className="opacity-20 ml-60 w-[800px] h-auto"
+                  />
+                </div>
+
+                <div className="absolute inset-0 bg-gradient-to-br from-amber-600/10 via-rose-600/10 to-rose-800/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+                <div className="relative z-10 flex flex-col h-full">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-600/20 to-rose-600/30 border border-amber-500/30 flex items-center justify-center mb-4 shadow-inner shadow-amber-900/10">
+                    <subject.icon className="text-amber-300 h-6 w-6 transition-transform icon" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-2 text-white group-hover:text-amber-50 transition-colors font-marvel tracking-wide">
+                    {subject.title}
+                  </h3>
+                  <p className="text-gray-300 flex-grow">{subject.description}</p>
+                  <div className="mt-4 flex items-center text-sm font-medium text-amber-300 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <span>LEARN {subject.title.toUpperCase()}</span>
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          {/* CTA */}
+          <div className="mt-20 rounded-xl bg-gradient-to-br from-gray-900 via-rose-900/40 to-gray-900 p-8 border border-amber-600/30 shadow-inner shadow-rose-900/20">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+              <div>
+                <div className="flex items-center gap-2 mb-1 text-amber-400 font-bold">
+                  <Brain className="h-5 w-5" />
+                  READY FOR A CHALLENGE?
+                </div>
+                <h2 className="text-2xl font-bold mb-1 text-amber-100 font-marvel">TEST YOUR KNOWLEDGE</h2>
+                <p className="text-gray-300">Prove your mastery by taking our interactive quizzes.</p>
+              </div>
+              <Button
+                asChild
+                size="lg"
+                className="bg-gradient-to-r from-amber-600 to-rose-600 hover:from-amber-500 hover:to-rose-500 text-white font-bold rounded-lg shadow-lg shadow-amber-900/20 transition-all"
+              >
+                <Link href="/quiz" className="flex items-center">
+                  <span>GO TO QUIZZES</span>
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  )
+    </>
+  );
 }

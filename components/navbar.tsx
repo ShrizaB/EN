@@ -154,9 +154,6 @@ export function Navbar() {
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center gap-2" onClick={closeMenu}>
-            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary">
-              <BookOpen className="h-4 w-4 text-primary-foreground" />
-            </div>
             <span className="font-bold text-xl">EduPlay</span>
           </Link>
 
@@ -220,9 +217,6 @@ export function Navbar() {
         <div className="fixed inset-0 z-50 bg-background md:hidden">
           <div className="container flex h-16 items-center justify-between">
             <Link href="/" className="flex items-center gap-2" onClick={closeMenu}>
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary">
-                <BookOpen className="h-4 w-4 text-primary-foreground" />
-              </div>
               <span className="font-bold text-xl">EduPlay</span>
             </Link>
 

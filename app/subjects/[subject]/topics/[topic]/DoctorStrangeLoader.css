@@ -1,0 +1,31 @@
+.loader-overlay {
+  @apply fixed inset-0 flex flex-col items-center justify-center bg-black z-50;
+}
+
+.portal-spinner {
+  width: 150px;
+  height: 150px;
+  border: 8px solid transparent;
+  border-top: 8px solid #f97316; /* Orange */
+  border-radius: 50%;
+  animation: spin 1.5s linear infinite;
+  box-shadow: 0 0 30px #f97316;
+}
+
+.loading-text {
+  color: #f97316;
+  font-family: 'Cinzel', serif; /* Optional fantasy-style font */
+  font-size: 1.2rem;
+  margin-top: 1rem;
+  letter-spacing: 1px;
+  text-shadow: 0 0 5px #f97316;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

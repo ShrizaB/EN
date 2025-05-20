@@ -11,14 +11,32 @@ import { useAuth } from "@/contexts/auth-context"
 import { logActivity } from "@/lib/user-service"
 import { getTopicLearningHistory, updateLearningHistory } from "@/lib/learning-history-service"
 import { GoogleGenerativeAI } from "@google/generative-ai"
+import DoctorStrangeLoader from "./DoctorStrangeLoader"
 
 // Initialize the Gemini API
 const GEMINI_API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY || "AIzaSyDiaCC3dAZS8ZiDU1uF8YfEu9PoWy8YLoA"
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY)
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
 
-// This would typically come from a database or API
-const topicsData = {
+// Add type definition for topicsData
+type TopicData = {
+  title: string
+  description: string
+  subject: string
+  subjectSlug: string
+  subjectColor: string
+  level: string
+  ageRange: string
+}
+
+type TopicsData = {
+  [subject: string]: {
+    [topic: string]: TopicData
+  }
+}
+
+// Update the topicsData type
+const topicsData: TopicsData = {
   math: {
     counting: {
       title: "Counting & Numbers",
@@ -223,7 +241,7 @@ const topicsData = {
       level: "Intermediate",
       ageRange: "8-10",
     },
-    
+
     writing: {
       title: "Creative Writing",
       description: "Express yourself through stories",
@@ -233,7 +251,7 @@ const topicsData = {
       level: "Advanced",
       ageRange: "9-12",
     },
-    
+
     poetry: {
       title: "Poetry",
       description: "Explore rhythm and expression in language",
@@ -290,7 +308,7 @@ const topicsData = {
       level: "Advanced",
       ageRange: "9-11",
     },
-    
+
     variables: {
       title: "Variables",
       description: "Store and use data in your programs",
@@ -300,7 +318,7 @@ const topicsData = {
       level: "Advanced",
       ageRange: "9-11",
     },
-    
+
     debugging: {
       title: "Debugging",
       description: "Find and fix errors in code",
@@ -310,7 +328,7 @@ const topicsData = {
       level: "Advanced",
       ageRange: "10-12",
     },
-    
+
     game_design: {
       title: "Game Design",
       description: "Build your own simple games with code",
@@ -320,7 +338,7 @@ const topicsData = {
       level: "Advanced",
       ageRange: "10-12",
     },
-    
+
   },
   // New subjects
   music: {
@@ -369,7 +387,7 @@ const topicsData = {
       level: "Intermediate",
       ageRange: "7-10",
     },
-    
+
     singing: {
       title: "Singing Basics",
       description: "Learn proper singing techniques and vocal exercises",
@@ -379,7 +397,7 @@ const topicsData = {
       level: "Beginner",
       ageRange: "5-9",
     },
-    
+
     music_theory: {
       title: "Music Theory",
       description: "Understand the building blocks of music",
@@ -389,7 +407,7 @@ const topicsData = {
       level: "Advanced",
       ageRange: "9-12",
     },
-    
+
     world_music: {
       title: "World Music",
       description: "Discover music from different cultures around the world",
@@ -399,7 +417,7 @@ const topicsData = {
       level: "Intermediate",
       ageRange: "7-11",
     },
-    
+
   },
   art: {
     colors: {
@@ -447,7 +465,7 @@ const topicsData = {
       level: "Intermediate",
       ageRange: "6-9",
     },
-    
+
     crafts: {
       title: "Arts & Crafts",
       description: "Make fun projects using different materials and techniques",
@@ -457,7 +475,7 @@ const topicsData = {
       level: "Beginner",
       ageRange: "4-7",
     },
-    
+
     digital_art: {
       title: "Digital Art",
       description: "Create art using digital tools and techniques",
@@ -467,7 +485,7 @@ const topicsData = {
       level: "Advanced",
       ageRange: "8-12",
     },
-    
+
     art_appreciation: {
       title: "Art Appreciation",
       description: "Learn to observe, analyze, and appreciate different artworks",
@@ -477,7 +495,7 @@ const topicsData = {
       level: "Intermediate",
       ageRange: "7-11",
     },
-    
+
   },
   geography: {
     continents: {
@@ -525,7 +543,7 @@ const topicsData = {
       level: "Beginner",
       ageRange: "6-9",
     },
-    
+
     cultures: {
       title: "World Cultures",
       description: "Discover traditions, foods, and customs from around the world",
@@ -535,7 +553,7 @@ const topicsData = {
       level: "Intermediate",
       ageRange: "7-10",
     },
-    
+
     natural_resources: {
       title: "Natural Resources",
       description: "Learn about the Earth's resources and their importance",
@@ -545,7 +563,7 @@ const topicsData = {
       level: "Advanced",
       ageRange: "9-12",
     },
-    
+
     environmental_geography: {
       title: "Environmental Geography",
       description: "Understand how humans interact with and impact the environment",
@@ -555,7 +573,7 @@ const topicsData = {
       level: "Advanced",
       ageRange: "10-12",
     },
-    
+
   },
   logic: {
     patterns: {
@@ -603,7 +621,7 @@ const topicsData = {
       level: "Intermediate",
       ageRange: "7-10",
     },
-    
+
     sudoku: {
       title: "Sudoku & Number Puzzles",
       description: "Learn to solve number-based logic puzzles",
@@ -613,7 +631,7 @@ const topicsData = {
       level: "Advanced",
       ageRange: "9-12",
     },
-    
+
     critical_thinking: {
       title: "Critical Thinking",
       description: "Analyze information and make reasoned judgments",
@@ -623,7 +641,7 @@ const topicsData = {
       level: "Advanced",
       ageRange: "10-12",
     },
-    
+
     logical_fallacies: {
       title: "Logical Fallacies",
       description: "Identify common errors in reasoning",
@@ -633,7 +651,7 @@ const topicsData = {
       level: "Advanced",
       ageRange: "10-12",
     },
-    
+
   },
   // Programming languages
   c_programming: {
@@ -682,7 +700,7 @@ const topicsData = {
       level: "Intermediate",
       ageRange: "11-12",
     },
-    
+
     pointers: {
       title: "Pointers",
       description: "Understand memory addresses and pointers in C",
@@ -692,7 +710,7 @@ const topicsData = {
       level: "Advanced",
       ageRange: "12",
     },
-    
+
     structures: {
       title: "Structures",
       description: "Create custom data types using structures",
@@ -702,7 +720,7 @@ const topicsData = {
       level: "Advanced",
       ageRange: "12",
     },
-    
+
     file_io: {
       title: "File Input/Output",
       description: "Learn to read from and write to files in C",
@@ -712,7 +730,7 @@ const topicsData = {
       level: "Advanced",
       ageRange: "12",
     },
-    
+
   },
   python: {
     intro: {
@@ -760,7 +778,7 @@ const topicsData = {
       level: "Intermediate",
       ageRange: "10-12",
     },
-    
+
     file_handling: {
       title: "File Handling",
       description: "Learn to read from and write to files in Python",
@@ -770,7 +788,7 @@ const topicsData = {
       level: "Intermediate",
       ageRange: "11-12",
     },
-    
+
     error_handling: {
       title: "Error Handling",
       description: "Understand how to handle errors and exceptions in Python",
@@ -780,7 +798,7 @@ const topicsData = {
       level: "Advanced",
       ageRange: "11-12",
     },
-    
+
     simple_games: {
       title: "Simple Games",
       description: "Create fun games using Python",
@@ -790,7 +808,7 @@ const topicsData = {
       level: "Advanced",
       ageRange: "11-12",
     },
-    
+
   },
   java: {
     intro: {
@@ -838,7 +856,7 @@ const topicsData = {
       level: "Intermediate",
       ageRange: "11-12",
     },
-    
+
     arrays: {
       title: "Arrays & ArrayLists",
       description: "Work with collections of data in Java",
@@ -848,7 +866,7 @@ const topicsData = {
       level: "Intermediate",
       ageRange: "11-12",
     },
-    
+
     inheritance: {
       title: "Inheritance & Polymorphism",
       description: "Learn advanced object-oriented programming concepts",
@@ -858,7 +876,7 @@ const topicsData = {
       level: "Advanced",
       ageRange: "12",
     },
-    
+
     exception_handling: {
       title: "Exception Handling",
       description: "Understand how to handle errors and exceptions in Java",
@@ -868,7 +886,7 @@ const topicsData = {
       level: "Advanced",
       ageRange: "12",
     },
-    
+
   },
   movies: {
     film_history: {
@@ -916,7 +934,7 @@ const topicsData = {
       level: "Advanced",
       ageRange: "10-12",
     },
-    
+
     film_techniques: {
       title: "Filmmaking Techniques",
       description: "Understand camera angles, shots, and visual storytelling",
@@ -926,7 +944,7 @@ const topicsData = {
       level: "Advanced",
       ageRange: "9-12",
     },
-    
+
     movie_reviews: {
       title: "Movie Reviews",
       description: "Learn how to analyze and critique films",
@@ -936,7 +954,7 @@ const topicsData = {
       level: "Intermediate",
       ageRange: "8-12",
     },
-    
+
     special_effects: {
       title: "Special Effects",
       description: "Discover how movie magic is created with special effects",
@@ -946,16 +964,28 @@ const topicsData = {
       level: "Intermediate",
       ageRange: "7-12",
     },
-    
+
   },
 }
 
+// Update Question interface to make id required
 interface Question {
   question: string
   options: string[]
   correctAnswer: number
   explanation: string
-  id?: string
+  id: string // Make id required
+}
+
+// Add type for UserActivity
+interface UserActivity {
+  type: string
+  subject: string
+  topic: string
+  difficulty?: string
+  score?: number
+  totalQuestions?: number
+  timeSpent?: number
 }
 
 interface LearningHistory {
@@ -1014,11 +1044,11 @@ export default function TopicPage({ params }: { params: { subject: string; topic
     }
   }, [])
 
-  // Check if the subject and topic exist in our data
+  // Fix the type checking for topicsData access
   if (
     mounted &&
-    (!topicsData[params.subject as keyof typeof topicsData] ||
-      !topicsData[params.subject as keyof typeof topicsData][params.topic as any])
+    (!topicsData[params.subject] ||
+      !topicsData[params.subject][params.topic])
   ) {
     notFound()
   }
@@ -1378,6 +1408,7 @@ export default function TopicPage({ params }: { params: { subject: string; topic
   const getDefaultQuestions = (title: string, subject: string): Question[] => {
     return [
       {
+        id: `${subject}-${title}-default-1`,
         question: `What is the main purpose of studying ${title}?`,
         options: ["To pass tests", "To gain practical knowledge", "To memorize facts", "To impress others"],
         correctAnswer: 1,
@@ -1385,6 +1416,7 @@ export default function TopicPage({ params }: { params: { subject: string; topic
           "The main purpose of studying any topic is to gain practical knowledge that can be applied in real-world situations.",
       },
       {
+        id: `${subject}-${title}-default-2`,
         question: `Which learning approach is most effective for ${title}?`,
         options: [
           "Memorization only",
@@ -1396,6 +1428,7 @@ export default function TopicPage({ params }: { params: { subject: string; topic
         explanation: "Practice and application help solidify knowledge and develop skills.",
       },
       {
+        id: `${subject}-${title}-default-3`,
         question: `How can you improve your understanding of difficult concepts in ${title}?`,
         options: [
           "Give up when it gets hard",
@@ -1407,12 +1440,14 @@ export default function TopicPage({ params }: { params: { subject: string; topic
         explanation: "Breaking down complex concepts into smaller, manageable parts makes them easier to understand.",
       },
       {
+        id: `${subject}-${title}-default-4`,
         question: `What is the benefit of taking quizzes while learning about ${title}?`,
         options: ["It wastes time", "It helps reinforce knowledge", "It's only for grades", "It makes learning boring"],
         correctAnswer: 1,
         explanation: "Quizzes help reinforce knowledge through active recall, which strengthens memory.",
       },
       {
+        id: `${subject}-${title}-default-5`,
         question: `Why is ${title} an important topic in ${subject}?`,
         options: [
           "It isn't important",
@@ -1424,18 +1459,21 @@ export default function TopicPage({ params }: { params: { subject: string; topic
         explanation: `${title} is a fundamental concept in ${subject} that builds the foundation for more advanced topics.`,
       },
       {
+        id: `${subject}-${title}-default-6`,
         question: `What should you do if you don't understand something about ${title}?`,
         options: ["Skip it and move on", "Ask for help", "Pretend you understand", "Give up on the subject"],
         correctAnswer: 1,
         explanation: "Asking for help is an important part of the learning process.",
       },
       {
+        id: `${subject}-${title}-default-7`,
         question: `How often should you review what you've learned about ${title}?`,
         options: ["Never", "Only before tests", "Regularly, using spaced repetition", "Once a year"],
         correctAnswer: 2,
         explanation: "Regular review using spaced repetition helps move information into long-term memory.",
       },
       {
+        id: `${subject}-${title}-default-8`,
         question: `What is the value of making mistakes while learning about ${title}?`,
         options: [
           "There is no value",
@@ -1447,12 +1485,14 @@ export default function TopicPage({ params }: { params: { subject: string; topic
         explanation: "Mistakes are valuable feedback that show what areas need more attention.",
       },
       {
+        id: `${subject}-${title}-default-9`,
         question: `How can you apply what you learn about ${title} in real life?`,
         options: ["You can't", "By looking for practical applications", "By memorizing facts", "By taking more tests"],
         correctAnswer: 1,
         explanation: "Looking for practical applications helps make learning relevant and useful.",
       },
       {
+        id: `${subject}-${title}-default-10`,
         question: `What is the best mindset for learning about ${title}?`,
         options: [
           "Fixed mindset - abilities are fixed",
@@ -1465,6 +1505,14 @@ export default function TopicPage({ params }: { params: { subject: string; topic
       },
     ]
   }
+
+  // Helper for level color
+  const getLevelBg = (level: string) => {
+    if (level === 'Beginner') return 'bg-[#60AFFF] text-[#0D0D0D] animate-badge-glow-blue'; // light blue bg, dark text, animated glow
+    if (level === 'Intermediate') return 'bg-[#FF6F00] text-white animate-badge-glow-orange'; // orange, animated glow
+    if (level === 'Advanced') return 'bg-[#A4FF00] text-[#0D0D0D] animate-badge-glow-green'; // green, animated glow
+    return 'bg-[#232323] text-white';
+  };
 
   // Generate educational content and questions
   useEffect(() => {
@@ -1484,7 +1532,9 @@ export default function TopicPage({ params }: { params: { subject: string; topic
         // Generate educational content based on previous history
         let content = ""
 
-        if (history && history.visitCount && history.visitCount > 1) {
+        const isReturningUser = Boolean(history && typeof history.visitCount === 'number' && history.visitCount > 1)
+
+        if (isReturningUser && history) {
           // User has studied this before, generate content that builds on previous knowledge
           const previousSummary = history.content.substring(0, 300) + "..."
 
@@ -1494,11 +1544,16 @@ export default function TopicPage({ params }: { params: { subject: string; topic
             topicData.ageRange,
             true,
             previousSummary,
-            history.visitCount,
+            history.visitCount
           )
         } else {
           // First time studying this topic
-          content = await generateContentWithGemini(topicData.title, topicData.subject, topicData.ageRange, false)
+          content = await generateContentWithGemini(
+            topicData.title,
+            topicData.subject,
+            topicData.ageRange,
+            false
+          )
         }
 
         // If content is empty, use default content
@@ -1506,7 +1561,7 @@ export default function TopicPage({ params }: { params: { subject: string; topic
           content = getDefaultContent(
             topicData.title,
             topicData.subject,
-            history && history.visitCount && history.visitCount > 1,
+            isReturningUser
           )
         }
 
@@ -1627,22 +1682,20 @@ export default function TopicPage({ params }: { params: { subject: string; topic
     storeLearningHistory(
       educationalContent,
       progressPercentage,
-      topicsData[params.subject as keyof typeof topicsData]?.[params.topic as any]?.level.toLowerCase() || "beginner",
+      topicsData[params.subject]?.[params.topic]?.level.toLowerCase() || "beginner"
     )
 
-    // Log quiz completion with score and time
+    // Fix the logActivity call
     if (user) {
       logActivity(user.id, {
         type: "quiz",
         subject: params.subject,
         topic: params.topic,
-        difficulty:
-          topicsData[params.subject as keyof typeof topicsData]?.[params.topic as any]?.level.toLowerCase() ||
-          "beginner",
+        difficulty: topicsData[params.subject]?.[params.topic]?.level.toLowerCase() || "beginner",
         score: score,
         totalQuestions: total,
         timeSpent: quizTimeSpent,
-      })
+      } as UserActivity)
         .then(() => {
           console.log("Quiz activity logged successfully")
         })
@@ -1652,24 +1705,19 @@ export default function TopicPage({ params }: { params: { subject: string; topic
     }
   }
 
-  const topicData = topicsData[params.subject as keyof typeof topicsData]?.[params.topic as any]
+  // Fix the topicData access
+  const topicData = topicsData[params.subject]?.[params.topic]
 
   if (!mounted) {
     return (
-      <div className="container py-12 flex items-center justify-center min-h-[60vh]">
-        <div className="w-8 h-8 rounded-full border-4 border-primary border-t-transparent animate-spin"></div>
-        <span className="ml-3 text-muted-foreground">Loading...</span>
-      </div>
+      <DoctorStrangeLoader />
     )
   }
 
   if (loading) {
     return (
-      <div className="container py-12 flex items-center justify-center min-h-[60vh]">
-        <div className="w-8 h-8 rounded-full border-4 border-primary border-t-transparent animate-spin"></div>
-        <span className="ml-3 text-muted-foreground">Generating educational content...</span>
-      </div>
-    )
+      <DoctorStrangeLoader />
+    );
   }
 
   if (error) {
@@ -1687,176 +1735,245 @@ export default function TopicPage({ params }: { params: { subject: string; topic
   }
 
   return (
-    <div className="container py-12 md:py-20">
+    <div className="container py-12 md:py-20 min-h-screen relative overflow-hidden bg-[#0D0D0D] text-white">
+      <div className="absolute inset-0 flex w-[390px] items-center h-full">
+        <img src="/images/eye-of-agamotto.svg" alt="" className="opacity-30 relative right-8 mt-20 drop-shadow-lg" />
+      </div>
+      {/* Enhanced animated background with magical portal effect */}
+      <div className="absolute inset-0 -z-10 animate-bg-gradient bg-gradient-to-br from-[#181818] via-[#0D0D0D] to-[#181818] opacity-90"></div>
+      {/* Glassmorphism overlay for extra depth */}
+      <div className="absolute inset-0 -z-10 backdrop-blur-[2.5px] bg-white/2 pointer-events-none" />
+      {/* Doctor Strange-inspired magical circles in background */}
+      <div className="absolute inset-0 pointer-events-none -z-10 opacity-10">
+        <div className="absolute left-[10%] top-[5%] w-[300px] h-[300px] border-2 border-[#FF6F00] rounded-full animate-rotate-slow shadow-lg shadow-[#FF6F00]/30" />
+        <div className="absolute right-[15%] bottom-[10%] w-[250px] h-[250px] border-2 border-[#A4FF00] rounded-full animate-rotate-reverse shadow-lg shadow-[#A4FF00]/30" />
+        <div className="absolute left-[50%] top-[40%] w-[400px] h-[400px] border border-[#FF2500] rounded-full animate-pulse-slow shadow-lg shadow-[#FF2500]/30" />
+      </div>
+      {/* Enhanced animated floating particles with magical energy feel */}
+      <div className="absolute inset-0 pointer-events-none -z-10">
+        {[...Array(18)].map((_, i) => (
+          <div key={i} className={`absolute rounded-full bg-[#FF6F00] opacity-10 animate-float-particle shadow-lg`} style={{
+            width: `${16 + Math.random() * 24}px`,
+            height: `${16 + Math.random() * 24}px`,
+            top: `${Math.random() * 90}%`,
+            left: `${Math.random() * 90}%`,
+            animationDelay: `${Math.random() * 3}s`,
+            animationDuration: `${6 + Math.random() * 8}s`,
+          }} />
+        ))}
+        {[...Array(12)].map((_, i) => (
+          <div key={`spark-${i}`} className="absolute rounded-full bg-[#FFC107] opacity-20 animate-mystic-spark shadow-md" style={{
+            width: `${4 + Math.random() * 8}px`,
+            height: `${4 + Math.random() * 8}px`,
+            top: `${Math.random() * 100}%`,
+            left: `${Math.random() * 100}%`,
+            animationDelay: `${Math.random() * 5}s`,
+            animationDuration: `${3 + Math.random() * 4}s`,
+          }} />
+        ))}
+      </div>
       <div className="mb-8">
         <Link
           href={`/subjects/${params.subject}`}
-          className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-4"
+          className="inline-flex text-sm font-semibold text-white hover:text-[#FF6F00] mb-4 transition-colors group no-underline"
         >
-          <ChevronRight className="mr-1 h-4 w-4 rotate-180" />
-          Back to {topicData?.subject}
+          <div className="flex items-center px-2 py-1 cursor-pointer border border-[#232323] rounded-lg w-fit bg-[#181818]/60 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200 backdrop-blur-sm">
+            <ChevronRight className="mr-1 h-4 w-4 rotate-180 text-[#FF6F00] group-hover:-translate-x-1 transition-transform duration-200 drop-shadow-[0_2px_6px_rgba(255,111,0,0.3)]" />
+            <span className="transition-colors font-bold tracking-wide uppercase text-shadow-md">Back to {topicData?.subject}</span>
+          </div>
         </Link>
-
-        <div className="relative overflow-hidden rounded-xl bg-secondary/30 border border-secondary p-8 mb-12">
-          <div className="absolute inset-0 pattern-dots opacity-10"></div>
+        <div className="relative overflow-hidden rounded-2xl bg-[#18181800] border border-[#232323] p-8 mb-12 animate-fade-in-up hover:shadow-mystical transition-all duration-500 shadow-2xl backdrop-blur-md before:content-[''] before:absolute before:inset-0 before:rounded-2xl before:bg-white/5 before:pointer-events-none before:backdrop-blur-[2px]">
+          {/* Mystical energy border effect */}
+          <div className="absolute inset-0 -z-1 bg-gradient-to-r from-[#FF6F00]/0 via-[#FF6F00]/10 to-[#FF6F00]/0 opacity-50 animate-border-glow rounded-2xl" />
+          <div className="absolute inset-0 flex justify-end items-center h-auto">
+            <img
+              src="https://i.postimg.cc/1RKCG6q7/pngegg-1.png"
+              alt="background"
+              className="opacity-40 object-top mt-10 w-[300px] h-auto mr-20 animate-float-slow drop-shadow-2xl"
+            />
+          </div>
           <div className="relative z-10">
             <div className="flex items-center gap-2 mb-2">
-              <div className={`px-2 py-0.5 rounded-full text-xs font-medium ${topicData?.subjectColor} text-white`}>
-                {topicData?.level}
-              </div>
-              <div className="text-xs text-muted-foreground">Ages {topicData?.ageRange}</div>
+              <div className={`px-2 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg ${getLevelBg(topicData?.level || '')} animate-appear border-2 border-[#232323] shadow-[0_2px_12px_0_rgba(255,255,255,0.08)] backdrop-blur-sm`}>{topicData?.level}</div>
+              <div className="text-xs text-white/70 bg-[#232323] px-2 py-0.5 rounded-full font-semibold animate-fade-in-right border border-[#232323] shadow-sm">Ages {topicData?.ageRange}</div>
               {visitCount > 1 && (
-                <div className="px-2 py-0.5 rounded-full text-xs font-medium bg-blue-500/20 text-blue-500">
-                  Visit #{visitCount}
-                </div>
+                <div className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#FF6F00]/10 text-[#FF6F00] border border-[#FF6F00]/30 animate-fade-in-right delay-100 shadow-sm">Visit #{visitCount}</div>
               )}
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold mb-4">{topicData?.title}</h1>
-            <p className="text-lg text-muted-foreground max-w-3xl">{topicData?.description}</p>
+            <h1 className="text-3xl md:text-4xl font-extrabold mb-4 text-[#fff] tracking-tight uppercase animate-fade-in-up drop-shadow-[0_2px_12px_rgba(255,255,255,0.12)] text-shadow-lg" style={{letterSpacing: '0.08em'}}>{topicData?.title}</h1>
+            <p className="text-lg text-white/80 max-w-3xl bg-[#18181800] px-3 py-2 rounded-lg font-medium animate-fade-in-up delay-150" style={{letterSpacing: '0.02em'}}>{topicData?.description}</p>
           </div>
         </div>
-
         {!readingComplete ? (
-          <div className="p-6 rounded-xl bg-secondary/30 border border-secondary">
+          <div className="p-6 rounded-2xl bg-[#181818]/80 border border-[#232323] animate-fade-in-up delay-200 hover:shadow-mystical transition-all duration-500 shadow-xl backdrop-blur-md before:content-[''] before:absolute before:inset-0 before:rounded-2xl before:bg-white/5 before:pointer-events-none before:backdrop-blur-[2px]">
             <div className="mb-6">
-              <h2 className="text-2xl font-bold mb-4">Educational Content</h2>
-
+              <h2 className="text-2xl font-extrabold mb-4 text-white tracking-wide animate-fade-in-up delay-250 relative inline-block drop-shadow-lg text-shadow-lg">
+                <div className="flex items-center gap-2">
+                  <span className="w-12 flex items-center justify-center">
+                    <img src="/images/time-stone.svg" alt="" className="drop-shadow-lg" />
+                  </span>
+                  <span className="bg-gradient-to-l from-[#96d09e] via-[#fff] to-[#fff] text-transparent bg-clip-text font-black tracking-wider text-shadow-lg" style={{letterSpacing: '0.09em'}}>Educational Content</span>
+                </div>
+                <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-[#16d52f] to-transparent animate-width-expand rounded-full"></span>
+              </h2>
               {previousContent && visitCount > 1 && (
-                <div className="mb-6 p-4 bg-primary/10 rounded-lg border border-primary/20">
+                <div className="mb-6 p-4 bg-[#FF6F00]/10 rounded-lg border border-[#FF6F00]/30 animate-fade-in-up delay-300 hover:bg-[#FF6F00]/15 transition-all duration-300 shadow-inner backdrop-blur-sm">
                   <div className="flex items-start gap-3">
-                    <BookOpen className="h-5 w-5 text-primary mt-0.5" />
+                    <BookOpen className="h-5 w-5 text-[#FF6F00] mt-0.5 animate-pulse drop-shadow-lg" />
                     <div>
-                      <h3 className="font-medium text-primary">Welcome Back!</h3>
-                      <p className="text-sm text-muted-foreground">
-                        You've studied this topic {visitCount} times before. This lesson builds on your previous
-                        knowledge.
-                      </p>
+                      <h3 className="font-bold text-white text-shadow-md">Welcome Back!</h3>
+                      <p className="text-sm text-white/80 font-semibold">You've studied this topic {visitCount} times before. This lesson builds on your previous knowledge.</p>
                     </div>
                   </div>
                 </div>
               )}
-
-              <div className="prose prose-sm dark:prose-invert max-w-none">
+              <div className="prose prose-sm prose-invert max-w-none text-white">
                 {educationalContent.split("\n\n").map((paragraph, index) => (
-                  <p key={index}>{paragraph}</p>
+                  <p key={index} className={`text-white/90 bg-[#181818] px-3 py-2 rounded-lg mb-2 font-medium animate-fade-in-up shadow-inner backdrop-blur-sm`} style={{ animationDelay: `${300 + (index * 80)}ms`, letterSpacing: '0.01em', textShadow: '0 2px 8px rgba(0,0,0,0.12)' }}>{paragraph}</p>
                 ))}
               </div>
             </div>
             <div className="flex justify-end">
-              <Button onClick={startQuiz} className={`${topicData?.subjectColor} text-white`}>
-                I've Read This - Start Quiz
+              <Button
+                onClick={startQuiz}
+                className="bg-gradient-to-r from-[#FF6F00] to-[#B00020] hover:from-[#B00020] hover:to-[#FF6F00] text-white font-bold px-6 py-2 rounded-lg transition-all duration-200 border-none shadow-lg shadow-[#FF6F00]/20 animate-mystic-glow relative overflow-hidden group focus:scale-105 active:scale-95 ring-2 ring-[#FF6F00]/30 ring-offset-2 ring-offset-[#181818]"
+              >
+                <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-[#FF6F00]/0 via-[#FF6F00]/30 to-[#FF6F00]/0 transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+                <span className="relative inline-block animate-wiggle font-black tracking-wider text-shadow-lg">I've Read This - Start Quiz</span>
               </Button>
             </div>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-6 animate-fade-in-up delay-200">
             {!quizCompleted ? (
               <>
                 <div className="flex justify-between items-center">
-                  <div className="text-sm font-medium text-muted-foreground">
-                    Timed Quiz: {questions.length} questions
-                  </div>
+                  <div className="text-sm font-bold text-white animate-fade-in">Timed Quiz: {questions.length} questions</div>
                   <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-primary" />
-                    <div className={`text-sm font-medium ${timeRemaining < 30 ? "text-red-500" : ""}`}>
+                    <Clock className={`h-4 w-4 text-[#FF6F00] ${timeRemaining < 30 ? 'animate-pulse-fast' : 'animate-pulse'}`} />
+                    <div className={`text-sm font-bold ${timeRemaining < 30 ? "text-[#B00020] animate-pulse-text" : "text-white"} animate-fade-in-slow`}>
                       Time Remaining: {formatTime(timeRemaining)}
                     </div>
                   </div>
                 </div>
 
-                <Progress value={(timeRemaining / timeLimit) * 100} className="h-1.5 bg-secondary" />
+                <div className="relative w-full group">
+                  <Progress
+                    value={(timeRemaining / timeLimit) * 100}
+                    className="h-2 rounded-full bg-[#232323] overflow-hidden transition-all duration-300"
+                    style={{ backgroundImage: 'linear-gradient(90deg, #60AFFF, #FF6F00, #A4FF00)' }}
+                  />
+                  {/* Animated stripes overlay with magical energy feel */}
+                  <div className="absolute inset-0 w-full h-full pointer-events-none animate-progress-stripes bg-[repeating-linear-gradient(135deg,rgba(255,255,255,0.08)_0_10px,transparent_10px_20px)] rounded-full" />
+
+                  {/* Magical spark effect on progress bar */}
+                  <div className="absolute top-0 bottom-0 pointer-events-none flex items-center">
+                    <div className="h-4 w-4 rounded-full bg-[#FF6F00] opacity-0 group-hover:opacity-100 shadow-[0_0_10px_4px_#FF6F00] transition-opacity duration-300"></div>
+                  </div>
+                </div>
 
                 {timerActive ? (
-                  <QuizEngine
-                    questions={questions}
-                    subjectColor={topicData?.subjectColor || "bg-primary"}
-                    subject={params.subject}
-                    topic={params.topic}
-                    timeLimit={timeLimit}
-                    difficulty={topicData?.level.toLowerCase()}
-                    onComplete={handleQuizComplete}
-                  />
+                  <div className="animate-fade-in-up delay-300">
+                    <QuizEngine
+                      questions={questions as Question[]}
+                      subjectColor="bg-[#FF6F00]"
+                      subject={params.subject}
+                      topic={params.topic}
+                      timeLimit={timeLimit}
+                      difficulty={topicData?.level.toLowerCase()}
+                      onComplete={handleQuizComplete}
+                    />
+                  </div>
                 ) : timeRemaining === 0 ? (
-                  <div className="p-8 rounded-xl bg-secondary/30 border border-secondary text-center">
-                    <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
-                      <Clock className="h-8 w-8 text-red-500" />
+                  <div className="p-8 rounded-2xl bg-[#181818] border border-[#232323] text-center animate-fade-in-up hover:shadow-mystical transition-all duration-500">
+                    <div className="w-16 h-16 rounded-full bg-[#FF6F00]/20 flex items-center justify-center mx-auto mb-4 animate-mystic-pulse">
+                      <Clock className="h-8 w-8 text-[#FF6F00]" />
                     </div>
-                    <h2 className="text-2xl font-bold mb-2">Time's Up!</h2>
-                    <p className="text-muted-foreground mb-6">
+                    <h2 className="text-2xl font-extrabold mb-2 text-white">Time's Up!</h2>
+                    <p className="text-white/80 mb-6 font-semibold">
                       You've run out of time for this quiz. Would you like to try again?
                     </p>
-                    <Button onClick={() => window.location.reload()}>Try Again</Button>
+                    <Button
+                      onClick={() => window.location.reload()}
+                      className="bg-gradient-to-r from-[#FF6F00] to-[#B00020] hover:from-[#B00020] hover:to-[#FF6F00] text-white font-bold px-6 py-2 rounded-lg border-none shadow-lg shadow-[#FF6F00]/20 animate-mystic-glow"
+                    >
+                      Try Again
+                    </Button>
                   </div>
                 ) : null}
               </>
             ) : (
-              <div className="p-8 rounded-xl bg-secondary/30 border border-secondary">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <Award className="h-8 w-8 text-primary" />
+              <div className="p-8 rounded-2xl bg-[#181818] border border-[#232323] animate-fade-in-up hover:shadow-mystical transition-all duration-500">
+                <div className="w-16 h-16 rounded-full bg-[#A4FF00]/10 flex items-center justify-center mx-auto mb-4 animate-mystic-pulse">
+                  <Award className="h-8 w-8 text-[#A4FF00]" />
                 </div>
-                <h3 className="text-2xl font-bold mb-2">Quiz Completed!</h3>
-                <p className="text-xl font-medium mb-1">
-                  Your Score: <span className="text-primary">{quizScore}</span> out of {questions.length}
+                <h3 className="text-2xl font-extrabold mb-2 text-white animate-fade-in-up delay-100">Quiz Completed!</h3>
+                <p className="text-xl font-bold mb-1 animate-fade-in-up delay-200">
+                  Your Score: <span className="text-[#A4FF00]">{quizScore}</span> out of <span className="text-white">{questions.length}</span>
                 </p>
-                <p className="text-muted-foreground mb-6">Time spent: {formatTime(activeTime)}</p>
+                <p className="text-white/80 mb-6 font-semibold animate-fade-in-up delay-300">Time spent: {formatTime(activeTime)}</p>
 
-                <div className="w-full max-w-xs mx-auto mb-6">
-                  <div className="relative h-4 rounded-full bg-secondary overflow-hidden">
+                <div className="w-full max-w-xs mx-auto mb-6 animate-fade-in-up delay-400">
+                  <div className="relative h-4 rounded-full bg-[#232323] overflow-hidden">
                     <div
-                      className={`absolute left-0 top-0 bottom-0 ${topicData?.subjectColor}`}
+                      className="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-[#60AFFF] via-[#FF6F00] to-[#A4FF00] animate-score-fill"
                       style={{ width: `${(quizScore / questions.length) * 100}%` }}
                     ></div>
+                    <div className="absolute inset-0 w-full h-full pointer-events-none animate-progress-stripes bg-[repeating-linear-gradient(135deg,rgba(255,255,255,0.08)_0_10px,transparent_10px_20px)] rounded-full" />
                   </div>
-                  <div className="flex justify-between mt-2 text-sm text-muted-foreground">
+                  <div className="flex justify-between mt-2 text-sm text-white font-bold">
                     <span>0</span>
                     <span>{questions.length}</span>
                   </div>
                 </div>
 
-                {/* Performance analysis */}
-                <div className="mb-6 p-4 rounded-lg bg-secondary/50">
-                  <h4 className="font-medium mb-2">Performance Analysis</h4>
+                {/* Performance analysis with magical animations */}
+                <div className="mb-6 p-4 rounded-lg bg-[#232323]/80 border border-[#232323] animate-fade-in-up delay-500 hover:shadow-mystical transition-all duration-300">
+                  <h4 className="font-bold mb-2 text-white relative inline-block">
+                    Performance Analysis
+                    <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-[#A4FF00] to-transparent animate-width-expand"></span>
+                  </h4>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-green-500/10 flex items-center justify-center">
-                        <CheckCircle className="h-4 w-4 text-green-500" />
+                    <div className="flex items-center gap-2 animate-fade-in-up delay-550">
+                      <div className="w-8 h-8 rounded-full bg-[#A4FF00]/10 flex items-center justify-center animate-mystic-pulse">
+                        <CheckCircle className="h-4 w-4 text-[#A4FF00]" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium">Correct Answers</p>
-                        <p className="text-lg font-bold">{quizScore}</p>
+                        <p className="text-sm font-bold text-white">Correct Answers</p>
+                        <p className="text-lg font-bold text-[#A4FF00]">{quizScore}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center">
-                        <XCircle className="h-4 w-4 text-red-500" />
+                    <div className="flex items-center gap-2 animate-fade-in-up delay-600">
+                      <div className="w-8 h-8 rounded-full bg-[#B00020]/10 flex items-center justify-center animate-mystic-pulse">
+                        <XCircle className="h-4 w-4 text-[#B00020]" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium">Incorrect Answers</p>
-                        <p className="text-lg font-bold">{questions.length - quizScore}</p>
+                        <p className="text-sm font-bold text-white">Incorrect Answers</p>
+                        <p className="text-lg font-bold text-[#B00020]">{questions.length - quizScore}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center">
-                        <Clock className="h-4 w-4 text-blue-500" />
+                    <div className="flex items-center gap-2 animate-fade-in-up delay-650">
+                      <div className="w-8 h-8 rounded-full bg-[#FF6F00]/10 flex items-center justify-center animate-mystic-pulse">
+                        <Clock className="h-4 w-4 text-[#FF6F00]" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium">Time Spent</p>
-                        <p className="text-lg font-bold">{formatTime(activeTime)}</p>
+                        <p className="text-sm font-bold text-white">Time Spent</p>
+                        <p className="text-lg font-bold text-white">{formatTime(activeTime)}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-purple-500/10 flex items-center justify-center">
-                        <Award className="h-4 w-4 text-purple-500" />
+                    <div className="flex items-center gap-2 animate-fade-in-up delay-700">
+                      <div className="w-8 h-8 rounded-full bg-[#A4FF00]/10 flex items-center justify-center animate-mystic-pulse">
+                        <Award className="h-4 w-4 text-[#A4FF00]" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium">Accuracy</p>
-                        <p className="text-lg font-bold">{Math.round((quizScore / questions.length) * 100)}%</p>
+                        <p className="text-sm font-bold text-white">Accuracy</p>
+                        <p className="text-lg font-bold text-white">{Math.round((quizScore / questions.length) * 100)}%</p>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up delay-800">
                   <Button
                     variant="outline"
                     onClick={() => {
@@ -1882,19 +1999,29 @@ export default function TopicPage({ params }: { params: { subject: string; topic
                         }
                       }, 1000)
                     }}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 bg-transparent border-[#FF6F00] text-[#FF6F00] hover:bg-[#FF6F00]/10 font-bold rounded-lg animate-mystic-glow relative overflow-hidden group"
                   >
-                    <RefreshCw className="h-4 w-4" />
-                    Try Again
+                    {/* Magical energy effect on hover */}
+                    <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-[#FF6F00]/0 via-[#FF6F00]/20 to-[#FF6F00]/0 transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></span>
+                    <RefreshCw className="h-4 w-4 relative animate-spin-slow" />
+                    <span className="relative">Try Again</span>
                   </Button>
                   <Button
-                    className={`${topicData?.subjectColor} text-white`}
+                    className="bg-[#B00020] hover:bg-[#FF6F00] text-white font-bold rounded-lg animate-mystic-glow relative overflow-hidden group"
                     onClick={() => (window.location.href = "/subjects")}
                   >
-                    Back to Subjects
+                    {/* Magical energy effect on hover */}
+                    <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-[#B00020]/0 via-[#B00020]/30 to-[#B00020]/0 transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></span>
+                    <span className="relative">Back to Subjects</span>
                   </Button>
-                  <Button variant="outline" onClick={() => (window.location.href = "/dashboard")}>
-                    View Dashboard
+                  <Button
+                    variant="outline"
+                    onClick={() => (window.location.href = "/dashboard")}
+                    className="bg-transparent border-[#A4FF00] text-[#A4FF00] hover:bg-[#A4FF00]/10 font-bold rounded-lg animate-mystic-glow relative overflow-hidden group"
+                  >
+                    {/* Magical energy effect on hover */}
+                    <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-[#A4FF00]/0 via-[#A4FF00]/20 to-[#A4FF00]/0 transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></span>
+                    <span className="relative">View Dashboard</span>
                   </Button>
                 </div>
               </div>
@@ -1902,6 +2029,17 @@ export default function TopicPage({ params }: { params: { subject: string; topic
           </div>
         )}
       </div>
+      {/* Enhanced animation keyframes and new styles */}
+      <style jsx>{`
+        .text-shadow-md { text-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+        .text-shadow-lg { text-shadow: 0 4px 24px rgba(0,0,0,0.22), 0 1px 0 #fff2; }
+        .shadow-inner { box-shadow: inset 0 2px 12px 0 rgba(255,255,255,0.04); }
+        .backdrop-blur-sm { backdrop-filter: blur(2.5px); }
+        .backdrop-blur-md { backdrop-filter: blur(4px); }
+        .drop-shadow-lg { filter: drop-shadow(0 4px 16px rgba(0,0,0,0.18)); }
+        .drop-shadow-2xl { filter: drop-shadow(0 8px 32px rgba(0,0,0,0.22)); }
+        // ... existing keyframes ...
+      `}</style>
     </div>
   )
 }

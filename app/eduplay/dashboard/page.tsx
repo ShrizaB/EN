@@ -29,6 +29,7 @@ import { getAllLearningHistory, type LearningHistory } from "@/lib/learning-hist
 import { getDashboardChartData, forceDashboardRefresh } from "@/lib/dashboard-service"
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { EduPlayNavbar } from "@/components/eduplay-navbar"
 
 // Subject icons mapping
 const subjectIcons: Record<string, React.ReactNode> = {
@@ -120,6 +121,7 @@ const formatTime = (seconds: number) => {
 // Login prompt component
 function LoginPrompt() {
   return (
+
     <div className="container py-12 md:py-20 flex flex-col items-center justify-center min-h-[60vh]">
       <div className="text-center max-w-md">
         <h1 className="text-3xl font-bold mb-4">Sign in to view your dashboard</h1>
@@ -142,6 +144,7 @@ function LoginPrompt() {
 // Skeleton loading component for stats cards
 function StatCardSkeleton() {
   return (
+    
     <div className="rounded-xl bg-secondary/30 border border-secondary p-6 animate-pulse">
       <div className="flex items-center gap-3 mb-4">
         <div className="w-10 h-10 rounded-full bg-primary/10"></div>

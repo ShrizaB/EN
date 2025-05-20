@@ -10,6 +10,7 @@ import { TopicContentViewer } from "@/components/search-learn-test/topic-content
 import { TopicQuizTest } from "@/components/search-learn-test/topic-quiz-test"
 import { useRouter } from "next/navigation"
 import { Card } from "@/components/ui/card"
+import { EduPlayNavbar } from "@/components/eduplay-navbar"
 
 export default function SearchLearnTestPage() {
   const [searchQuery, setSearchQuery] = useState("")
@@ -103,6 +104,8 @@ export default function SearchLearnTestPage() {
   ]
 
   return (
+    <>
+      <EduPlayNavbar/>
     <main className="container py-8">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
@@ -201,5 +204,6 @@ export default function SearchLearnTestPage() {
         )}
       </div>
     </main>
+    </>
   )
 }

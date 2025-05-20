@@ -1,0 +1,27 @@
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float-controller {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-float-star {
+  animation: float 3.5s ease-in-out infinite;
+}
+
+.animate-float-bulb {
+  animation: float 4.5s ease-in-out infinite;
+}
+
+@keyframes emberFall {
+  0% {
+    transform: translateY(-10px) scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(100vh) scale(0.5);
+    opacity: 0;
+  }
+}

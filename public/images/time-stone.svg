@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300">
+  <defs>
+    <!-- Core green glow -->
+    <radialGradient id="coreGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#d0ffe0"/>
+      <stop offset="40%" stop-color="#00ff66"/>
+      <stop offset="100%" stop-color="#003319"/>
+    </radialGradient>
+
+    <!-- Faceted highlight -->
+    <radialGradient id="facetLight" cx="30%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.4"/>
+      <stop offset="60%" stop-color="transparent"/>
+    </radialGradient>
+
+    <!-- Outer glow filter -->
+    <filter id="realisticGlow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="10" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Crystal cut pattern -->
+    <pattern id="gemCuts" patternUnits="userSpaceOnUse" width="12" height="12">
+      <path d="M0,6 L12,6 M6,0 L6,12" stroke="#00ff99" stroke-opacity="0.07" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <!-- Gem base -->
+  <ellipse cx="150" cy="150" rx="80" ry="110"
+           fill="url(#coreGlow)"
+           stroke="#00ff99"
+           stroke-width="3"
+           filter="url(#realisticGlow)" />
+
+  <!-- Crystal facets overlay -->
+  <ellipse cx="150" cy="150" rx="78" ry="108"
+           fill="url(#gemCuts)"
+           opacity="0.6"/>
+
+  <!-- Shimmer highlight -->
+  <ellipse cx="120" cy="100" rx="25" ry="15"
+           fill="url(#facetLight)"
+           transform="rotate(-15 120 100)"
+           opacity="0.5" />
+
+  <!-- Edge glints -->
+  <circle cx="190" cy="130" r="6" fill="#00ffcc" opacity="0.2"/>
+  <circle cx="110" cy="180" r="4" fill="#00ffcc" opacity="0.15"/>
+</svg>
