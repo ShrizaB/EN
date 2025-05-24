@@ -1,0 +1,448 @@
+/* Define custom properties (CSS variables) */
+:root {
+  --background: hsl(20, 30%, 10%);
+  --foreground: hsl(0, 0%, 98%);
+  --card: hsl(20, 30%, 15%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --popover: hsl(20, 30%, 15%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --primary: hsl(43, 74%, 49%);
+  --primary-foreground: hsl(0, 0%, 98%);
+  --secondary: hsl(20, 30%, 20%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --muted: hsl(20, 30%, 20%);
+  --muted-foreground: hsl(0, 0%, 70%);
+  --accent: hsl(43, 74%, 49%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 63%, 31%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --border: hsl(20, 30%, 25%);
+  --input: hsl(20, 30%, 25%);
+  --ring: hsl(43, 74%, 49%);
+  --radius: 0.5rem;
+  /* TVA Colors */
+  --tva-brown: hsl(20, 30%, 15%);
+  --tva-brown-dark: hsl(20, 30%, 10%);
+  --tva-brown-light: hsl(20, 30%, 70%);
+  --variant-green: hsl(100, 30%, 60%);
+}
+
+/* Base styles */
+* {
+  border-color: hsl(20, 30%, 25%);
+}
+
+body {
+  background-color: hsl(20, 30%, 10%);
+  color: hsl(0, 0%, 98%);
+  font-feature-settings: "rlig" 1, "calt" 1;
+  font-family: "Courier New", monospace;
+}
+
+/* Utility classes */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+.pattern-diagonal {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(212, 160, 23, 0.1),
+    rgba(212, 160, 23, 0.1) 1px,
+    transparent 1px,
+    transparent 10px
+  );
+}
+
+/* Enhanced TVA Logo Background */
+.tva-logo-bg {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg%3E%3Ccircle cx='50' cy='50' r='40' fill='none' stroke='%23D4A017' stroke-width='2' opacity='0.1'/%3E%3Ctext x='50' y='55' text-anchor='middle' font-family='monospace' font-size='16' fill='%23D4A017' opacity='0.1'%3ETVA%3C/text%3E%3Cpath d='M30,30 L70,70 M70,30 L30,70' stroke='%2300FF88' stroke-width='1' opacity='0.05'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 100px 100px;
+}
+
+/* Enhanced Timeline Spiral Background */
+.timeline-spiral-bg {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath d='M100,20 Q150,50 120,100 Q90,150 100,180' fill='none' stroke='%2300FF88' stroke-width='2' opacity='0.3'/%3E%3Cpath d='M100,30 Q140,60 110,100 Q80,140 100,170' fill='none' stroke='%23D4A017' stroke-width='1' opacity='0.2'/%3E%3Ccircle cx='100' cy='100' r='5' fill='%2300FF88' opacity='0.4'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px 200px;
+  animation: rotate 20s linear infinite;
+}
+
+/* Enhanced Horn Divider */
+.horn-divider {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20'%3E%3Cpath d='M10,10 Q30,5 50,10 Q70,15 90,10' fill='none' stroke='%23D4A017' stroke-width='2'/%3E%3Cpath d='M15,10 Q25,8 35,10 Q45,12 55,10' fill='none' stroke='%2300FF88' stroke-width='1'/%3E%3Ccircle cx='50' cy='10' r='2' fill='%2300FF88' opacity='0.6'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-size: 100px 20px;
+  height: 20px;
+  width: 100%;
+}
+
+/* Timeline Verification Animations */
+.timeline-verify-lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.timeline-verify-lines::before {
+  content: "";
+  position: absolute;
+  top: 20%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #00ff88, transparent);
+  animation: timeline-verify 4s ease-in-out infinite;
+}
+
+.timeline-verify-lines::after {
+  content: "";
+  position: absolute;
+  top: 60%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #d4a017, transparent);
+  animation: timeline-verify 6s ease-in-out infinite 2s;
+}
+
+/* Data Stream Animation */
+.data-stream {
+  position: absolute;
+  top: 0;
+  left: 10%;
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(180deg, transparent, #00ff88, transparent);
+  animation: data-stream 3s ease-in-out infinite;
+}
+
+.data-stream:nth-child(2) {
+  left: 30%;
+  animation-delay: 1s;
+}
+
+.data-stream:nth-child(3) {
+  left: 70%;
+  animation-delay: 2s;
+}
+
+.data-stream:nth-child(4) {
+  left: 90%;
+  animation-delay: 0.5s;
+}
+
+/* Energy Pulse Effects */
+.energy-pulse {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #00ff88, transparent);
+  animation: energy-pulse 2s ease-in-out infinite;
+}
+
+.energy-pulse:nth-child(1) {
+  top: 20%;
+  left: 20%;
+  animation-delay: 0s;
+}
+
+.energy-pulse:nth-child(2) {
+  top: 60%;
+  right: 20%;
+  animation-delay: 1s;
+}
+
+.energy-pulse:nth-child(3) {
+  bottom: 20%;
+  left: 60%;
+  animation-delay: 2s;
+}
+
+/* CRT and retro effects */
+.crt-scanlines {
+  background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.05) 50%, transparent 100%);
+  background-size: 100% 4px;
+  pointer-events: none;
+}
+
+.crt-overlay {
+  background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.05) 80%, rgba(0, 0, 0, 0.1) 100%);
+  pointer-events: none;
+}
+
+/* Enhanced TVA Glitch Effects */
+.animate-glitch {
+  animation: glitch 0.2s ease-in-out;
+}
+
+.animate-glitch-text {
+  text-shadow: 1px 0 #ff0000, -1px 0 #00ffff;
+  animation: glitch-text 0.3s ease-in-out;
+}
+
+.tva-glitch-button {
+  text-shadow: 1px 0 #ff0000, -1px 0 #00ffff;
+  transition: text-shadow 0.3s ease;
+}
+
+.tva-glitch-button:hover {
+  text-shadow: 2px 0 #ff0000, -2px 0 #00ffff, 0 2px #00ff88;
+  animation: glitch-text 0.5s ease-in-out infinite;
+}
+
+/* Animations */
+@keyframes glitch-text {
+  0% {
+    text-shadow: 1px 0 #ff0000, -1px 0 #00ffff;
+  }
+  25% {
+    text-shadow: -1px 0 #ff0000, 1px 0 #00ffff;
+  }
+  50% {
+    text-shadow: 0 -1px #ff0000, 0 1px #00ffff;
+  }
+  75% {
+    text-shadow: 0 1px #ff0000, 0 -1px #00ffff;
+  }
+  100% {
+    text-shadow: 1px 0 #ff0000, -1px 0 #00ffff;
+  }
+}
+
+@keyframes glitch {
+  0% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(-1px, 1px);
+  }
+  40% {
+    transform: translate(-1px, -1px);
+  }
+  60% {
+    transform: translate(1px, 1px);
+  }
+  80% {
+    transform: translate(1px, -1px);
+  }
+  100% {
+    transform: translate(0);
+  }
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translateY(0px);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateY(-10px);
+    opacity: 0.6;
+  }
+}
+
+@keyframes float-medium {
+  0%,
+  100% {
+    transform: translateY(0px) scale(1);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translateY(-8px) scale(1.05);
+    opacity: 0.7;
+  }
+}
+
+@keyframes float-fast {
+  0%,
+  100% {
+    transform: translateY(0px);
+    opacity: 0.2;
+  }
+  50% {
+    transform: translateY(-15px);
+    opacity: 0.8;
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes timeline-verify {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes data-stream {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes energy-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+}
+
+/* Snake-like progress bar */
+.snake-progress {
+  position: relative;
+  overflow: hidden;
+}
+
+.snake-progress::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 20px;
+  background: linear-gradient(90deg, transparent, #00ff88, transparent);
+  animation: slither 3s ease-in-out infinite;
+}
+
+@keyframes slither {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Enhanced TVA Hover Effects */
+.tva-hover-glow:hover {
+  box-shadow: 0 0 15px #00ff88, 0 0 25px #00ff88;
+  transition: box-shadow 0.3s ease;
+}
+
+/* Typewriter effect */
+.typewriter {
+  overflow: hidden;
+  border-right: 2px solid #00ff88;
+  white-space: nowrap;
+  animation: typewriter 2s steps(40) 1s both, blink-caret 1s step-end infinite;
+}
+
+@keyframes typewriter {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes blink-caret {
+  from,
+  to {
+    border-color: transparent;
+  }
+  50% {
+    border-color: #00ff88;
+  }
+}
+
+/* Enhanced Achievement Cards */
+.achievement-card {
+  background: linear-gradient(135deg, rgba(60, 47, 47, 0.9), rgba(26, 26, 26, 0.9));
+  border: 1px solid rgba(212, 160, 23, 0.3);
+  transition: all 0.3s ease;
+}
+
+.achievement-card:hover {
+  border-color: #00ff88;
+  background: linear-gradient(135deg, rgba(26, 26, 26, 0.9), rgba(60, 47, 47, 0.9));
+  transform: translateY(-2px);
+}
+
+.achievement-card.earned {
+  border-color: #00ff88;
+  background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(212, 160, 23, 0.1));
+}
+
+.achievement-icon {
+  background: transparent;
+  border: 2px solid rgba(0, 255, 136, 0.3);
+  transition: all 0.3s ease;
+}
+
+.achievement-card:hover .achievement-icon {
+  border-color: #00ff88;
+  background: rgba(0, 255, 136, 0.1);
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+}
+
+.achievement-card.earned .achievement-icon {
+  border-color: #00ff88;
+  background: rgba(0, 255, 136, 0.2);
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+}
+
+/* Performance optimizations */
+.recharts-wrapper {
+  will-change: auto;
+}
+
+.recharts-pie-sector {
+  transition: none;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .animate-glitch,
+  .animate-float-slow,
+  .animate-float-medium,
+  .animate-float-fast,
+  .timeline-spiral-bg,
+  .snake-progress::before,
+  .timeline-verify-lines::before,
+  .timeline-verify-lines::after,
+  .data-stream,
+  .energy-pulse {
+    animation: none;
+  }
+}

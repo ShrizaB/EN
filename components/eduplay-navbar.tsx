@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
 import {
   X, Sun, Moon, BookOpen, Trophy, History, User,
-  LogOut, LogIn, UserPlus, Video, Home, Brain, Gamepad2, LayoutDashboard
+  LogOut, LogIn, UserPlus, Video, Home, Brain, Gamepad2, LayoutDashboard, Search
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTheme } from "next-themes"
@@ -28,7 +28,7 @@ export const EduPlayNavbar = forwardRef<HTMLDivElement, SidebarProps>(
     const toggleTheme = () => setTheme(theme === "dark" ? "light" : "dark")
 
     const navLinks = [
-      { name: "Home", href: "/", icon: Home },
+      { name: "Home", href: "/eduplay/home", icon: Home },
       { name: "Dashboard", href: "/eduplay/dashboard", icon: LayoutDashboard },
       { name: "Subjects", href: "/subjects", icon: BookOpen },
       { name: "Quiz", href: "/quiz", icon: Brain },
@@ -36,6 +36,7 @@ export const EduPlayNavbar = forwardRef<HTMLDivElement, SidebarProps>(
       { name: "Video Search", href: "/video-search", icon: Video },
       { name: "Test Your Level", href: "/test-your-level", icon: Trophy },
       { name: "Question Generator", href: "/question-generator", icon: Brain },
+      { name: "Search Learn Test", href: "/search-learn-test", icon: Search },
     ]
 
     const userLinks = user

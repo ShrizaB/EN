@@ -1,11 +1,9 @@
 "use client"
 
 import type React from "react"
-
 import { useEffect, useState, useCallback, Suspense } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
 import {
   ArrowRight,
   BarChart3,
@@ -14,53 +12,62 @@ import {
   Clock,
   Code,
   FlaskRoundIcon as Flask,
-  Trophy,
   Award,
   Music,
   Palette,
   Globe,
   Brain,
   Film,
-  RefreshCw,
+  FileText,
+  AlertCircle,
+  Hourglass,
 } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 import { getUserData, type UserProgress, type UserStats } from "@/lib/user-service"
 import { getAllLearningHistory, type LearningHistory } from "@/lib/learning-history-service"
-import { getDashboardChartData, forceDashboardRefresh } from "@/lib/dashboard-service"
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { EduPlayNavbar } from "@/components/eduplay-navbar"
+import {
+  getDashboardChartData,
+  forceDashboardRefresh,
+  getTotalLearningTime,
+} from "@/lib/dashboard-service"
+import { TVABadge } from "./comp/tva-badge"
+import { TVATimeDoor } from "./comp/tva-time-door"
+import { TVATimeline } from "./comp/tva-timeline"
+import { TVANotification } from "./comp/tva-notification"
+import { TVAGlitchText } from "./comp/tva-glitch-text"
+import { TVAPortalLoader } from "./comp/tva-portal-loader"
+import './dashboard.css'
 
 // Subject icons mapping
 const subjectIcons: Record<string, React.ReactNode> = {
-  math: <Calculator className="h-5 w-5 text-math" />,
-  science: <Flask className="h-5 w-5 text-science" />,
-  reading: <BookOpen className="h-5 w-5 text-reading" />,
-  coding: <Code className="h-5 w-5 text-coding" />,
-  art: <Palette className="h-5 w-5 text-art" />,
-  music: <Music className="h-5 w-5 text-music" />,
-  geography: <Globe className="h-5 w-5 text-geography" />,
-  logic: <Brain className="h-5 w-5 text-logic" />,
-  movies: <Film className="h-5 w-5 text-primary" />,
-  c_programming: <Code className="h-5 w-5 text-coding" />,
-  python: <Code className="h-5 w-5 text-coding" />,
-  java: <Code className="h-5 w-5 text-coding" />,
+  math: <Calculator className="h-5 w-5 text-loki-green" />,
+  science: <Flask className="h-5 w-5 text-loki-green" />,
+  reading: <BookOpen className="h-5 w-5 text-loki-green" />,
+  coding: <Code className="h-5 w-5 text-loki-green" />,
+  art: <Palette className="h-5 w-5 text-loki-green" />,
+  music: <Music className="h-5 w-5 text-loki-green" />,
+  geography: <Globe className="h-5 w-5 text-loki-green" />,
+  logic: <Brain className="h-5 w-5 text-loki-green" />,
+  movies: <Film className="h-5 w-5 text-loki-green" />,
+  c_programming: <Code className="h-5 w-5 text-loki-green" />,
+  python: <Code className="h-5 w-5 text-loki-green" />,
+  java: <Code className="h-5 w-5 text-loki-green" />,
 }
 
 // Subject colors mapping
 const subjectColors: Record<string, string> = {
-  math: "#4F46E5",
-  science: "#10B981",
-  reading: "#EC4899",
-  coding: "#F59E0B",
-  art: "#C026D3",
-  music: "#F59E0B",
-  geography: "#06B6D4",
-  logic: "#8B5CF6",
-  movies: "#8B5CF6",
-  c_programming: "#3B82F6",
-  python: "#10B981",
-  java: "#F97316",
+  math: "#00FF88",
+  science: "#D4A017",
+  reading: "#E76F51",
+  coding: "#00FF88",
+  art: "#D4A017",
+  music: "#E76F51",
+  geography: "#00FF88",
+  logic: "#D4A017",
+  movies: "#E76F51",
+  c_programming: "#00FF88",
+  python: "#D4A017",
+  java: "#E76F51",
 }
 
 // Subject names mapping
@@ -118,25 +125,73 @@ const formatTime = (seconds: number) => {
   return `${hours}h ${minutes}m`
 }
 
+// Audio for typewriter effect
+const playTypewriterSound = () => {
+  try {
+    const audio = new Audio(
+      "data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT",
+    )
+    audio.volume = 0.3
+    audio.play().catch(() => { })
+  } catch (error) {
+    // Ignore audio errors
+  }
+}
+
+// Random timeline deviation notifications
+const timelineDeviations = [
+  "Timeline Deviation Detected!",
+  "Nexus Event Approaching!",
+  "Variant Activity Monitored!",
+  "Sacred Timeline Secured!",
+  "Temporal Anomaly Resolved!",
+  "Timeline Verification Complete!",
+  "Variant Behavior Analyzed!",
+  "Sacred Timeline Maintained!",
+]
+
 // Login prompt component
 function LoginPrompt() {
-  return (
+  const [showPortal, setShowPortal] = useState(false)
 
-    <div className="container py-12 md:py-20 flex flex-col items-center justify-center min-h-[60vh]">
-      <div className="text-center max-w-md">
-        <h1 className="text-3xl font-bold mb-4">Sign in to view your dashboard</h1>
-        <p className="text-muted-foreground mb-8">
-          Track your progress, view your achievements, and continue your learning journey.
+  const handleLogin = () => {
+    playTypewriterSound()
+    setShowPortal(true)
+    setTimeout(() => {
+      window.location.href = "/sign-in"
+    }, 2000)
+  }
+
+  return (
+    <div className="container py-12 md:py-20 flex flex-col items-center justify-center min-h-[60vh] relative">
+      {showPortal && <TVAPortalLoader />}
+      <div className="text-center max-w-md relative z-10">
+        <div className="mb-6">
+          <TVAGlitchText text="UNAUTHORIZED VARIANT" className="text-3xl font-bold text-tva-orange mb-2" />
+          <div className="h-1 w-32 bg-tva-gold mx-auto mb-4"></div>
+        </div>
+        <p className="font-mono text-light-gray mb-8 leading-relaxed">
+          VARIANT DETECTED. AUTHORIZATION REQUIRED TO ACCESS SACRED TIMELINE DATA.
         </p>
         <div className="flex gap-4 justify-center">
-          <Button asChild>
-            <Link href="/sign-in">Sign In</Link>
+          <Button
+            onClick={handleLogin}
+            className="bg-tva-brown hover:bg-dark-gray text-light-gray border border-tva-gold tva-hover-glow tva-glitch-button"
+          >
+            <span className="mr-2">AUTHENTICATE</span>
+            <FileText className="h-4 w-4" />
           </Button>
-          <Button asChild variant="outline">
-            <Link href="/sign-in?tab=signup">Create Account</Link>
+          <Button
+            variant="outline"
+            asChild
+            className="border-tva-gold text-tva-gold hover:bg-tva-brown/20 tva-hover-glow tva-glitch-button"
+          >
+            <Link href="/sign-in?tab=signup">CREATE VARIANT PROFILE</Link>
           </Button>
         </div>
       </div>
+      <div className="absolute inset-0 tva-logo-bg opacity-10 pointer-events-none"></div>
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-tva-gold to-transparent"></div>
     </div>
   )
 }
@@ -144,67 +199,16 @@ function LoginPrompt() {
 // Skeleton loading component for stats cards
 function StatCardSkeleton() {
   return (
-    
-    <div className="rounded-xl bg-secondary/30 border border-secondary p-6 animate-pulse">
+    <div className="rounded-md bg-dark-gray border border-tva-gold/30 p-6 animate-pulse">
       <div className="flex items-center gap-3 mb-4">
-        <div className="w-10 h-10 rounded-full bg-primary/10"></div>
+        <div className="w-10 h-10 rounded-full bg-tva-gold/10"></div>
         <div className="space-y-2">
-          <div className="h-4 w-24 bg-muted-foreground/20 rounded"></div>
-          <div className="h-3 w-16 bg-muted-foreground/10 rounded"></div>
+          <div className="h-4 w-24 bg-tva-gold/20 rounded"></div>
+          <div className="h-3 w-16 bg-tva-gold/10 rounded"></div>
         </div>
       </div>
-      <div className="h-8 w-16 bg-muted-foreground/20 rounded mb-1"></div>
-      <div className="h-3 w-32 bg-muted-foreground/10 rounded"></div>
-    </div>
-  )
-}
-
-// Skeleton loading component for pie chart
-function PieChartSkeleton() {
-  return (
-    <Card>
-      <CardHeader>
-        <div className="h-6 w-40 bg-muted-foreground/20 rounded mb-2"></div>
-        <div className="h-4 w-60 bg-muted-foreground/10 rounded"></div>
-      </CardHeader>
-      <CardContent className="h-[300px] flex items-center justify-center">
-        <div className="w-40 h-40 rounded-full border-8 border-muted-foreground/10 animate-pulse"></div>
-      </CardContent>
-    </Card>
-  )
-}
-
-// Skeleton loading component for activity cards
-function ActivityCardSkeleton() {
-  return (
-    <div className="rounded-lg bg-secondary/50 border border-secondary p-4 animate-pulse">
-      <div className="flex justify-between items-start mb-4">
-        <div className="space-y-2">
-          <div className="h-5 w-32 bg-muted-foreground/20 rounded"></div>
-          <div className="h-4 w-24 bg-muted-foreground/10 rounded"></div>
-        </div>
-        <div className="h-8 w-20 bg-primary/30 rounded"></div>
-      </div>
-      <div className="h-1.5 w-full bg-muted-foreground/10 rounded mb-2"></div>
-      <div className="flex justify-between">
-        <div className="h-3 w-16 bg-muted-foreground/10 rounded"></div>
-        <div className="h-3 w-20 bg-muted-foreground/10 rounded"></div>
-      </div>
-    </div>
-  )
-}
-
-// Skeleton loading component for achievement cards
-function AchievementCardSkeleton() {
-  return (
-    <div className="rounded-lg bg-secondary/50 border border-secondary p-4 animate-pulse">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-muted-foreground/10"></div>
-        <div className="space-y-2 flex-1">
-          <div className="h-4 w-28 bg-muted-foreground/20 rounded"></div>
-          <div className="h-3 w-36 bg-muted-foreground/10 rounded"></div>
-        </div>
-      </div>
+      <div className="h-8 w-16 bg-tva-gold/20 rounded mb-1"></div>
+      <div className="h-3 w-32 bg-tva-gold/10 rounded"></div>
     </div>
   )
 }
@@ -222,25 +226,53 @@ function DashboardContent() {
     isLoaded: false,
   })
   const [chartData, setChartData] = useState<any[]>([])
-  const [activeIndex, setActiveIndex] = useState(0)
   const [refreshKey, setRefreshKey] = useState(0)
+  const [totalLearningTime, setTotalLearningTime] = useState<string>(getTotalLearningTime())
+  const [showNotification, setShowNotification] = useState(false)
+  const [notificationMessage, setNotificationMessage] = useState("")
+
+  // Default UserStats object to prevent type errors
+  const defaultUserStats: UserStats = {
+    totalQuizzesTaken: 0,
+    totalQuestionsAnswered: 0,
+    correctAnswers: 0,
+    totalTimeSpent: 0,
+    gamesPlayed: 0,
+    lastActive: new Date(),
+  }
 
   // Simple refresh function that increments the refresh key
   const refreshData = useCallback(() => {
-    console.log("🔄 Manual refresh triggered")
+    playTypewriterSound()
     setRefreshKey((prev) => prev + 1)
+    setShowNotification(true)
+    const randomDeviation = timelineDeviations[Math.floor(Math.random() * timelineDeviations.length)]
+    setNotificationMessage(randomDeviation)
+    setTimeout(() => setShowNotification(false), 3000)
     forceDashboardRefresh()
+  }, [])
+
+  // Random timeline deviation notifications
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (Math.random() > 0.7) {
+        const randomDeviation = timelineDeviations[Math.floor(Math.random() * timelineDeviations.length)]
+        setNotificationMessage(randomDeviation)
+        setShowNotification(true)
+        setTimeout(() => setShowNotification(false), 3000)
+      }
+    }, 30000) // Every 30 seconds
+
+    return () => clearInterval(interval)
   }, [])
 
   // Listen for learning history update events
   useEffect(() => {
     const handleLearningHistoryUpdated = () => {
-      console.log("Learning history update detected, refreshing data...")
       refreshData()
     }
 
     const handleForceRefresh = () => {
-      console.log("Force refresh event detected, refreshing data...")
       refreshData()
     }
 
@@ -253,6 +285,22 @@ function DashboardContent() {
     }
   }, [refreshData])
 
+  // Listen for learning time updates
+  useEffect(() => {
+    const updateLearningTime = (event: any) => {
+      if (event?.detail?.totalLearningTime) {
+        setTotalLearningTime(event.detail.totalLearningTime)
+      } else {
+        setTotalLearningTime(getTotalLearningTime())
+      }
+    }
+    window.addEventListener("learning-time-updated", updateLearningTime)
+    setTotalLearningTime(getTotalLearningTime())
+    return () => {
+      window.removeEventListener("learning-time-updated", updateLearningTime)
+    }
+  }, [])
+
   // Fetch chart data separately
   useEffect(() => {
     let isMounted = true
@@ -261,11 +309,8 @@ function DashboardContent() {
       if (!user) return
 
       try {
-        console.log("Fetching chart data...")
         const data = await getDashboardChartData(user.id)
-
         if (isMounted) {
-          console.log("Setting chart data:", data)
           setChartData(data)
         }
       } catch (error) {
@@ -290,21 +335,20 @@ function DashboardContent() {
       if (!user) return
 
       try {
-        // Fetch both in parallel with cache-busting
         const timestamp = Date.now()
         const [history, userData] = await Promise.all([
           getAllLearningHistory(`t=${timestamp}`),
           getUserData(`${user.id}?t=${timestamp}`),
         ])
 
-        console.log("Learning history fetched:", history?.length || 0, "items")
-        console.log("User data fetched:", userData)
-
         if (isMounted) {
           setDashboardData({
             userData: {
               progress: userData?.progress || {},
-              stats: userData?.stats || {},
+              stats: {
+                ...defaultUserStats,
+                ...userData?.stats,
+              },
             },
             learningHistory: history || [],
             isLoaded: true,
@@ -313,8 +357,14 @@ function DashboardContent() {
       } catch (error) {
         console.error("Error fetching dashboard data:", error)
         if (isMounted) {
-          // Even on error, mark as loaded to show empty state
-          setDashboardData((prev) => ({ ...prev, isLoaded: true }))
+          setDashboardData((prev) => ({
+            ...prev,
+            userData: {
+              progress: {},
+              stats: { ...defaultUserStats },
+            },
+            isLoaded: true,
+          }))
         }
       }
     }
@@ -334,17 +384,11 @@ function DashboardContent() {
   const activityCountBySubject: Record<string, number> = {}
   const uniqueTopics = new Set<string>()
 
-  // Debug the learning history data
-  console.log("Processing learning history for activities:", dashboardData.learningHistory)
-
-  // First, normalize subject names to match our keys
-  const normalizedHistory = dashboardData.learningHistory.map((item) => {
+  const normalizedHistory: Array<LearningHistory & { normalizedSubject?: string }> = dashboardData.learningHistory.map((item) => {
     if (!item || !item.subject) return item
 
-    // Convert subject to lowercase and remove spaces
     let normalizedSubject = item.subject.toLowerCase().replace(/\s+/g, "")
 
-    // Handle common variations
     if (normalizedSubject.includes("math")) normalizedSubject = "math"
     if (normalizedSubject.includes("science")) normalizedSubject = "science"
     if (normalizedSubject.includes("read")) normalizedSubject = "reading"
@@ -356,40 +400,34 @@ function DashboardContent() {
     }
   })
 
-  // Now count activities by normalized subject
   normalizedHistory.forEach((item) => {
     if (!item || !item.subject || !item.topic) return
 
     const subject = item.normalizedSubject || item.subject.toLowerCase()
     const key = `${subject}-${item.topic}`
 
-    // Only count each unique topic once
     if (!uniqueTopics.has(key)) {
       uniqueTopics.add(key)
       activityCountBySubject[subject] = (activityCountBySubject[subject] || 0) + 1
-      console.log(`Added activity for subject: ${subject}, count now: ${activityCountBySubject[subject]}`)
     }
   })
 
-  // Calculate total activities
   const totalActivities = Object.values(activityCountBySubject).reduce((sum, count) => sum + count, 0)
 
-  // Get user's recent activities based on learning history
   const recentActivities = dashboardData.learningHistory
-    .filter((item) => item && item.subject && item.topic) // Filter out invalid entries
-    .slice(0, 3) // Take the 3 most recent activities
+    .filter((item) => item && item.subject && item.topic)
+    .slice(0, 3)
     .map((item) => {
       const subjectKey = item.subject.toLowerCase().replace(/\s+/g, "") as keyof typeof subjectNames
       let displaySubject = item.subject
       let subjectSlug = item.subject.toLowerCase().replace(/\s+/g, "")
-      let color = "#8B5CF6" // Default color
+      let color = "#00FF88"
 
-      // Try to match with our known subjects
       Object.entries(subjectNames).forEach(([key, value]) => {
         if (subjectSlug.includes(key.toLowerCase())) {
           displaySubject = value
           subjectSlug = key
-          color = subjectColors[key as keyof typeof subjectColors] || "#8B5CF6"
+          color = subjectColors[key as keyof typeof subjectColors] || "#00FF88"
         }
       })
 
@@ -404,9 +442,8 @@ function DashboardContent() {
       }
     })
 
-  // If no activities from learning history, fall back to the original method
   const fallbackActivities = Object.entries(dashboardData.userData?.progress || {})
-    .filter(([_, value]) => value > 0) // Only show subjects with progress
+    .filter(([_, value]) => value > 0)
     .map(([key, value]) => {
       const subjectKey = key as keyof typeof subjectNames
       return {
@@ -432,180 +469,204 @@ function DashboardContent() {
                   : `${subjectNames[subjectKey] || key} Basics`,
         subject: subjectNames[subjectKey] || key,
         subjectSlug: key,
-        subjectColor: subjectColors[subjectKey] || "#8B5CF6",
+        subjectColor: subjectColors[subjectKey] || "#00FF88",
         lastPlayed: "Recently",
-        progress: value, // This is the actual progress percentage (0-100)
+        progress: value,
       }
     })
-    .slice(0, 3) // Show top 3 activities
+    .slice(0, 3)
 
-  // Use learning history activities if available, otherwise fall back
   const displayActivities = recentActivities.length > 0 ? recentActivities : fallbackActivities
-
-  // If no activities, show empty state
   const hasActivities = displayActivities.length > 0
 
-  // Calculate achievements based on user stats and learning history
   const achievements = [
     {
       title: "Math Explorer",
       description: "Started learning mathematics",
       icon: Calculator,
-      color: "text-math",
-      bgColor: "bg-math/10",
+      color: "text-loki-green",
       earned: Object.keys(activityCountBySubject).some((key) => key.includes("math")),
     },
     {
       title: "Reading Beginner",
       description: "Started reading activities",
       icon: BookOpen,
-      color: "text-reading",
-      bgColor: "bg-reading/10",
+      color: "text-loki-green",
       earned: Object.keys(activityCountBySubject).some((key) => key.includes("read")),
     },
     {
       title: "Science Curious",
       description: "Explored science topics",
       icon: Flask,
-      color: "text-science",
-      bgColor: "bg-science/10",
+      color: "text-loki-green",
       earned: Object.keys(activityCountBySubject).some((key) => key.includes("science")),
     },
     {
       title: "Coding Enthusiast",
       description: "Started coding journey",
       icon: Code,
-      color: "text-coding",
-      bgColor: "bg-coding/10",
+      color: "text-loki-green",
       earned: Object.keys(activityCountBySubject).some((key) => key.includes("cod") || key.includes("program")),
     },
   ]
 
-  // Calculate total achievements earned
   const achievementsEarned = achievements.filter((a) => a.earned).length
 
   return (
     <>
+      {showNotification && <TVANotification message={notificationMessage} onClose={() => setShowNotification(false)} />}
+
+      {/* Enhanced Timeline Verification Background */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="timeline-verify-lines"></div>
+        <div className="data-stream"></div>
+        <div className="data-stream"></div>
+        <div className="data-stream"></div>
+        <div className="data-stream"></div>
+        <div className="energy-pulse"></div>
+        <div className="energy-pulse"></div>
+        <div className="energy-pulse"></div>
+      </div>
+
+      {/* Horn Divider */}
+      <div className="horn-divider mb-8"></div>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-        <div className="group relative overflow-hidden rounded-xl bg-secondary/30 border border-secondary p-6 transition-all duration-300 hover:bg-secondary/50">
-          <div className="absolute -inset-px bg-gradient-to-r from-primary/0 to-primary/0 group-hover:from-primary/5 group-hover:to-primary/10 rounded-xl transition-all duration-300"></div>
+        <div className="group relative overflow-hidden rounded-md bg-tva-brown border border-tva-gold hover:border-loki-green p-6 transition-all duration-500 hover:-translate-y-1 hover:shadow-md hover:shadow-loki-green/30 tva-hover-glow">
+          <div className="absolute inset-0 crt-overlay opacity-5"></div>
+          <div className="absolute inset-0 tva-logo-bg opacity-5"></div>
+          <div className="absolute inset-0 timeline-spiral-bg opacity-10"></div>
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <Clock className="h-5 w-5 text-primary" />
+              <div className="w-12 h-12 rounded-full bg-transparent border-2 border-loki-green/30 flex items-center justify-center transition-all group-hover:scale-110 group-hover:border-loki-green group-hover:bg-loki-green/10 group-hover:shadow-lg group-hover:shadow-loki-green/30 duration-500">
+                <Hourglass className="h-6 w-6 text-loki-green" />
               </div>
               <div>
-                <h3 className="font-medium">Total Learning Time</h3>
-                <p className="text-muted-foreground text-sm">All time</p>
+                <h3 className="font-mono font-medium text-tva-gold group-hover:text-loki-green group-hover:animate-glitch-text transition-colors">
+                  TIMELINE EXPOSURE
+                </h3>
+                <p className="text-light-gray text-sm">All time</p>
               </div>
             </div>
-
-            <div className="text-3xl font-bold">{formatTime(dashboardData.userData?.stats?.totalTimeSpent || 0)}</div>
-            <p className="text-xs text-muted-foreground mt-1">Time spent on completed activities</p>
+            <div className="text-3xl font-mono font-bold text-light-gray group-hover:text-loki-green transition-colors duration-300">
+              {totalLearningTime || formatTime((dashboardData.userData?.stats?.totalTimeSpent ?? defaultUserStats.totalTimeSpent))}
+            </div>
+            <p className="text-xs text-light-gray mt-2 font-mono">TIME SPENT ON SACRED TIMELINE</p>
           </div>
+          <div className="absolute bottom-0 right-0 w-32 h-32 bg-loki-green/10 rounded-full blur-2xl animate-pulse"></div>
+          <div className="absolute top-2 right-2 w-3 h-3 bg-loki-green/50 rounded-full animate-ping"></div>
         </div>
 
-        <div className="group relative overflow-hidden rounded-xl bg-secondary/30 border border-secondary p-6 transition-all duration-300 hover:bg-secondary/50">
-          <div className="absolute -inset-px bg-gradient-to-r from-primary/0 to-primary/0 group-hover:from-primary/5 group-hover:to-primary/10 rounded-xl transition-all duration-300"></div>
+        <div className="group relative overflow-hidden rounded-md bg-tva-brown border border-tva-gold hover:border-loki-green p-6 transition-all duration-500 hover:-translate-y-1 hover:shadow-md hover:shadow-loki-green/30 tva-hover-glow">
+          <div className="absolute inset-0 crt-overlay opacity-5"></div>
+          <div className="absolute inset-0 tva-logo-bg opacity-5"></div>
+          <div className="absolute inset-0 timeline-spiral-bg opacity-10"></div>
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <BarChart3 className="h-5 w-5 text-primary" />
+              <div className="w-12 h-12 rounded-full bg-transparent border-2 border-loki-green/30 flex items-center justify-center transition-all group-hover:scale-110 group-hover:border-loki-green group-hover:bg-loki-green/10 group-hover:shadow-lg group-hover:shadow-loki-green/30 duration-500">
+                <FileText className="h-6 w-6 text-loki-green" />
               </div>
               <div>
-                <h3 className="font-medium">Activities Completed</h3>
-                <p className="text-muted-foreground text-sm">All time</p>
+                <h3 className="font-mono font-medium text-tva-gold group-hover:text-loki-green group-hover:animate-glitch-text transition-colors">
+                  TIMELINE BRANCHES
+                </h3>
+                <p className="text-light-gray text-sm">All time</p>
               </div>
             </div>
-            <div className="text-3xl font-bold">{totalActivities || 0}</div>
-            <p className="text-xs text-muted-foreground mt-1">Complete more activities to learn!</p>
+            <div className="text-3xl font-mono font-bold text-light-gray group-hover:text-loki-green transition-colors duration-300">
+              {totalActivities || 0}
+            </div>
+            <p className="text-xs text-light-gray mt-2 font-mono">COMPLETE MORE TO MAINTAIN TIMELINE</p>
           </div>
+          <div className="absolute bottom-0 right-0 w-32 h-32 bg-loki-green/10 rounded-full blur-2xl animate-pulse"></div>
+          <div className="absolute top-2 right-2 w-3 h-3 bg-loki-green/50 rounded-full animate-ping"></div>
         </div>
 
-        <div className="group relative overflow-hidden rounded-xl bg-secondary/30 border border-secondary p-6 transition-all duration-300 hover:bg-secondary/50">
-          <div className="absolute -inset-px bg-gradient-to-r from-primary/0 to-primary/0 group-hover:from-primary/5 group-hover:to-primary/10 rounded-xl transition-all duration-300"></div>
+        <div className="group relative overflow-hidden rounded-md bg-tva-brown border border-tva-gold hover:border-loki-green p-6 transition-all duration-500 hover:-translate-y-1 hover:shadow-md hover:shadow-loki-green/30 tva-hover-glow">
+          <div className="absolute inset-0 crt-overlay opacity-5"></div>
+          <div className="absolute inset-0 tva-logo-bg opacity-5"></div>
+          <div className="absolute inset-0 timeline-spiral-bg opacity-10"></div>
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <Trophy className="h-5 w-5 text-primary" />
+              <div className="w-12 h-12 rounded-full bg-transparent border-2 border-loki-green/30 flex items-center justify-center transition-all group-hover:scale-110 group-hover:border-loki-green group-hover:bg-loki-green/10 group-hover:shadow-lg group-hover:shadow-loki-green/30 duration-500">
+                <Award className="h-6 w-6 text-loki-green" />
               </div>
               <div>
-                <h3 className="font-medium">Achievements</h3>
-                <p className="text-muted-foreground text-sm">Total earned</p>
+                <h3 className="font-mono font-medium text-tva-gold group-hover:text-loki-green group-hover:animate-glitch-text transition-colors">
+                  VARIANT COMMENDATIONS
+                </h3>
+                <p className="text-light-gray text-sm">Total earned</p>
               </div>
             </div>
-            <div className="text-3xl font-bold">{achievementsEarned}</div>
-            <p className="text-xs text-muted-foreground mt-1">Earn more by exploring subjects!</p>
+            <div className="text-3xl font-mono font-bold text-light-gray group-hover:text-loki-green transition-colors duration-300">
+              {achievementsEarned}
+            </div>
+            <p className="text-xs text-light-gray mt-2 font-mono">EARN MORE BY EXPLORING SUBJECTS</p>
           </div>
+          <div className="absolute bottom-0 right-0 w-32 h-32 bg-loki-green/10 rounded-full blur-2xl animate-pulse"></div>
+          <div className="absolute top-2 right-2 w-3 h-3 bg-loki-green/50 rounded-full animate-ping"></div>
         </div>
       </div>
 
-      {/* Subject Progress Pie Chart */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
-        <Card className="lg:col-span-1">
-          <CardHeader>
-            <CardTitle>Subject Distribution</CardTitle>
-            <CardDescription>Your learning activities across all subjects</CardDescription>
-          </CardHeader>
-          <CardContent className="h-[300px] flex items-center justify-center">
-            {chartData.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    activeIndex={activeIndex}
-                    data={chartData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                    onMouseEnter={(_, index) => setActiveIndex(index)}
-                    animationBegin={0}
-                    animationDuration={1200}
-                    animationEasing="ease-out"
-                  >
-                    {chartData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    formatter={(value, name, props) => {
-                      // @ts-ignore - entry has our custom properties
-                      const entry = props.payload
-                      return [`${value}% (${entry?.count || 0} activities)`, name]
-                    }}
-                    contentStyle={{
-                      backgroundColor: "rgba(23, 23, 23, 0.8)",
-                      borderRadius: "8px",
-                      border: "none",
-                      color: "white",
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="text-center text-muted-foreground">
-                <p>No activities completed yet</p>
-                <p className="text-sm">Complete activities to see your distribution</p>
-                <Button variant="outline" size="sm" onClick={refreshData} className="mt-4">
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  Refresh Data
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+      {/* Horn Divider */}
+      <div className="horn-divider mb-8"></div>
 
+      {/* Subject Progress and Timeline */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+        <div className="relative overflow-hidden rounded-md bg-tva-brown border border-tva-gold hover:border-loki-green p-6 lg:col-span-1 shadow-lg hover:shadow-md hover:shadow-loki-green/30 transition-all duration-500 tva-hover-glow">
+          <div className="absolute inset-0 pattern-diagonal opacity-10"></div>
+          <div className="absolute inset-0 crt-overlay opacity-5"></div>
+          <div className="absolute inset-0 tva-logo-bg opacity-5"></div>
+          <div className="absolute inset-0 timeline-spiral-bg opacity-10"></div>
+
+          <div className="relative z-10">
+            <div className="flex justify-between items-center mb-3">
+              <TVAGlitchText text="TIMELINE BRANCHES" className="text-xl font-mono font-bold text-tva-gold" />
+              <div className="w-10 h-10 rounded-full bg-tva-gold/10 flex items-center justify-center">
+                <BarChart3 className="h-5 w-5 text-tva-gold" />
+              </div>
+            </div>
+            <p className="text-sm text-light-gray mb-6 font-mono">SUBJECT DISTRIBUTION ANALYSIS</p>
+
+            <div className="h-[300px] flex items-center justify-center">
+              {chartData.length > 0 ? (
+                <TVATimeline data={chartData} />
+              ) : (
+                <div className="text-center text-tva-gold font-mono">
+                  <p>NO DATA AVAILABLE</p>
+                  <p className="text-sm text-light-gray">COMPLETE SOME ACTIVITIES TO SEE YOUR PROGRESS</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Recent Activities */}
         <div className="lg:col-span-2">
-          <div className="relative overflow-hidden rounded-xl bg-secondary/30 border border-secondary p-6">
+          <div className="absolute inset-0 flex justify-center items-center h-[1200px]">
+            <img
+              src=""
+              alt=""
+              className="opacity-30 w-[100px] h-auto mb-80 transform scale-x-[-1]"
+            />
+          </div>
+          <div className="relative overflow-hidden rounded-md bg-tva-brown border border-tva-gold hover:border-loki-green p-6 tva-hover-glow">
             <div className="absolute inset-0 pattern-diagonal opacity-5"></div>
+            <div className="absolute inset-0 crt-overlay opacity-5"></div>
+            <div className="absolute inset-0 tva-logo-bg opacity-5"></div>
+            <div className="absolute inset-0 timeline-spiral-bg opacity-10"></div>
             <div className="relative z-10">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold">Recent Activities</h2>
-                <Button variant="ghost" size="sm" asChild className="text-sm">
+                <TVAGlitchText text="RECENT TIMELINE ACTIVITY" className="text-xl font-mono font-bold text-tva-gold" />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  asChild
+                  className="text-sm text-tva-gold hover:text-loki-green hover:bg-dark-gray tva-hover-glow tva-glitch-button"
+                  onClick={playTypewriterSound}
+                >
                   <Link href="/history">
-                    View All
+                    VIEW ALL
                     <ArrowRight className="ml-1 h-3.5 w-3.5" />
                   </Link>
                 </Button>
@@ -613,54 +674,31 @@ function DashboardContent() {
 
               <div className="space-y-4">
                 {hasActivities ? (
-                  displayActivities.map((activity) => (
-                    <div
+                  displayActivities.map((activity, index) => (
+                    <TVATimeDoor
                       key={`${activity.subjectSlug}-${activity.id}`}
-                      className="group relative overflow-hidden rounded-lg bg-secondary/50 border border-secondary hover:border-primary/50 p-4 transition-all duration-300"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <h3 className="font-medium truncate group-hover:text-primary transition-colors">
-                                {activity.title}
-                              </h3>
-                              <p className="text-sm text-muted-foreground">{activity.subject}</p>
-                            </div>
-                            <Button asChild size="sm" variant="ghost" className="bg-primary text-white">
-                              <Link href={`/subjects/${activity.subjectSlug}/topics/${activity.id}`}>Continue</Link>
-                            </Button>
-                          </div>
-                          <div className="mt-2">
-                            <Progress
-                              value={activity.progress}
-                              className="h-1.5"
-                              style={
-                                {
-                                  "--progress-background": activity.subjectColor,
-                                } as React.CSSProperties
-                              }
-                            />
-                            <div className="flex justify-between mt-1">
-                              <span className="text-xs text-muted-foreground">{activity.progress}% complete</span>
-                              <span className="text-xs text-muted-foreground">
-                                {Math.max(1, Math.round((100 - activity.progress) / 10))} questions left
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                      title={activity.title}
+                      subject={activity.subject}
+                      progress={activity.progress}
+                      href={`/subjects/${activity.subjectSlug}/topics/${activity.id}`}
+                      delay={index * 150}
+                    />
                   ))
                 ) : (
-                  <div className="text-center p-8 bg-secondary/20 rounded-lg">
-                    <p className="text-muted-foreground mb-2">No activities yet</p>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Start exploring subjects to track your progress
+                  <div className="text-center p-8 bg-dark-gray rounded-md border border-tva-gold/30">
+                    <AlertCircle className="h-8 w-8 text-tva-orange mx-auto mb-2" />
+                    <p className="text-tva-gold mb-2 font-mono">NO TIMELINE ACTIVITY DETECTED</p>
+                    <p className="text-sm text-light-gray mb-4 font-mono">
+                      START EXPLORING SUBJECTS TO TRACK YOUR PROGRESS
                     </p>
-                    <Button asChild size="sm">
+                    <Button
+                      asChild
+                      size="sm"
+                      className="bg-dark-gray hover:bg-tva-brown text-light-gray border border-tva-gold/50 tva-hover-glow tva-glitch-button"
+                      onClick={playTypewriterSound}
+                    >
                       <Link href="/subjects">
-                        Start Learning
+                        START LEARNING
                         <ArrowRight className="ml-1 h-3.5 w-3.5" />
                       </Link>
                     </Button>
@@ -672,78 +710,95 @@ function DashboardContent() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
-        <div>
-          <div className="relative overflow-hidden rounded-xl bg-secondary/30 border border-secondary p-6 h-full">
-            <div className="absolute inset-0 pattern-diagonal opacity-5"></div>
-            <div className="relative z-10">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold">Achievements</h2>
-                <Button variant="ghost" size="sm" asChild className="text-sm">
-                  <Link href="/achievements">
-                    View All
-                    <ArrowRight className="ml-1 h-3.5 w-3.5" />
-                  </Link>
-                </Button>
-              </div>
+      {/* Horn Divider */}
+      <div className="horn-divider mb-8"></div>
 
-              <div className="space-y-4">
-                {achievements.map((achievement, index) => (
-                  <div
-                    key={index}
-                    className="group relative overflow-hidden rounded-lg bg-secondary/50 border border-secondary hover:border-primary/50 p-4 transition-all duration-300"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={`w-10 h-10 rounded-full ${achievement.bgColor} flex items-center justify-center ${achievement.earned ? "" : "opacity-50"}`}
-                      >
-                        <achievement.icon
-                          className={`h-5 w-5 ${achievement.color} ${achievement.earned ? "" : "opacity-50"}`}
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className={`font-medium truncate ${achievement.earned ? "" : "text-muted-foreground"}`}>
-                          {achievement.title}
-                        </h3>
-                        <p className="text-xs text-muted-foreground truncate">{achievement.description}</p>
-                      </div>
-                      {achievement.earned && <Award className="h-5 w-5 text-yellow-500" />}
+      {/* Achievements and Recommended Topics Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+        {/* Enhanced Achievements Section */}
+        <div>
+          <TVAGlitchText text="VARIANT COMMENDATIONS" className="text-xl font-mono font-bold text-tva-gold mb-6" />
+          <div className="grid grid-cols-1 gap-4">
+            {achievements.map((achievement, index) => (
+              <div
+                key={index}
+                className={`achievement-card ${achievement.earned ? "earned" : ""} group relative overflow-hidden rounded-md p-6 transition-all duration-500`}
+              >
+                <div className="absolute inset-0 crt-overlay opacity-5"></div>
+                <div className="absolute inset-0 tva-logo-bg opacity-5"></div>
+                <div className="absolute inset-0 timeline-spiral-bg opacity-10"></div>
+                <div className="relative z-10">
+                  <div className="flex items-center gap-3">
+                    <div className="achievement-icon w-12 h-12 rounded-full flex items-center justify-center transition-all group-hover:scale-110 duration-500">
+                      <achievement.icon className={`h-6 w-6 ${achievement.color}`} />
+                    </div>
+                    <div>
+                      <h3 className="font-mono font-medium text-tva-gold group-hover:text-loki-green group-hover:animate-glitch-text transition-colors">
+                        {achievement.title}
+                      </h3>
+                      <p className="text-light-gray text-sm font-mono">{achievement.description}</p>
+                      {achievement.earned && (
+                        <div className="flex items-center gap-1 mt-1">
+                          <div className="w-2 h-2 bg-loki-green rounded-full animate-pulse"></div>
+                          <span className="text-xs text-loki-green font-mono">EARNED</span>
+                        </div>
+                      )}
                     </div>
                   </div>
-                ))}
+                </div>
               </div>
-            </div>
+            ))}
           </div>
         </div>
 
+        {/* Recommended For You */}
         <div className="lg:col-span-2">
-          <div className="relative overflow-hidden rounded-xl bg-secondary/30 border border-secondary p-6">
+          <div className="relative overflow-hidden rounded-md bg-tva-brown border border-tva-gold hover:border-loki-green p-6 tva-hover-glow">
             <div className="absolute inset-0 pattern-diagonal opacity-5"></div>
+            <div className="absolute inset-0 crt-overlay opacity-5"></div>
+            <div className="absolute inset-0 tva-logo-bg opacity-5"></div>
+            <div className="absolute inset-0 timeline-spiral-bg opacity-10"></div>
             <div className="relative z-10">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold">Recommended For You</h2>
-                <Button variant="ghost" size="sm" asChild className="text-sm">
+                <TVAGlitchText
+                  text="RECOMMENDED TIMELINE PATHS"
+                  className="text-xl font-mono font-bold text-tva-gold"
+                />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  asChild
+                  className="text-sm text-tva-gold hover:text-loki-green hover:bg-dark-gray tva-hover-glow tva-glitch-button"
+                  onClick={playTypewriterSound}
+                >
                   <Link href="/subjects">
-                    View All Subjects
+                    VIEW ALL SUBJECTS
                     <ArrowRight className="ml-1 h-3.5 w-3.5" />
                   </Link>
                 </Button>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {recommendedTopics.map((topic) => (
+                {recommendedTopics.map((topic, index) => (
                   <Link key={topic.id} href={`/subjects/${topic.subjectSlug}/topics/${topic.id}`} className="group">
-                    <div className="relative overflow-hidden rounded-lg bg-secondary/50 border border-secondary hover:border-primary/50 p-4 h-full transition-all duration-300">
-                      <div className="flex flex-col h-full">
+                    <div className="relative overflow-hidden rounded-md bg-dark-gray border border-tva-gold/30 hover:border-loki-green p-4 h-full transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:shadow-loki-green/30 tva-hover-glow">
+                      <div className="absolute inset-0 crt-overlay opacity-5"></div>
+                      <div className="absolute inset-0 tva-logo-bg opacity-5"></div>
+                      <div className="absolute inset-0 timeline-spiral-bg opacity-10"></div>
+                      <div className="flex flex-col h-full relative z-10">
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-green-500/20 text-green-500">
+                          <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-loki-green/20 text-loki-green border border-loki-green/30">
                             {topic.level}
                           </span>
-                          <span className="text-xs text-muted-foreground">Ages {topic.ageRange}</span>
+                          <span className="text-xs text-light-gray font-mono">Ages {topic.ageRange}</span>
                         </div>
-                        <h3 className="font-medium group-hover:text-primary transition-colors">{topic.title}</h3>
-                        <p className="text-xs text-muted-foreground mb-2">{topic.subject}</p>
-                        <div className="mt-auto text-xs text-muted-foreground">{topic.questionsCount} questions</div>
+                        <h3 className="font-mono font-medium text-tva-gold group-hover:text-loki-green group-hover:animate-glitch-text transition-colors">
+                          {topic.title}
+                        </h3>
+                        <p className="text-xs text-light-gray mb-2 font-mono">{topic.subject}</p>
+                        <div className="mt-auto text-xs text-light-gray font-mono">
+                          {topic.questionsCount} questions
+                        </div>
                       </div>
                     </div>
                   </Link>
@@ -752,11 +807,13 @@ function DashboardContent() {
             </div>
           </div>
           <div className="mt-6 flex justify-center">
-            <Button asChild variant="outline" className="flex items-center gap-2">
-              <Link href="/test-your-level">
-                <Brain className="h-4 w-4 text-primary" />
-                Test Your Knowledge Level
-              </Link>
+            <Button
+              variant="outline"
+              className="flex items-center gap-2 border-tva-gold text-tva-gold hover:bg-dark-gray hover:text-loki-green hover:border-loki-green tva-hover-glow tva-glitch-button"
+              onClick={playTypewriterSound}
+            >
+              <Brain className="h-4 w-4" />
+              TEST YOUR KNOWLEDGE LEVEL
             </Button>
           </div>
         </div>
@@ -765,119 +822,89 @@ function DashboardContent() {
   )
 }
 
-// Dashboard skeleton component
-function DashboardSkeleton() {
-  return (
-    <>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-        <StatCardSkeleton />
-        <StatCardSkeleton />
-        <StatCardSkeleton />
-      </div>
+// Main Dashboard component
+export default function Dashboard() {
+  const { user } = useAuth()
+  const [isLoading, setIsLoading] = useState(true)
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
-        <PieChartSkeleton />
-        <div className="lg:col-span-2">
-          <div className="relative overflow-hidden rounded-xl bg-secondary/30 border border-secondary p-6">
-            <div className="flex justify-between items-center mb-6">
-              <div className="h-6 w-40 bg-muted-foreground/20 rounded"></div>
-              <div className="h-8 w-20 bg-muted-foreground/10 rounded"></div>
-            </div>
-            <div className="space-y-4">
-              <ActivityCardSkeleton />
-              <ActivityCardSkeleton />
-              <ActivityCardSkeleton />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
-        <div>
-          <div className="relative overflow-hidden rounded-xl bg-secondary/30 border border-secondary p-6 h-full">
-            <div className="flex justify-between items-center mb-6">
-              <div className="h-6 w-32 bg-muted-foreground/20 rounded"></div>
-              <div className="h-8 w-20 bg-muted-foreground/10 rounded"></div>
-            </div>
-            <div className="space-y-4">
-              <AchievementCardSkeleton />
-              <AchievementCardSkeleton />
-              <AchievementCardSkeleton />
-              <AchievementCardSkeleton />
-            </div>
-          </div>
-        </div>
-        <div className="lg:col-span-2">
-          <div className="relative overflow-hidden rounded-xl bg-secondary/30 border border-secondary p-6">
-            <div className="flex justify-between items-center mb-6">
-              <div className="h-6 w-48 bg-muted-foreground/20 rounded"></div>
-              <div className="h-8 w-32 bg-muted-foreground/10 rounded"></div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="rounded-lg bg-secondary/50 border border-secondary p-4 h-24 animate-pulse"></div>
-              <div className="rounded-lg bg-secondary/50 border border-secondary p-4 h-24 animate-pulse"></div>
-              <div className="rounded-lg bg-secondary/50 border border-secondary p-4 h-24 animate-pulse"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
-  )
-}
-
-export default function DashboardPage() {
-  const { user, loading, refreshUser } = useAuth()
-  const [refreshKey, setRefreshKey] = useState(0)
-
-  // Simple refresh function that increments the refresh key
-  const refreshData = useCallback(() => {
-    setRefreshKey((prev) => prev + 1)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 1500)
+    return () => clearTimeout(timer)
   }, [])
 
-  // Refresh user session on page load
-  useEffect(() => {
-    refreshUser()
-  }, [refreshUser])
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-dark-gray flex items-center justify-center">
+        <TVAPortalLoader />
+      </div>
+    )
+  }
 
-  // If not logged in, show login prompt
-  if (!loading && !user) {
+  if (!user) {
     return <LoginPrompt />
   }
 
   return (
-    <div className="container py-12 md:py-20">
-      <div className="relative mb-12 pb-12 border-b">
-        <div className="absolute inset-0 pattern-dots opacity-10"></div>
-        <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
-              {user?.name ? `${user.name}'s Dashboard` : "Dashboard"}
-            </h1>
-            <p className="text-xl text-muted-foreground">Track your progress and continue your learning journey</p>
-          </div>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={refreshData}
-              className="h-10 w-10"
-              title="Refresh dashboard data"
-            >
-              <RefreshCw className="h-4 w-4" />
-            </Button>
-            <Button asChild className="bg-primary hover:bg-primary/90">
-              <Link href="/subjects">
-                Explore Subjects
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-dark-gray via-tva-brown to-dark-gray relative overflow-hidden pt-8">
+      {/* Enhanced Animated Background Elements */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute inset-0 timeline-spiral-bg opacity-10"></div>
+        <div className="absolute top-1/4 left-1/4 w-3 h-3 bg-loki-green/40 rounded-full animate-float-slow shadow-lg shadow-loki-green/20"></div>
+        <div className="absolute top-1/3 right-1/4 w-2 h-2 bg-tva-gold/50 rounded-full animate-float-medium shadow-lg shadow-tva-gold/20"></div>
+        <div className="absolute bottom-1/4 left-1/3 w-4 h-4 bg-loki-green/30 rounded-full animate-float-fast shadow-lg shadow-loki-green/20"></div>
+        <div className="absolute top-2/3 right-1/3 w-2 h-2 bg-tva-orange/40 rounded-full animate-float-slow shadow-lg shadow-tva-orange/20"></div>
+        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-loki-green/40 to-transparent animate-timeline-verify"></div>
+        <div
+          className="absolute top-1/3 left-0 w-full h-px bg-gradient-to-r from-transparent via-tva-gold/30 to-transparent animate-timeline-verify"
+          style={{ animationDelay: "2s" }}
+        ></div>
+        <div
+          className="absolute bottom-1/3 left-0 w-full h-px bg-gradient-to-r from-transparent via-loki-green/20 to-transparent animate-timeline-verify"
+          style={{ animationDelay: "4s" }}
+        ></div>
+        <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-loki-green/30 to-transparent animate-data-stream"></div>
+        <div
+          className="absolute top-0 right-1/3 w-px h-full bg-gradient-to-b from-transparent via-tva-gold/20 to-transparent animate-data-stream"
+          style={{ animationDelay: "1.5s" }}
+        ></div>
+        <div className="absolute top-1/4 right-1/4 w-32 h-32 border border-loki-green/20 rounded-full animate-energy-pulse"></div>
+        <div
+          className="absolute bottom-1/4 left-1/4 w-24 h-24 border border-tva-gold/15 rounded-full animate-energy-pulse"
+          style={{ animationDelay: "1s" }}
+        ></div>
       </div>
 
-      <Suspense fallback={<DashboardSkeleton />}>
-        <DashboardContent key={refreshKey} />
-      </Suspense>
+      <main className="container py-8 relative z-10">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <TVAGlitchText
+              text="SACRED TIMELINE DASHBOARD"
+              className="text-2xl font-mono font-bold text-loki-green"
+              glitchIntensity="high"
+            />
+            <p className="text-light-gray font-mono mt-1">MONITOR YOUR PROGRESS ACROSS THE SACRED TIMELINE</p>
+          </div>
+          <div className="flex-shrink-0">
+            <TVABadge userId={user.id} userName={user.name} />
+          </div>
+        </div>
+
+        <Suspense
+          fallback={
+            <div className="space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <StatCardSkeleton />
+                <StatCardSkeleton />
+                <StatCardSkeleton />
+              </div>
+            </div>
+          }
+        >
+          <DashboardContent />
+        </Suspense>
+      </main>
     </div>
   )
 }

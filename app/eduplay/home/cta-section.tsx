@@ -86,7 +86,7 @@ const CtaSection = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative z-0 py-16 md:py-20 bg-white dark:bg-gray-900 overflow-hidden"
+      className="relative z-0 py-16 md:py-20 bg-gray-900 overflow-hidden"
     >
       <div className="container px-4 md:px-6 relative z-10">
         <div
@@ -138,7 +138,12 @@ const CtaSection = () => {
                 key={image.id}
                 src={image.src}
                 alt={`Character ${image.id}`}
-                className={`${image.className}`}
+                className={
+                  image.id === 3
+                    ? 'z-0 absolute bottom-0 left-[200px] md:left-[370px] w-[320px] h-[330px] opacity-50 object-cover floating-element'
+                    : `${image.className} hidden md:block`
+                }
+                data-mobile-center={image.id === 3 ? 'true' : undefined}
               />
             ))}
           </div>
@@ -247,6 +252,67 @@ const CtaSection = () => {
           </div>
         </div>
       </div>
+      <style jsx global>{`
+        @media (max-width: 768px) {
+          .cta-box {
+            padding: 1.5rem !important;
+            border-radius: 2rem !important;
+          }
+          .cta-box h2 {
+            font-size: 1.5rem !important;
+          }
+          .cta-box p {
+            font-size: 1rem !important;
+          }
+          img[data-mobile-center="true"] {
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            position: absolute !important;
+            bottom: 0 !important;
+          }
+          .cta-box .rounded-xl {
+            border-radius: 0.75rem !important;
+          }
+        }
+        .cta-box {
+          box-shadow: 0 8px 40px 0 rgba(255, 72, 52, 0.25), 0 1.5px 8px 0 rgba(0,0,0,0.12);
+          background: linear-gradient(135deg, #ff4834 0%, #30025c 60%, #660101 100%);
+          position: relative;
+          overflow: hidden;
+        }
+        .cta-box::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(circle at 80% 20%, rgba(255,255,255,0.08) 0, transparent 60%),
+                      radial-gradient(circle at 20% 80%, rgba(255,255,255,0.06) 0, transparent 60%);
+          z-index: 1;
+          pointer-events: none;
+        }
+        .cta-box h2 span {
+          background: linear-gradient(90deg, #fff 40%, #ffb347 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+        .cta-box .border {
+          border-radius: 1.5rem;
+        }
+        .cta-box .rounded-xl {
+          background: rgba(255,255,255,0.04);
+          box-shadow: 0 2px 12px 0 rgba(255,255,255,0.08);
+        }
+        .cta-box .rounded-xl:hover {
+          background: rgba(255,255,255,0.08);
+          box-shadow: 0 4px 24px 0 rgba(255,255,255,0.12);
+        }
+        .cta-box .flex .group {
+          box-shadow: 0 2px 8px 0 rgba(255,72,52,0.10);
+        }
+        .cta-box .group:hover {
+          box-shadow: 0 4px 16px 0 rgba(255,72,52,0.18);
+        }
+      `}</style>
     </section>
   );
 };

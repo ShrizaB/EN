@@ -270,6 +270,16 @@ export default function FeaturesSection() {
         .animate-sparkle {
           animation: sparkle 1.5s infinite;
         }
+        /* Only on mobile, override comic font with curly font */
+        @media (max-width: 600px) {
+          @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Caveat:wght@700&display=swap');
+          .comic-font {
+            font-family: 'Pacifico', cursive, sans-serif !important;
+          }
+          .comic-font-secondary {
+            font-family: 'Caveat', cursive, sans-serif !important;
+          }
+        }
       `}</style>
     </section>
   )

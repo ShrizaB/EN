@@ -1,13 +1,40 @@
 "use client"
 
+import type React from "react"
+
 import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, BookOpen, Timer, Brain, Maximize, Minimize, Volume2, VolumeX, AlertCircle } from "lucide-react"
-import { Progress } from "@/components/ui/progress"
+import { ArrowLeft, BookOpen, Timer, Brain, Maximize, Minimize, Volume2, VolumeX, AlertCircle, Shield } from 'lucide-react'
 import { updateLearningHistory } from "@/lib/learning-history-service"
 import { useAuth } from "@/contexts/auth-context"
 import { Card } from "@/components/ui/card"
 import confetti from "canvas-confetti"
+import './topic-content-quiz.css'
+
+// Batman logo component for background animations
+function BatmanLogo({ className, style }: { className?: string; style?: React.CSSProperties }) {
+  return (
+    <svg width="60" height="30" viewBox="0 0 60 30" className={`absolute ${className}`} style={style}>
+      <path
+        d="M30 5 L25 10 L15 8 L20 15 L5 20 L20 25 L15 28 L25 26 L30 30 L35 26 L45 28 L40 25 L55 20 L40 15 L45 8 L35 10 Z"
+        fill="currentColor"
+      />
+    </svg>
+  )
+}
+
+// Lightning effect component
+function Lightning({ className, style }: { className?: string; style?: React.CSSProperties }) {
+  return (
+    <div
+      className={`absolute w-1 bg-gradient-to-b from-white via-yellow-300 to-transparent animate-lightning ${className}`}
+      style={{
+        height: "200px",
+        ...style,
+      }}
+    />
+  )
+}
 
 interface TopicContentViewerProps {
   topic: string
@@ -215,7 +242,7 @@ export function TopicContentViewer({
       // Check if paragraph looks like a heading (short and ends with a colon or is all caps)
       if ((paragraph.length < 50 && paragraph.endsWith(":")) || paragraph.toUpperCase() === paragraph) {
         return (
-          <h3 key={index} className="text-xl font-bold mt-6 mb-3 text-primary-600">
+          <h3 key={index} className="text-xl font-bold mt-6 mb-3 text-yellow-500 font-mono tracking-wider uppercase">
             {paragraph}
           </h3>
         )
@@ -223,7 +250,7 @@ export function TopicContentViewer({
 
       // Regular paragraph
       return (
-        <p key={index} className="mb-4 text-lg leading-relaxed">
+        <p key={index} className="mb-4 text-lg leading-relaxed font-mono text-gray-300">
           {paragraph}
         </p>
       )
@@ -231,13 +258,119 @@ export function TopicContentViewer({
   }
 
   return (
-    <div className={`transition-all duration-300 ${isFullScreen ? "fixed inset-0 z-50 bg-background" : "relative"}`}>
+    <div className={`transition-all duration-300 ${isFullScreen ? "fixed inset-0 z-50 bg-black" : "relative"}`}>
+      {/* Batman logos flashing in background */}
+      {[...Array(12)].map((_, i) => (
+        <BatmanLogo
+          key={i}
+          className="text-yellow-500/10 animate-bat-symbol-flash pointer-events-none"
+          style={{
+            top: `${Math.random() * 80}%`,
+            left: `${Math.random() * 90}%`,
+            transform: `scale(${0.8 + Math.random() * 2.5}) rotate(${Math.random() * 40 - 20}deg)`,
+            animationDelay: `${i * 1.5}s`,
+            opacity: 0.1,
+            zIndex: 0,
+          }}
+        />
+      ))}
+
+      {/* Lightning effects */}
+      {[...Array(3)].map((_, i) => (
+        <Lightning
+          key={i}
+          className="pointer-events-none"
+          style={{
+            left: `${20 + i * 30}%`,
+            top: "0",
+            animationDelay: `${i * 2 + 5}s`,
+            animationDuration: `${4 + i}s`,
+            opacity: 0.5,
+            zIndex: 0,
+          }}
+        />
+      ))}
+
+      {/* Gotham City skyline */}
+      <div className="absolute bottom-0 left-0 right-0 h-48 overflow-hidden opacity-15 pointer-events-none">
+        <svg width="100%" height="192" viewBox="0 0 1920 192" className="absolute bottom-0">
+          <defs>
+            <linearGradient id="buildingGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#0f172a" />
+              <stop offset="100%" stopColor="#020617" />
+            </linearGradient>
+            <linearGradient id="wayneTowerGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#1e293b" />
+              <stop offset="100%" stopColor="#0f172a" />
+            </linearGradient>
+          </defs>
+
+          {/* Wayne Tower (tallest in center) */}
+          <rect x="900" y="0" width="120" height="192" fill="url(#wayneTowerGrad)" />
+          <rect x="930" y="0" width="60" height="30" fill="url(#wayneTowerGrad)" />
+          <polygon points="930,0 990,0 960,30" fill="#1e293b" />
+
+          {/* Building silhouettes - left side */}
+          <rect x="0" y="100" width="80" height="92" fill="url(#buildingGrad)" />
+          <rect x="80" y="80" width="60" height="112" fill="url(#buildingGrad)" />
+          <rect x="140" y="110" width="40" height="82" fill="url(#buildingGrad)" />
+          <rect x="180" y="70" width="70" height="122" fill="url(#buildingGrad)" />
+          <rect x="250" y="90" width="50" height="102" fill="url(#buildingGrad)" />
+          <rect x="300" y="60" width="80" height="132" fill="url(#buildingGrad)" />
+          <rect x="380" y="85" width="55" height="107" fill="url(#buildingGrad)" />
+          <rect x="435" y="105" width="45" height="87" fill="url(#buildingGrad)" />
+          <rect x="480" y="75" width="75" height="117" fill="url(#buildingGrad)" />
+          <rect x="555" y="95" width="65" height="97" fill="url(#buildingGrad)" />
+          <rect x="620" y="65" width="70" height="127" fill="url(#buildingGrad)" />
+          <rect x="690" y="100" width="50" height="92" fill="url(#buildingGrad)" />
+          <rect x="740" y="80" width="65" height="112" fill="url(#buildingGrad)" />
+          <rect x="805" y="110" width="45" height="82" fill="url(#buildingGrad)" />
+          <rect x="850" y="50" width="50" height="142" fill="url(#buildingGrad)" />
+
+          {/* Building silhouettes - right side */}
+          <rect x="1020" y="90" width="60" height="102" fill="url(#buildingGrad)" />
+          <rect x="1080" y="60" width="90" height="132" fill="url(#buildingGrad)" />
+          <rect x="1170" y="85" width="65" height="107" fill="url(#buildingGrad)" />
+          <rect x="1235" y="105" width="55" height="87" fill="url(#buildingGrad)" />
+          <rect x="1290" y="75" width="85" height="117" fill="url(#buildingGrad)" />
+          <rect x="1375" y="95" width="75" height="97" fill="url(#buildingGrad)" />
+          <rect x="1450" y="65" width="80" height="127" fill="url(#buildingGrad)" />
+          <rect x="1530" y="100" width="60" height="92" fill="url(#buildingGrad)" />
+          <rect x="1590" y="80" width="75" height="112" fill="url(#buildingGrad)" />
+          <rect x="1665" y="110" width="55" height="82" fill="url(#buildingGrad)" />
+          <rect x="1720" y="70" width="90" height="122" fill="url(#buildingGrad)" />
+          <rect x="1810" y="90" width="70" height="102" fill="url(#buildingGrad)" />
+          <rect x="1880" y="60" width="40" height="132" fill="url(#buildingGrad)" />
+
+          {/* Windows with flickering lights */}
+          {[...Array(40)].map((_, i) => (
+            <rect
+              key={i}
+              x={20 + (i % 24) * 80 + Math.random() * 40}
+              y={70 + Math.floor(i / 24) * 20 + Math.random() * 15}
+              width="3"
+              height="4"
+              fill="#ffe066"
+              opacity={Math.random() > 0.7 ? "0.6" : "0.2"}
+              className="animate-flicker"
+              style={{
+                animationDelay: `${Math.random() * 5}s`,
+                animationDuration: `${2 + Math.random() * 3}s`,
+              }}
+            />
+          ))}
+        </svg>
+      </div>
+
       <div
-        className={`bg-gradient-to-br from-blue-50 to-purple-50 dark:from-slate-900 dark:to-indigo-950 border border-border rounded-xl shadow-lg overflow-hidden ${isFullScreen ? "h-screen" : ""}`}
+        className={`border border-yellow-500/20 rounded-xl shadow-lg overflow-hidden ${isFullScreen ? "h-screen" : ""} bg-gradient-to-br from-gray-900 to-black border-2 border-yellow-500/20 shadow-[0_0_30px_rgba(0,0,0,0.8)]`}
+        style={{
+          boxShadow: "inset 0 0 60px rgba(0,0,0,0.5), 0 0 30px rgba(0,0,0,0.8)",
+        }}
       >
-        <div className="p-4 border-b border-border bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm flex items-center justify-between sticky top-0 z-10">
+        <div className="p-4 border-b border-yellow-500/20 flex items-center justify-between sticky top-0 z-10 bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 backdrop-blur-sm">
           {!isFullScreen && (
-            <Button variant="ghost" size="sm" onClick={onBack} className="gap-1">
+            <Button variant="ghost" size="sm" onClick={onBack} className="gap-1 batman-cursor-hover text-yellow-500/80">
               <ArrowLeft className="h-4 w-4" />
               Back
             </Button>
@@ -246,11 +379,11 @@ export function TopicContentViewer({
           <div className="flex items-center gap-4">
             <div className="flex items-center text-sm">
               <Timer className={`h-4 w-4 mr-1 ${timeRemaining < 300 ? "text-red-500" : "text-amber-500"}`} />
-              <span className={`font-medium ${timeRemaining < 300 ? "text-red-500" : ""}`}>
+              <span className={`font-medium ${timeRemaining < 300 ? "text-red-500" : "text-yellow-500/80"} font-mono`}>
                 {formatTime(timeRemaining)}
               </span>
             </div>
-            <div className="flex items-center text-sm text-muted-foreground">
+            <div className="flex items-center text-sm text-yellow-500/60 font-mono">
               <BookOpen className="h-4 w-4 mr-1" />
               <span>Learning: {topic}</span>
             </div>
@@ -258,12 +391,17 @@ export function TopicContentViewer({
               variant="ghost"
               size="sm"
               onClick={toggleReadAloud}
-              className={`gap-1 ${isSpeaking ? "text-green-500" : ""}`}
+              className={`gap-1 ${isSpeaking ? "text-green-500" : "text-yellow-500/80"} batman-cursor-hover font-mono`}
             >
               {isSpeaking ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
               {isSpeaking ? "Stop Reading" : "Read Aloud"}
             </Button>
-            <Button variant="ghost" size="sm" onClick={toggleFullScreen} className="gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleFullScreen}
+              className="gap-1 batman-cursor-hover text-yellow-500/80 font-mono"
+            >
               {isFullScreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
               {isFullScreen ? "Exit Fullscreen" : "Fullscreen"}
             </Button>
@@ -274,74 +412,104 @@ export function TopicContentViewer({
           <div
             ref={contentRef}
             id="content-container"
-            className="flex-1 p-6 md:p-8 overflow-y-auto bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm"
+            className="flex-1 p-6 md:p-8 overflow-y-auto bg-black/80 backdrop-blur-sm text-gray-300 relative"
           >
-            <h2 className="text-3xl font-bold mb-6 text-primary">{topic}</h2>
-            <div className="prose prose-lg max-w-none dark:prose-invert">{formatContent(content)}</div>
-            <div className="h-20"></div> {/* Spacer at the bottom */}
+            {/* Scan line effect */}
+            <div
+              className="absolute inset-0 pointer-events-none z-0 overflow-hidden"
+              style={{
+                background: "linear-gradient(to bottom, transparent, rgba(255,224,102,0.03) 50%, transparent)",
+                backgroundSize: "100% 8px",
+                animation: "scanline 8s linear infinite",
+                opacity: 0.3,
+              }}
+            ></div>
+
+            {/* Vignette effect */}
+            <div
+              className="absolute inset-0 pointer-events-none z-0"
+              style={{
+                boxShadow: "inset 0 0 100px rgba(0,0,0,0.7)",
+                background: "radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.4) 100%)",
+              }}
+            ></div>
+
+            {/* Noise texture */}
+            <div className="absolute inset-0 bg-noise opacity-5 pointer-events-none z-0"></div>
+
+            <div className="relative z-10">
+              <h2 className="text-3xl font-bold mb-6 text-yellow-500 font-mono tracking-wide uppercase">
+                {topic}
+              </h2>
+              <div className="prose prose-lg max-w-none dark:prose-invert">{formatContent(content)}</div>
+              <div className="h-20"></div> {/* Spacer at the bottom */}
+            </div>
           </div>
 
-          <div className="w-full md:w-72 p-4 border-t md:border-t-0 md:border-l border-border bg-white/30 dark:bg-slate-800/30 backdrop-blur-sm">
+          <div className="w-full md:w-72 p-4 border-t md:border-t-0 md:border-l border-yellow-500/20 backdrop-blur-sm">
             <div className="sticky top-4">
-              <h3 className="font-medium mb-3">Your Progress</h3>
-              <Progress value={readingProgress} className="h-3 mb-2 bg-slate-200 dark:bg-slate-700">
+              <h3 className="font-medium mb-3 text-yellow-500/80 font-mono tracking-wider uppercase">Your Progress</h3>
+              <div className="relative h-3 mb-2 bg-gray-800 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-300"
+                  className="h-full bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-full transition-all duration-300"
                   style={{ width: `${readingProgress}%` }}
                 />
-              </Progress>
-              <p className="text-sm text-muted-foreground mb-6">{readingProgress}% complete</p>
+                <div className="absolute inset-0 bg-noise opacity-10"></div>
+              </div>
+              <p className="text-sm text-yellow-500/60 mb-6 font-mono">{readingProgress}% complete</p>
 
               <div className="space-y-4">
-                <Card className="p-3 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 border-none shadow-md">
+                <Card className="p-3 bg-gradient-to-br from-gray-900 to-black border border-yellow-500/20 shadow-md animate-glow-pulse">
                   <div className="flex items-center gap-2 mb-2">
                     <Timer className="h-5 w-5 text-amber-500" />
-                    <h4 className="font-medium">Time Remaining</h4>
+                    <h4 className="font-medium text-yellow-500/80 font-mono tracking-wider">Time Remaining</h4>
                   </div>
-                  <div className="text-2xl font-bold text-center mb-2">{formatTime(timeRemaining)}</div>
-                  <p className="text-xs text-muted-foreground text-center">
+                  <div className="text-2xl font-bold text-center mb-2 text-yellow-500 font-mono">
+                    {formatTime(timeRemaining)}
+                  </div>
+                  <p className="text-xs text-yellow-500/60 mt-2 text-center font-mono">
                     The test will start automatically when time runs out
                   </p>
                 </Card>
 
-                <Card className="p-3 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 border-none shadow-md">
+                <Card className="p-3 bg-gradient-to-br from-gray-900 to-black border border-yellow-500/20 shadow-md animate-glow-pulse">
                   <div className="flex items-center gap-2 mb-2">
-                    <Brain className="h-5 w-5 text-primary" />
-                    <h4 className="font-medium">Ready for the test?</h4>
+                    <Brain className="h-5 w-5 text-yellow-500" />
+                    <h4 className="font-medium text-yellow-500/80 font-mono tracking-wider">Ready for the test?</h4>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-3">
+                  <p className="text-sm text-yellow-500/60 mb-3 font-mono">
                     Take a 20-question test to check your understanding of this topic.
                   </p>
                   <Button
                     onClick={handleStartTest}
-                    className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+                    className="w-full bg-black hover:bg-black text-yellow-500 border-2 border-yellow-500/30 hover:border-yellow-500/50 hover:shadow-yellow-500/20 transform hover:scale-105 batman-cursor-hover font-mono uppercase tracking-wider"
                   >
                     {isReady ? "Start Test Now" : "I'm Ready"}
                   </Button>
                   {!isReady && (
-                    <p className="text-xs text-muted-foreground mt-2 text-center">
+                    <p className="text-xs text-yellow-500/60 mt-2 text-center font-mono">
                       Continue reading to unlock the test
                     </p>
                   )}
                 </Card>
 
-                <Card className="p-3 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 border-none shadow-md">
-                  <h4 className="font-medium mb-2">Reading Tips</h4>
-                  <ul className="text-sm text-muted-foreground space-y-2">
+                <Card className="p-3 bg-gradient-to-br from-gray-900 to-black border border-yellow-500/20 shadow-md animate-glow-pulse">
+                  <h4 className="font-medium mb-2 text-yellow-500/80 font-mono tracking-wider">Reading Tips</h4>
+                  <ul className="text-sm text-yellow-500/60 space-y-2 font-mono">
                     <li className="flex items-start gap-2">
-                      <span className="text-primary">•</span>
+                      <span className="text-yellow-500">•</span>
                       <span>Take notes as you read</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <span className="text-primary">•</span>
+                      <span className="text-yellow-500">•</span>
                       <span>Use the read aloud feature</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <span className="text-primary">•</span>
+                      <span className="text-yellow-500">•</span>
                       <span>Try fullscreen mode</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <span className="text-primary">•</span>
+                      <span className="text-yellow-500">•</span>
                       <span>Review before taking the test</span>
                     </li>
                   </ul>
@@ -354,17 +522,21 @@ export function TopicContentViewer({
 
       {/* Warning modal */}
       {showWarning && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <Card className="w-full max-w-md p-6 bg-white dark:bg-slate-900">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50">
+          <Card className="w-full max-w-md p-6 bg-gradient-to-br from-gray-900 to-black border-2 border-yellow-500/20 shadow-[0_0_30px_rgba(255,224,102,0.2)]">
             <div className="flex items-center gap-3 mb-4">
               <AlertCircle className="h-6 w-6 text-amber-500" />
-              <h3 className="text-xl font-bold">Are you sure?</h3>
+              <h3 className="text-xl font-bold text-yellow-500 font-mono tracking-wider">Are you sure?</h3>
             </div>
-            <p className="mb-6">
+            <p className="mb-6 text-gray-300 font-mono">
               You've only read {readingProgress}% of the content. It's recommended to read more before taking the test.
             </p>
             <div className="flex gap-3 justify-end">
-              <Button variant="outline" onClick={() => setShowWarning(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setShowWarning(false)}
+                className="batman-cursor-hover border-yellow-500/30 text-yellow-500 hover:bg-yellow-500/10 font-mono"
+              >
                 Continue Reading
               </Button>
               <Button
@@ -372,6 +544,7 @@ export function TopicContentViewer({
                   setShowWarning(false)
                   onStartTest()
                 }}
+                className="batman-cursor-hover bg-black hover:bg-black text-yellow-500 border-2 border-yellow-500/30 hover:border-yellow-500/50 font-mono"
               >
                 Take Test Anyway
               </Button>
