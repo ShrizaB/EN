@@ -1,8 +1,8 @@
-import { type NextRequest, NextResponse } from "next/server"
-import axios from "axios"
+import { type NextRequest, NextResponse } from "next/server";
+import axios, { AxiosError } from "axios"; // Import AxiosError for type guard
 
-// Groq API endpoint and hardcoded API key
-const GROQ_API_KEY = "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";
+// Load environment variables
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
 export async function POST(request: NextRequest) {
@@ -64,8 +64,18 @@ export async function POST(request: NextRequest) {
     try {
       console.log("Sending data to Groq API for analysis...");
 
-      // Since Groq API does not directly support file uploads like Gemini, we'll include the base64 data in the prompt
-      // or describe the file metadata if the content is too large. For simplicity, we'll describe the file type and name.
+      // Check if API key is available
+      if (!GROQ_API_KEY) {
+        console.error("GROQ_API_KEY is not set in environment variables");
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Server configuration error",
+          },
+          { status: 500 }
+        );
+      }
+
       const prompt = `You are an expert educator tasked with analyzing educational content from a provided ${isImage ? "image" : "PDF document"}.
 
 Document details:
@@ -76,9 +86,10 @@ Document details:
 Your objective is to:
 1. Assume the content of the document is educational material related to the filename.
 2. Generate exactly 10 specific questions based on the likely content of this document (infer from the filename if direct content analysis isn't possible).
-3. Provide a concise answer for each question based on inferred content.
-4. Ensure each question relates to potential facts, concepts, or information in this specific content.
-5. Avoid overly generic questions; focus on the likely subject matter.
+3. Identify the **most important question** among the 10, based on its relevance to the core concepts of the inferred subject matter.
+4. Provide a concise answer for each question, except for the most important question, where the answer should be detailed (50-100 words) if the question is complex (e.g., involves "explain," "why," "compare") or concise (10-30 words) if simple (e.g., "what is").
+5. Ensure each question relates to potential facts, concepts, or information in this specific content.
+6. Avoid overly generic questions; focus on the likely subject matter.
 
 Format your response as a JSON array with objects containing "question" and "answer" properties. Example:
 [
@@ -94,7 +105,7 @@ Important: Base your questions and answers on the inferred content of this docum
       const response = await axios.post(
         GROQ_API_URL,
         {
-          model: "llama-3.3-70b-versatile",
+          model: "llama3-70b-8192",
           messages: [
             {
               role: "user",
@@ -119,12 +130,12 @@ Important: Base your questions and answers on the inferred content of this docum
       try {
         // Clean the response text by removing markdown code block indicators
         let cleanedText = text
-          .replace(/```json/g, '') // Remove ```json
-          .replace(/```/g, '')     // Remove ```
-          .replace(/`/g, '')       // Remove single backticks
-          .trim();                 // Remove leading/trailing whitespace
+          .replace(/```json/g, '')
+          .replace(/```/g, '')
+          .replace(/`/g, '')
+          .trim();
 
-        // Attempt to extract JSON content if it's still not clean
+        // Attempt to extract JSON content
         const jsonStartIndex = cleanedText.indexOf('[');
         const jsonEndIndex = cleanedText.lastIndexOf(']');
         if (jsonStartIndex >= 0 && jsonEndIndex > jsonStartIndex) {
@@ -174,7 +185,7 @@ Important: Base your questions and answers on the inferred content of this docum
         });
       }
 
-      // If all extraction methods failed, generate fallback questions based on file name
+      // Fallback questions based on file name
       const fileName = file.name.replace(/\.[^/.]+$/, "").replace(/[_-]/g, " ");
       const fallbackQuestions = generateFallbackQuestions(fileName);
       const fallbackAnswers = fallbackQuestions.map((q) => generateDefaultAnswer(q));
@@ -184,10 +195,18 @@ Important: Base your questions and answers on the inferred content of this docum
         questions: fallbackQuestions,
         answers: fallbackAnswers,
       });
-    } catch (error) {
-      console.error("Error generating content with Groq API:", error);
+    } catch (error: unknown) { // Use unknown to comply with TypeScript
+      if (error instanceof AxiosError) {
+        console.error("Error generating content with Groq API:", {
+          message: error.message,
+          status: error.response?.status,
+          data: error.response?.data,
+        });
+      } else {
+        console.error("Unexpected error generating content with Groq API:", error);
+      }
 
-      // Generate fallback questions based on file name
+      // Fallback questions based on file name
       const fileName = file.name.replace(/\.[^/.]+$/, "").replace(/[_-]/g, " ");
       const fallbackQuestions = generateFallbackQuestions(fileName);
       const fallbackAnswers = fallbackQuestions.map((q) => generateDefaultAnswer(q));
@@ -198,8 +217,8 @@ Important: Base your questions and answers on the inferred content of this docum
         answers: fallbackAnswers,
       });
     }
-  } catch (error) {
-    console.error("Error processing request:", error);
+  } catch (error: unknown) {
+    console.error("Error processing request:", error instanceof Error ? error.message : String(error));
     return NextResponse.json(
       {
         success: false,

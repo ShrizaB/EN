@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
   9. Career path (4-5 steps with title, description, timeline, and salary range)
   10. Additional resources (3-4 resources with title and description)
   11. Recommended YouTube videos for learning key skills (4-6 videos with title, topic, and description)
-  12. Role roadmap (6-10 learning steps with title, description, and estimated learning time)
+  12. Role roadmap (15-20 learning steps with title, description, and estimated learning time)
   
   Format the response as a valid JSON object with the following structure:
   {
@@ -60,8 +60,8 @@ export async function POST(req: NextRequest) {
     const response = await result.response
     const text = response.text()
 
-    // Add YouTube API integration after the Gemini response
-    const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY || "AIzaSyCd4Nl9qskVrhr8J-Xt9pMXUaXInw_NY3k"
+    // Use the provided YouTube API key directly
+    const YOUTUBE_API_KEY = "AIzaSyCd4Nl9qskVrhr8J-Xt9pMXUaXInw_NY3k"
 
     // Add a function to fetch YouTube videos for each roadmap step
     async function fetchYouTubeVideos(topics: any[]) {
@@ -182,8 +182,6 @@ export async function POST(req: NextRequest) {
       return enhancedTopics
     }
     
-    
-
     // Update the response processing to include YouTube videos for the roadmap
     try {
       // Extract JSON from the response if it's wrapped in markdown code blocks
@@ -362,7 +360,6 @@ function generateMockCareerData(jobRole: string, sector: string, salaryRange: nu
         description: "Develop essential communication and leadership skills for career advancement.",
       },
     ],
-
     roleRoadmap: [
       {
         title: "Fundamentals",
