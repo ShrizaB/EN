@@ -37,6 +37,7 @@ export const EduPlayNavbar = forwardRef<HTMLDivElement, SidebarProps>(
       { name: "Test Your Level", href: "/test-your-level", icon: Trophy },
       { name: "Question Generator", href: "/question-generator", icon: Brain },
       { name: "Search Learn Test", href: "/search-learn-test", icon: Search },
+      { name: "quiz-battle", href: "/quiz-battle", icon: Gamepad2 },
     ]
 
     const userLinks = user

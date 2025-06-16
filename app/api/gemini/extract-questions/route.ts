@@ -142,7 +142,23 @@ Important: Base your questions and answers on the inferred content of this docum
           cleanedText = cleanedText.slice(jsonStartIndex, jsonEndIndex + 1);
         }
 
-        console.log("Cleaned response for JSON parsing:", cleanedText.substring(0, 200) + "...");
+        // Fix common JSON issues: trailing commas, single quotes, etc.
+        cleanedText = cleanedText
+          .replace(/,\s*}/g, '}') // Remove trailing commas before }
+          .replace(/,\s*]/g, ']') // Remove trailing commas before ]
+          .replace(/\r?\n/g, '') // Remove newlines
+          .replace(/\s+/g, ' ') // Collapse whitespace
+          .replace(/\'([^']*)\'/g, '"$1"') // Replace single quotes with double quotes (if any)
+          .replace(/([\{,])\s*([a-zA-Z0-9_]+)\s*:/g, '$1 "$2":') // Ensure property names are quoted
+          .replace(/([:,])\s*"\s*([^\"]*?)\s*"\s*([,}\]])/g, '$1 "$2"$3') // Remove extra spaces inside quotes
+          .replace(/\"\s*\"/g, '""') // Remove empty quoted strings with spaces
+          .replace(/\},\s*\}/g, '}}') // Remove double closing braces
+          .replace(/\},\s*\]/g, '}]'); // Remove double closing braces before array end
+
+        // Try to fix missing commas between objects
+        cleanedText = cleanedText.replace(/}(\s*){/g, '},{$1');
+
+        console.log("Cleaned and fixed response for JSON parsing (final):", cleanedText.substring(0, 200) + "...");
 
         const jsonData = JSON.parse(cleanedText);
 
