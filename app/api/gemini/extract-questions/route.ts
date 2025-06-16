@@ -155,11 +155,18 @@ Important: Base your questions and answers on the inferred content of this docum
           .replace(/\},\s*\}/g, '}}') // Remove double closing braces
           .replace(/\},\s*\]/g, '}]'); // Remove double closing braces before array end
 
-        // Try to fix missing commas between objects
-        cleanedText = cleanedText.replace(/}(\s*){/g, '},{$1');
+          // Fix unescaped double quotes inside string values (e.g., in answers)
+          // This is a common LLM bug: "answer": "The title is "Asleep in the Valley".
+          cleanedText = cleanedText.replace(/: "([^"]*?)"([^"]*?)"([^"]*?)"/g, (match: string, p1: string, p2: string, p3: string) => {
+            // Escape inner quotes
+            return ': "' + p1.replace(/"/g, '\\"') + '"' + p2.replace(/"/g, '\\"') + '"' + p3.replace(/"/g, '\\"') + '"';
+          });
+          // Also escape any remaining unescaped quotes inside string values
+          cleanedText = cleanedText.replace(/: "([^"]*?)"([^"]*?)"/g, (match: string, p1: string, p2: string) => {
+            return ': "' + p1.replace(/"/g, '\\"') + '"' + p2.replace(/"/g, '\\"') + '"';
+          });
 
-        console.log("Cleaned and fixed response for JSON parsing (final):", cleanedText.substring(0, 200) + "...");
-
+        // Try to parse the cleaned text as JSON
         const jsonData = JSON.parse(cleanedText);
 
         if (Array.isArray(jsonData)) {
