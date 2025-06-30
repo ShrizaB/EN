@@ -57,7 +57,7 @@ export function TVANotification({ message, onClose }: TVANotificationProps) {
 
   return (
     <div
-      className={`fixed top-4 right-4 z-50 transition-all duration-500 ${
+      className={`fixed top-4 right-4 z-50 transition-all duration-500 mt-4 ${
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-8"
       }`}
     >

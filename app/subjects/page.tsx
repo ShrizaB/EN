@@ -14,9 +14,11 @@ import {
   Brain,
   Film,
   Images,
+  Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import './subject.css';
+import { useEffect, useState } from 'react';
 
 const subjects = [
   {
@@ -93,20 +95,6 @@ const subjects = [
   },
 ];
 
-const Imgaes = [
-  {
-    src: "https://i.postimg.cc/zvTTYvwp/48834ee7eed27d8e62b3d9e6c6d3bd36.png",
-    className: "opacity-100 w-[100px] h-auto mb-80 absolute left-0 top-56 sm:left-72 sm:top-auto",
-  },
-  {
-    src: "https://i.postimg.cc/mgxcYTsy/b415c94fec168772ce2d8a7633c5befa.png",
-    className: "absolute opacity-50 w-[300px] sm:w-[700px] h-auto invisible sm:visible mb-80 top-[600px] sm:top-[400px]",
-  },
-  {
-    src: "https://i.postimg.cc/900sx3GW/e7dae6ded592f59cbf5302012c96b24e.png",
-    className: "opacity-100 w-[100px] h-auto mb-80 absolute right-0 top-56 sm:right-72 sm:top-auto",
-  },
-];
 
 export default function SubjectsPage() {
   return (
@@ -114,16 +102,13 @@ export default function SubjectsPage() {
       <div className="relative bg-gray-950 text-white min-h-screen overflow-hidden visible font-sans">
         <SpiderWebBackground />
 
-        {/* Spider-Man Images */}
-        <div className="absolute inset-0 flex justify-center items-center h-auto bottom-[780px]">
-          {Imgaes.map((image, index) => (
-            <img
-              key={index}
-              src={image.src}
-              alt="background"
-              className={image.className}
-            />
-          ))}
+        {/* Background Image with overlay */}
+        <div className="absolute inset-0 flex h-auto w-auto">
+          <img
+            src="https://i.postimg.cc/GhVCVwxJ/iron-spider-png-4-by-dhv123-dfgk034.png"
+            alt="background"
+            className="opacity-90 w-[500px] h-auto mb-80 fixed top-10 left-0 z-10"
+          />
         </div>
 
         <div className="container py-12 md:py-20 relative z-10">

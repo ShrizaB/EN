@@ -7,6 +7,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 interface Question {
   id: string
   question: string
+  type?: string // technical or behavioral
 }
 
 interface InterviewResultsProps {
@@ -14,11 +15,9 @@ interface InterviewResultsProps {
     degree: string
     skills: string[]
     jobTitle: string
+    interviewType?: string
   } | null
-  questions: {
-    technical: Question[]
-    behavioral: Question[]
-  } | null
+  questions: Question[] | null
   interviewAnswers: {
     answers: Record<string, string>
     analysis: any
@@ -31,37 +30,32 @@ export default function InterviewResults({ applicationData, questions, interview
   }
 
   const { analysis } = interviewAnswers
-
-  // Get all questions in a flat array
-  const allQuestions = [...questions.technical, ...questions.behavioral]
-
-  // Get question scores from analysis
-  const getQuestionScore = (questionId: string) => {
-    if (analysis?.questionScores && analysis.questionScores[questionId]) {
-      return analysis.questionScores[questionId]
+  // If the new API returns an array of results, use that
+  const isArrayResults = Array.isArray(analysis?.questions)
+  // Use the flat array of questions
+  const allQuestions = questions
+  // Get question scores and best answers from the new API
+  const getQuestionScore = (question: any, idx: number) => {
+    if (isArrayResults && analysis.questions[idx]) {
+      return analysis.questions[idx].score
     }
-    // Fallback to random score between 60-95 if not available
-    return Math.floor(Math.random() * 36) + 60
+    if (analysis?.questionScores && analysis.questionScores[question.id]) {
+      return analysis.questionScores[question.id]
+    }
+    return 0
   }
-
-  // Get best answer from analysis
-  const getBestAnswer = (questionId: string) => {
-    if (analysis?.bestAnswers && analysis.bestAnswers[questionId]) {
-      return analysis.bestAnswers[questionId]
+  const getBestAnswer = (question: any, idx: number) => {
+    if (isArrayResults && analysis.questions[idx]) {
+      return analysis.questions[idx].bestAnswer
+    }
+    if (analysis?.bestAnswers && analysis.bestAnswers[question.id]) {
+      return analysis.bestAnswers[question.id]
     }
     return "The ideal answer would demonstrate knowledge of the subject matter while being concise and clear."
   }
-
-  // Calculate overall scores
-  const technicalScore =
-    analysis?.technicalScore ||
-    Math.round(questions.technical.reduce((sum, q) => sum + getQuestionScore(q.id), 0) / questions.technical.length)
-
-  const behavioralScore =
-    analysis?.behavioralScore ||
-    Math.round(questions.behavioral.reduce((sum, q) => sum + getQuestionScore(q.id), 0) / questions.behavioral.length)
-
-  const overallScore = Math.round((technicalScore + behavioralScore) / 2)
+  // Calculate overall score out of 10
+  const totalScore = allQuestions.reduce((sum, q, idx) => sum + getQuestionScore(q, idx), 0)
+  const overallScore = Math.round((totalScore / allQuestions.length) * 10) / 10
 
   return (
     <div className="space-y-8">
@@ -71,48 +65,23 @@ export default function InterviewResults({ applicationData, questions, interview
           Here's your personalized feedback based on your interview answers
         </p>
       </div>
-
       <Card className="p-6">
         <h3 className="text-xl font-bold mb-4">Overall Performance</h3>
         <div className="flex items-center mb-6">
           <div className="w-full">
-            <Progress value={overallScore} className="h-4" />
+            <Progress value={(overallScore / 10) * 100} className="h-4" />
           </div>
-          <span className="ml-4 font-bold text-xl">{overallScore}%</span>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <div className="p-4 border rounded-lg">
-            <h4 className="font-medium mb-2">Technical</h4>
-            <div className="flex items-center">
-              <div className="w-full">
-                <Progress value={technicalScore} className="h-2" />
-              </div>
-              <span className="ml-2 font-medium">{technicalScore}%</span>
-            </div>
-          </div>
-          <div className="p-4 border rounded-lg">
-            <h4 className="font-medium mb-2">Behavioral</h4>
-            <div className="flex items-center">
-              <div className="w-full">
-                <Progress value={behavioralScore} className="h-2" />
-              </div>
-              <span className="ml-2 font-medium">{behavioralScore}%</span>
-            </div>
-          </div>
+          <span className="ml-4 font-bold text-xl">{overallScore} / 10</span>
         </div>
       </Card>
-
       <Card className="p-6">
         <h3 className="text-xl font-bold mb-4">Detailed Question Analysis</h3>
-
         <Accordion type="single" collapsible className="w-full">
           {allQuestions.map((question, index) => {
-            const isTechnical = questions.technical.some((q) => q.id === question.id)
-            const score = getQuestionScore(question.id)
+            const isTechnical = question.type === "technical"
+            const score = getQuestionScore(question, index)
             const userAnswer = interviewAnswers.answers[question.id] || "No answer provided"
-            const bestAnswer = getBestAnswer(question.id)
-
+            const bestAnswer = getBestAnswer(question, index)
             return (
               <AccordionItem key={question.id} value={question.id}>
                 <AccordionTrigger className="hover:no-underline">
@@ -124,8 +93,8 @@ export default function InterviewResults({ applicationData, questions, interview
                       <div className="font-medium">{question.question}</div>
                     </div>
                     <div className="flex items-center">
-                      <Progress value={score} className="w-24 h-2 mr-2" />
-                      <span className="text-sm font-medium">{score}%</span>
+                      <Progress value={(score / 10) * 100} className="w-24 h-2 mr-2" />
+                      <span className="text-sm font-medium">{score} / 10</span>
                     </div>
                   </div>
                 </AccordionTrigger>
@@ -150,7 +119,6 @@ export default function InterviewResults({ applicationData, questions, interview
           })}
         </Accordion>
       </Card>
-
       <Card className="p-6">
         <h3 className="text-lg font-bold mb-4">Improvement Suggestions</h3>
         <div className="space-y-4">

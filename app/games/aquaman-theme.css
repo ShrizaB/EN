@@ -1,0 +1,695 @@
+/* Aquaman DC Dark Theme - True Atlantis Depths */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+  --abyss-black: #000711;
+  --deep-trench: #0A0F1C;
+  --atlantis-depths: #0F1419;
+  --ocean-void: #1A1F2E;
+  --trident-gold: #FFD700;
+  --atlantis-cyan: #00CED1;
+  --deep-teal: #008B8B;
+  --sea-foam: #20B2AA;
+  --coral-glow: #FF7F50;
+  --pearl-white: #F8F8FF;
+}
+
+/* Utility classes for Tailwind CSS integration */
+.text-trident-gold { color: var(--trident-gold); }
+.text-atlantis-cyan { color: var(--atlantis-cyan); }
+.text-sea-foam { color: var(--sea-foam); }
+.text-pearl-white { color: var(--pearl-white); }
+.bg-atlantis-depths { background-color: var(--atlantis-depths); }
+.border-atlantis-cyan { border-color: var(--atlantis-cyan); }
+
+.font-atlantis {
+  font-family: 'Cinzel', serif;
+}
+
+.font-trident {
+  font-family: 'Orbitron', monospace;
+}
+
+/* Epic Water Loading Screen */
+@keyframes oceanic-reveal {
+  0% {
+    clip-path: circle(0% at 50% 50%);
+    background: var(--abyss-black);
+  }
+  30% {
+    clip-path: circle(30% at 50% 50%);
+    background: var(--deep-trench);
+  }
+  70% {
+    clip-path: circle(70% at 50% 50%);
+    background: var(--atlantis-depths);
+  }
+  100% {
+    clip-path: circle(150% at 50% 50%);
+    background: transparent;
+  }
+}
+
+@keyframes trident-summon {
+  0% {
+    transform: translateY(100px) scale(0) rotate(180deg);
+    opacity: 0;
+    filter: blur(10px);
+  }
+  50% {
+    transform: translateY(0) scale(1.2) rotate(0deg);
+    opacity: 1;
+    filter: blur(0px);
+  }
+  100% {
+    transform: translateY(0) scale(1) rotate(0deg);
+    opacity: 1;
+    filter: blur(0px);
+  }
+}
+
+@keyframes atlantis-pulse {
+  0%, 100% { 
+    text-shadow: 0 0 20px var(--trident-gold), 0 0 40px var(--atlantis-cyan);
+    transform: scale(1);
+  }
+  50% { 
+    text-shadow: 0 0 40px var(--trident-gold), 0 0 80px var(--atlantis-cyan), 0 0 120px var(--deep-teal);
+    transform: scale(1.05);
+  }
+}
+
+@keyframes water-ripple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+@keyframes bubble-rise {
+  0% {
+    transform: translateY(100vh) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.7;
+  }
+  90% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateY(-100px) scale(1.5);
+    opacity: 0;
+  }
+}
+
+/* Enhanced Underwater Current Animations */
+@keyframes deep-current {
+  0% { transform: translateX(-200%) skewX(-15deg); opacity: 0; }
+  50% { transform: translateX(0%) skewX(0deg); opacity: 0.6; }
+  100% { transform: translateX(200%) skewX(15deg); opacity: 0; }
+}
+
+@keyframes seafloor-drift {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  25% { transform: translateY(-20px) rotate(3deg); }
+  75% { transform: translateY(15px) rotate(-3deg); }
+}
+
+@keyframes oceanic-pulse {
+  0%, 100% { 
+    filter: hue-rotate(0deg) brightness(0.8);
+    transform: scale(1);
+  }
+  50% { 
+    filter: hue-rotate(15deg) brightness(1.2);
+    transform: scale(1.02);
+  }
+}
+
+@keyframes aquaman-shimmer {
+  0%, 100% { 
+    background-position: 0% 50%;
+    filter: hue-rotate(0deg) brightness(0.9);
+  }
+  50% { 
+    background-position: 100% 50%;
+    filter: hue-rotate(20deg) brightness(1.3);
+  }
+}
+
+@keyframes floating-kelp {
+  0%, 100% { transform: translateY(0) rotate(0deg) scaleY(1); }
+  33% { transform: translateY(-10px) rotate(2deg) scaleY(1.05); }
+  66% { transform: translateY(5px) rotate(-2deg) scaleY(0.95); }
+}
+
+@keyframes golden-wave {
+  0% { transform: translateX(-100%) scaleY(0.5); opacity: 0; }
+  50% { transform: translateX(0%) scaleY(1); opacity: 0.3; }
+  100% { transform: translateX(100%) scaleY(0.5); opacity: 0; }
+}
+
+/* Epic Loading Screen */
+.atlantis-loading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, var(--deep-trench) 0%, var(--abyss-black) 100%);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: oceanic-reveal 3s ease-in-out forwards;
+  animation-delay: 1s;
+}
+
+.loading-trident {
+  text-align: center;
+  position: relative;
+}
+
+.trident-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 20px;
+  animation: trident-summon 2s ease-out;
+}
+
+.loading-title {
+  font-size: 3rem;
+  font-weight: 700;
+  background: linear-gradient(45deg, var(--trident-gold), var(--atlantis-cyan), var(--trident-gold));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: atlantis-pulse 2s ease-in-out infinite;
+  margin-bottom: 10px;
+}
+
+.loading-subtitle {
+  color: var(--sea-foam);
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  opacity: 0.8;
+}
+
+.water-ripples {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.ripple {
+  position: absolute;
+  border: 2px solid var(--atlantis-cyan);
+  border-radius: 50%;
+  animation: water-ripple 3s ease-out infinite;
+}
+
+.ripple:nth-child(1) { top: 20%; left: 30%; animation-delay: 0s; }
+.ripple:nth-child(2) { top: 60%; left: 70%; animation-delay: 1s; }
+.ripple:nth-child(3) { top: 80%; left: 20%; animation-delay: 2s; }
+
+/* True Abyss Background - Enhanced with depth and golden waves */
+.atlantis-abyss {
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(0, 206, 209, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 215, 0, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(32, 178, 170, 0.09) 0%, transparent 50%),
+    radial-gradient(ellipse at 60% 70%, rgba(0, 139, 139, 0.07) 0%, transparent 60%),
+    radial-gradient(circle at 10% 30%, rgba(255, 215, 0, 0.06) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(255, 215, 0, 0.05) 0%, transparent 35%),
+    linear-gradient(135deg, var(--abyss-black) 0%, var(--deep-trench) 15%, rgba(0, 30, 40, 1) 30%, var(--atlantis-depths) 45%, var(--ocean-void) 60%, rgba(0, 30, 40, 1) 75%, var(--deep-trench) 85%, var(--abyss-black) 100%);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 120% 120%, 80% 80%, 80% 80%, 400% 400%;
+  animation: aquaman-shimmer 25s ease-in-out infinite;
+  min-height: 100vh;
+  position: relative;
+}
+
+.atlantis-abyss::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    repeating-linear-gradient(45deg, transparent, transparent 120px, rgba(0, 206, 209, 0.03) 121px, rgba(0, 206, 209, 0.03) 123px),
+    repeating-linear-gradient(-45deg, transparent, transparent 120px, rgba(255, 215, 0, 0.025) 121px, rgba(255, 215, 0, 0.025) 123px),
+    radial-gradient(circle at 30% 20%, rgba(0, 206, 209, 0.05), transparent 40%),
+    radial-gradient(circle at 70% 80%, rgba(32, 178, 170, 0.04), transparent 40%),
+    radial-gradient(circle at 15% 60%, rgba(255, 215, 0, 0.03), transparent 30%),
+    radial-gradient(circle at 85% 40%, rgba(255, 215, 0, 0.02), transparent 25%);
+  animation: deep-current 30s linear infinite;
+}
+
+.atlantis-abyss::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(0, 206, 209, 0.08), transparent 40%);
+  transition: background 0.3s ease;
+  pointer-events: none;
+}
+
+/* Deep Sea Currents */
+.ocean-current {
+  position: absolute;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(0, 206, 209, 0.2), 
+    rgba(32, 178, 170, 0.4), 
+    rgba(255, 215, 0, 0.4),
+    rgba(255, 215, 0, 0.5),
+    rgba(32, 178, 170, 0.4),
+    rgba(0, 206, 209, 0.2), 
+    transparent);
+  border-radius: 10px;
+  filter: blur(1px);
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+.current-1 {
+  top: 25%;
+  animation: deep-current 25s linear infinite;
+}
+
+.current-2 {
+  top: 50%;
+  animation: deep-current 30s linear infinite reverse;
+  animation-delay: -10s;
+}
+
+.current-3 {
+  top: 75%;
+  animation: deep-current 35s linear infinite;
+  animation-delay: -20s;
+}
+
+/* Atlantis Bubble Effects */
+.atlantis-bubble {
+  position: absolute;
+  background: radial-gradient(circle, rgba(0, 206, 209, 0.4) 0%, rgba(32, 178, 170, 0.2) 50%, transparent 100%);
+  border-radius: 50%;
+  animation: bubble-rise linear infinite;
+  filter: blur(0.5px);
+}
+
+.atlantis-bubble:nth-child(1) { width: 8px; height: 8px; left: 15%; animation-duration: 8s; animation-delay: 0s; }
+.atlantis-bubble:nth-child(2) { width: 12px; height: 12px; left: 35%; animation-duration: 10s; animation-delay: 2s; }
+.atlantis-bubble:nth-child(3) { width: 6px; height: 6px; left: 55%; animation-duration: 12s; animation-delay: 4s; }
+.atlantis-bubble:nth-child(4) { width: 10px; height: 10px; left: 75%; animation-duration: 9s; animation-delay: 6s; }
+.atlantis-bubble:nth-child(5) { width: 14px; height: 14px; left: 85%; animation-duration: 11s; animation-delay: 1s; }
+
+/* Floating Kelp Forest */
+.floating-kelp {
+  position: absolute;
+  width: 3px;
+  background: linear-gradient(to top, 
+    rgba(0, 100, 0, 0.3) 0%, 
+    rgba(0, 139, 139, 0.4) 30%, 
+    rgba(32, 178, 170, 0.3) 60%, 
+    rgba(0, 206, 209, 0.2) 100%);
+  border-radius: 50px;
+  animation: floating-kelp 8s ease-in-out infinite;
+  filter: blur(0.5px);
+}
+
+.kelp-1 { height: 200px; bottom: 0; left: 5%; animation-delay: 0s; }
+.kelp-2 { height: 150px; bottom: 0; left: 12%; animation-delay: 2s; }
+.kelp-3 { height: 180px; bottom: 0; left: 25%; animation-delay: 4s; }
+.kelp-4 { height: 160px; bottom: 0; right: 30%; animation-delay: 1s; }
+.kelp-5 { height: 220px; bottom: 0; right: 15%; animation-delay: 3s; }
+.kelp-6 { height: 140px; bottom: 0; right: 8%; animation-delay: 5s; }
+
+/* Golden Wave Streams */
+.golden-wave-stream {
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 215, 0, 0.1), 
+    rgba(255, 215, 0, 0.3), 
+    rgba(255, 215, 0, 0.5),
+    rgba(255, 215, 0, 0.3), 
+    rgba(255, 215, 0, 0.1),
+    transparent);
+  border-radius: 10px;
+  filter: blur(1px);
+  animation: golden-wave 20s linear infinite;
+}
+
+.wave-stream-1 { top: 20%; animation-delay: 0s; }
+.wave-stream-2 { top: 40%; animation-delay: -7s; }
+.wave-stream-3 { top: 60%; animation-delay: -14s; }
+.wave-stream-4 { top: 80%; animation-delay: -3s; }
+
+/* Enhanced Aquaman Debris */
+.ocean-debris {
+  position: absolute;
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.2) 0%, rgba(0, 206, 209, 0.1) 50%, transparent 100%);
+  border-radius: 50%;
+  animation: seafloor-drift 15s ease-in-out infinite;
+  filter: blur(1px);
+}
+
+.ocean-debris:nth-child(1) { width: 4px; height: 4px; top: 20%; left: 10%; animation-delay: 0s; }
+.ocean-debris:nth-child(2) { width: 6px; height: 6px; top: 40%; left: 80%; animation-delay: 3s; }
+.ocean-debris:nth-child(3) { width: 3px; height: 3px; top: 60%; left: 25%; animation-delay: 6s; }
+.ocean-debris:nth-child(4) { width: 5px; height: 5px; top: 80%; left: 70%; animation-delay: 9s; }
+.ocean-debris:nth-child(5) { width: 7px; height: 7px; top: 30%; left: 50%; animation-delay: 12s; }
+
+/* Trident Cards - Enhanced Aquaman theme with golden depth */
+.trident-card {
+  background: 
+    radial-gradient(circle at 10% 20%, rgba(255, 215, 0, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(0, 206, 209, 0.06) 0%, transparent 40%),
+    linear-gradient(135deg, 
+      rgba(10, 15, 28, 0.98) 0%,
+      rgba(0, 30, 40, 0.96) 15%,
+      rgba(0, 20, 35, 0.94) 30%,
+      rgba(0, 30, 40, 0.96) 45%,
+      rgba(0, 25, 38, 0.95) 60%,
+      rgba(0, 30, 40, 0.96) 75%,
+      rgba(10, 15, 28, 0.98) 100%);
+  backdrop-filter: blur(20px);
+  border: 1px solid;
+  border-image: linear-gradient(135deg, 
+    rgba(255, 215, 0, 0.25),
+    rgba(0, 206, 209, 0.2),
+    rgba(32, 178, 170, 0.15),
+    rgba(255, 215, 0, 0.3)) 1;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.7),
+    0 0 20px rgba(0, 206, 209, 0.12),
+    0 0 40px rgba(255, 215, 0, 0.08),
+    inset 0 1px 0 rgba(255, 215, 0, 0.1),
+    inset 0 -1px 0 rgba(0, 206, 209, 0.08);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  height: 240px;
+  width: 100%;
+  border-radius: 12px;
+}
+
+.trident-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 215, 0, 0.12), 
+    rgba(0, 206, 209, 0.15), 
+    rgba(32, 178, 170, 0.1),
+    rgba(255, 215, 0, 0.08),
+    transparent);
+  transition: left 0.6s ease;
+}
+
+.trident-card:hover::before {
+  left: 100%;
+}
+
+.trident-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  border-image: linear-gradient(135deg, 
+    rgba(255, 215, 0, 0.4),
+    rgba(0, 206, 209, 0.35),
+    rgba(32, 178, 170, 0.3),
+    rgba(255, 215, 0, 0.45)) 1;
+  box-shadow: 
+    0 16px 48px rgba(0, 0, 0, 0.8),
+    0 0 40px rgba(0, 206, 209, 0.2),
+    0 0 60px rgba(255, 215, 0, 0.15),
+    inset 0 1px 0 rgba(255, 215, 0, 0.15),
+    inset 0 -1px 0 rgba(0, 206, 209, 0.12);
+}
+
+.atlantis-icon {
+  /* Simplified icon styling */
+  transition: transform 0.3s ease;
+}
+
+.depth-badge {
+  background: linear-gradient(45deg, 
+    rgba(0, 206, 209, 0.2), 
+    rgba(255, 215, 0, 0.15));
+  border: 1px solid rgba(0, 206, 209, 0.4);
+  color: var(--sea-foam);
+  backdrop-filter: blur(10px);
+  text-shadow: 0 0 10px rgba(0, 206, 209, 0.5);
+}
+
+.atlantis-text {
+  background: linear-gradient(45deg, var(--trident-gold), var(--atlantis-cyan), var(--sea-foam));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: atlantis-pulse 3s ease-in-out infinite;
+}
+
+.ocean-lord-cta {
+  background: 
+    radial-gradient(circle at 30% 20%, rgba(0, 206, 209, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 70% 80%, rgba(255, 215, 0, 0.06) 0%, transparent 50%),
+    linear-gradient(135deg, 
+      var(--abyss-black) 0%,
+      rgba(0, 30, 40, 0.98) 20%,
+      var(--deep-trench) 40%,
+      rgba(0, 30, 40, 0.95) 60%,
+      var(--atlantis-depths) 80%,
+      var(--abyss-black) 100%);
+  border: 2px solid;
+  border-image: linear-gradient(45deg, 
+    rgba(255, 215, 0, 0.4),
+    rgba(0, 206, 209, 0.3),
+    rgba(255, 215, 0, 0.4)) 1;
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.9),
+    inset 0 1px 0 rgba(255, 215, 0, 0.15),
+    0 0 60px rgba(0, 206, 209, 0.15),
+    0 0 100px rgba(255, 215, 0, 0.08);
+  backdrop-filter: blur(20px);
+  position: relative;
+  overflow: hidden;
+}
+
+.ocean-lord-cta::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    repeating-linear-gradient(45deg, transparent, transparent 80px, rgba(0, 206, 209, 0.02) 81px, rgba(0, 206, 209, 0.02) 83px),
+    repeating-linear-gradient(-45deg, transparent, transparent 80px, rgba(255, 215, 0, 0.015) 81px, rgba(255, 215, 0, 0.015) 83px);
+  animation: kelp-sway 12s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.trident-button {
+  background: linear-gradient(45deg, 
+    var(--deep-trench), 
+    rgba(0, 206, 209, 0.2), 
+    var(--deep-trench));
+  border: 2px solid var(--trident-gold);
+  box-shadow: 
+    0 0 20px rgba(0, 206, 209, 0.3),
+    inset 0 0 20px rgba(255, 215, 0, 0.1);
+  transition: all 0.5s ease;
+}
+
+.trident-button:hover {
+  background: linear-gradient(45deg, 
+    rgba(0, 206, 209, 0.3), 
+    var(--trident-gold), 
+    rgba(0, 206, 209, 0.3));
+  box-shadow: 
+    0 0 40px rgba(255, 215, 0, 0.5),
+    inset 0 0 20px rgba(0, 206, 209, 0.2);
+  transform: scale(1.05);
+}
+
+/* Enhanced Aquaman Animations */
+@keyframes trident-shimmer {
+  0%, 100% { 
+    box-shadow: 
+      0 0 10px rgba(255, 215, 0, 0.3),
+      0 0 20px rgba(0, 206, 209, 0.2);
+  }
+  50% { 
+    box-shadow: 
+      0 0 20px rgba(255, 215, 0, 0.6),
+      0 0 40px rgba(0, 206, 209, 0.4),
+      0 0 60px rgba(32, 178, 170, 0.3);
+  }
+}
+
+@keyframes kelp-sway {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  33% { transform: translateX(2px) rotate(1deg); }
+  66% { transform: translateX(-2px) rotate(-1deg); }
+}
+
+@keyframes depth-charge {
+  0% { transform: translateY(0) scale(1); opacity: 0.7; }
+  50% { transform: translateY(-5px) scale(1.02); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 0.7; }
+}
+
+/* Shimmering Oceanic Particles */
+.oceanic-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.shimmer-particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.8) 0%, rgba(255, 215, 0, 0.3) 50%, transparent 100%);
+  border-radius: 50%;
+  animation: particle-float linear infinite;
+}
+
+@keyframes particle-float {
+  0% {
+    transform: translateY(100vh) translateX(0) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-100px) translateX(50px) scale(1);
+    opacity: 0;
+  }
+}
+
+.shimmer-particle:nth-child(1) { left: 5%; animation-duration: 15s; animation-delay: 0s; }
+.shimmer-particle:nth-child(2) { left: 15%; animation-duration: 18s; animation-delay: 3s; }
+.shimmer-particle:nth-child(3) { left: 25%; animation-duration: 12s; animation-delay: 6s; }
+.shimmer-particle:nth-child(4) { left: 35%; animation-duration: 20s; animation-delay: 9s; }
+.shimmer-particle:nth-child(5) { left: 45%; animation-duration: 16s; animation-delay: 12s; }
+.shimmer-particle:nth-child(6) { left: 55%; animation-duration: 14s; animation-delay: 2s; }
+.shimmer-particle:nth-child(7) { left: 65%; animation-duration: 17s; animation-delay: 5s; }
+.shimmer-particle:nth-child(8) { left: 75%; animation-duration: 13s; animation-delay: 8s; }
+.shimmer-particle:nth-child(9) { left: 85%; animation-duration: 19s; animation-delay: 11s; }
+.shimmer-particle:nth-child(10) { left: 95%; animation-duration: 21s; animation-delay: 1s; }
+
+@keyframes coral-glow-pulse {
+  0%, 100% { 
+    text-shadow: 0 0 10px rgba(255, 127, 80, 0.5);
+    color: #FF7F50;
+  }
+  50% { 
+    text-shadow: 0 0 20px rgba(255, 127, 80, 0.8), 0 0 30px rgba(255, 215, 0, 0.3);
+    color: #FFA07A;
+  }
+}
+
+@keyframes atlantean-runes {
+  0% { opacity: 0.3; transform: rotate(0deg); }
+  25% { opacity: 0.7; transform: rotate(90deg); }
+  50% { opacity: 1; transform: rotate(180deg); }
+  75% { opacity: 0.7; transform: rotate(270deg); }
+  100% { opacity: 0.3; transform: rotate(360deg); }
+}
+
+/* Card content structure for proper layout */
+.trident-card .card-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.5rem;
+}
+
+.trident-card .card-header {
+  flex-shrink: 0;
+}
+
+.trident-card .card-body {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.trident-card .card-footer {
+  flex-shrink: 0;
+  margin-top: auto;
+}
+
+/* Enhanced water ripple effect on hover */
+@keyframes enhanced-ripple {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2.5);
+    opacity: 0;
+  }
+}
+
+.trident-card::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.4) 0%, rgba(0, 206, 209, 0.3) 30%, rgba(32, 178, 170, 0.2) 50%, transparent 70%);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.6s ease;
+}
+
+.trident-card:hover::after {
+  animation: enhanced-ripple 0.8s ease-out;
+}
+
+/* Aquaman Power Glow on Cards */
+.trident-card {
+  position: relative;
+}
+
+.trident-card:before {
+  z-index: -1;
+}
+
+.trident-card:hover {
+  animation: trident-shimmer 2s ease-in-out infinite;
+}
+
+/* Enhanced hover effects for interactions */
+.atlantis-abyss a:hover, 
+.atlantis-abyss button:hover, 
+.atlantis-abyss .trident-card:hover, 
+.atlantis-abyss .trident-button:hover {
+  filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.3));
+}
+

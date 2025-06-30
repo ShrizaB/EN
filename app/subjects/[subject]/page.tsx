@@ -969,27 +969,24 @@ export default function SubjectPage({ params }: { params: { subject: string } })
 
 
   return (
-    <div className="relative bg-gradient-to-bl from-[#0d3c0d] via-black to-[#440303] text-green-100 min-h-screen hulk-particles">
+    <div className="relative bg-gradient-to-bl from-[#0d3c0d] via-black to-[#440303] text-green-100 min-h-screen hulk-particles overflow-hidden">
       <img
         src="https://i.postimg.cc/PrbLMy46/Red-Hulk-No-Background.png"
         alt="background"
-        className=" absolute bottom-[-80px] left-0 w-[600px] h-auto opacity-70"
+        className="absolute bottom-0 left-0 w-[600px] max-w-full h-auto opacity-70 pointer-events-none select-none object-contain"
+        style={{maxWidth: '100vw', maxHeight: '100vh'}}
       />
       <img
         src="https://i.postimg.cc/X7bsZLxj/f9ad028ac76eb967349c888bfb355495.png"
         alt="background"
-        className=" absolute top-20 right-0 w-[600px] h-auto opacity-50 scale-x-[-1]"
-      />
-      <img
-        src="https://i.postimg.cc/RZGLH2zk/hulk-marvel-rivals-png-by-joaolucasvingaprimos-di6otfx.png"
-        alt="background"
-        className=" absolute bottom-0 right-0 w-[270px] h-auto opacity-100 scale-x-[-1] animate-float"
+        className="absolute top-20 right-0 w-[600px] max-w-full h-auto opacity-50 scale-x-[-1] pointer-events-none select-none object-contain"
+        style={{maxWidth: '100vw', maxHeight: '100vh'}}
       />
 
       <div className="container py-12 md:py-20 relative z-10">
         <Link
           href="/subjects"
-          className="inline-flex items-center text-sm font-medium text-green-400 hover:text-green-300 transition-colors mb-8"
+          className="inline-flex items-center text-sm font-medium text-green-400 hover:text-green-300 transition-colors mb-8 "
         >
           <ArrowLeft className="mr-1 h-4 w-4" />
           Back to Subjects

@@ -7,6 +7,12 @@ import InterviewResults from "./interview-results"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 
+type Question = {
+  id: string
+  question: string
+  type?: string // 'technical' | 'behavioral'
+}
+
 type InterviewStage = "application" | "interview" | "results"
 
 export default function InterviewProcess() {
@@ -15,22 +21,19 @@ export default function InterviewProcess() {
     degree: string
     skills: string[]
     jobTitle: string
+    interviewType: "technical" | "behavioral" | "both"
   } | null>(null)
-  const [questions, setQuestions] = useState<{
-    technical: { id: string; question: string }[]
-    behavioral: { id: string; question: string }[]
-  } | null>(null)
+  const [questions, setQuestions] = useState<Question[] | null>(null)
   const [interviewAnswers, setInterviewAnswers] = useState<{
     answers: Record<string, string>
     analysis: any
   } | null>(null)
 
-  const handleApplicationComplete = async (data: { degree: string; skills: string[]; jobTitle: string }) => {
+  const handleApplicationComplete = async (data: { degree: string; skills: string[]; jobTitle: string; interviewType: "technical" | "behavioral" | "both" }) => {
     setApplicationData(data)
-
     try {
       // Generate questions based on application data
-      const response = await fetch("/api/interview/generate-questions", {
+      const response = await fetch("/api/gemini/questions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -39,6 +42,7 @@ export default function InterviewProcess() {
           degree: data.degree,
           skills: data.skills,
           jobTitle: data.jobTitle,
+          interviewType: data.interviewType,
         }),
       })
 
@@ -47,25 +51,37 @@ export default function InterviewProcess() {
       }
 
       const generatedQuestions = await response.json()
-      setQuestions(generatedQuestions)
+      // Robustly handle both array and object with questions property
+      let questionsArray: Question[] = []
+      if (Array.isArray(generatedQuestions)) {
+        questionsArray = generatedQuestions
+      } else if (Array.isArray(generatedQuestions.questions)) {
+        questionsArray = generatedQuestions.questions
+      }
+      // Fallback to default questions if array is empty or malformed
+      if (!questionsArray || questionsArray.length === 0) {
+        questionsArray = Array(10)
+          .fill(0)
+          .map((_, i) => ({
+            id: `default-${i}`,
+            question: `Default question ${i + 1}`,
+            type: i < 5 ? "technical" : "behavioral",
+          }))
+      }
+      setQuestions(questionsArray)
       setStage("interview")
     } catch (error) {
       console.error("Error generating questions:", error)
       // Fallback to default questions if API fails
-      setQuestions({
-        technical: Array(10)
+      setQuestions(
+        Array(10)
           .fill(0)
           .map((_, i) => ({
-            id: `tech-${i}`,
-            question: `Default technical question ${i + 1}`,
-          })),
-        behavioral: Array(10)
-          .fill(0)
-          .map((_, i) => ({
-            id: `behav-${i}`,
-            question: `Default behavioral question ${i + 1}`,
-          })),
-      })
+            id: `default-${i}`,
+            question: `Default question ${i + 1}`,
+            type: i < 5 ? "technical" : "behavioral",
+          }))
+      )
       setStage("interview")
     }
   }

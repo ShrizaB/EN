@@ -76,6 +76,9 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      const marksRaw = formData.get("marks");
+      const marks = marksRaw ? Number(marksRaw) : 1;
+
       const prompt = `You are an expert educator tasked with analyzing educational content from a provided ${isImage ? "image" : "PDF document"}.
 
 Document details:
@@ -85,11 +88,14 @@ Document details:
 
 Your objective is to:
 1. Assume the content of the document is educational material related to the filename.
-2. Generate exactly 10 specific questions based on the likely content of this document (infer from the filename if direct content analysis isn't possible).
-3. Identify the **most important question** among the 10, based on its relevance to the core concepts of the inferred subject matter.
-4. Provide a concise answer for each question, except for the most important question, where the answer should be detailed (50-100 words) if the question is complex (e.g., involves "explain," "why," "compare") or concise (10-30 words) if simple (e.g., "what is").
-5. Ensure each question relates to potential facts, concepts, or information in this specific content.
-6. Avoid overly generic questions; focus on the likely subject matter.
+2. Generate exactly 10 questions based on the likely content of this document (infer from the filename if direct content analysis isn't possible).
+3. The questions and answers must be tailored to the following marks value: ${marks} mark${marks > 1 ? 's' : ''}.
+4. If marks is 1 or 2: ALL questions must be short, direct, and simple, and ALL answers must be concise (1 mark: about 15 words, 2 marks: about 30 words). Do NOT generate any descriptive or analytical questions for marks 1 or 2.
+5. If marks is 3, 4, or 5: ALL questions must be long, descriptive, and analytical, and ALL answers must be detailed and explanatory (3 marks: about 45 words, 4 marks: about 60 words, 5 marks: at least 75 words). Do NOT generate any short or direct questions for marks 3, 4, or 5.
+6. Each question must relate to potential facts, concepts, or information in this specific content.
+7. Avoid overly generic questions; focus on the likely subject matter.
+
+IMPORTANT: Do NOT mix question types. For marks 1 or 2, only short/direct questions. For marks 3, 4, or 5, only descriptive/analytical questions. Answers must always match the required word count for the marks value.
 
 Format your response as a JSON array with objects containing "question" and "answer" properties. Example:
 [
@@ -99,7 +105,7 @@ Format your response as a JSON array with objects containing "question" and "ans
   }
 ]
 
-Important: Base your questions and answers on the inferred content of this document based on its metadata.`;
+Base your questions and answers on the inferred content of this document based on its metadata. Strictly follow the answer word count and question descriptiveness based on the marks value.`;
 
       // Send request to Groq API
       const response = await axios.post(
@@ -127,6 +133,9 @@ Important: Base your questions and answers on the inferred content of this docum
       console.log("Received response from Groq API:", text.substring(0, 200) + "...");
 
       // Try to parse the response as JSON by cleaning markdown formatting
+      let questions = [];
+      let answers = [];
+      let jsonError = null;
       try {
         // Clean the response text by removing markdown code block indicators
         let cleanedText = text
@@ -135,88 +144,93 @@ Important: Base your questions and answers on the inferred content of this docum
           .replace(/`/g, '')
           .trim();
 
-        // Attempt to extract JSON content
-        const jsonStartIndex = cleanedText.indexOf('[');
-        const jsonEndIndex = cleanedText.lastIndexOf(']');
-        if (jsonStartIndex >= 0 && jsonEndIndex > jsonStartIndex) {
-          cleanedText = cleanedText.slice(jsonStartIndex, jsonEndIndex + 1);
+        // Extract the first JSON array using regex (robust to extra text)
+        const arrayMatch = cleanedText.match(/\[\s*{[\s\S]*?}\s*\]/);
+        if (arrayMatch) {
+          cleanedText = arrayMatch[0];
         }
 
-        // Fix common JSON issues: trailing commas, single quotes, etc.
+        // Fix common JSON issues
         cleanedText = cleanedText
-          .replace(/,\s*}/g, '}') // Remove trailing commas before }
-          .replace(/,\s*]/g, ']') // Remove trailing commas before ]
-          .replace(/\r?\n/g, '') // Remove newlines
-          .replace(/\s+/g, ' ') // Collapse whitespace
-          .replace(/\'([^']*)\'/g, '"$1"') // Replace single quotes with double quotes (if any)
-          .replace(/([\{,])\s*([a-zA-Z0-9_]+)\s*:/g, '$1 "$2":') // Ensure property names are quoted
-          .replace(/([:,])\s*"\s*([^\"]*?)\s*"\s*([,}\]])/g, '$1 "$2"$3') // Remove extra spaces inside quotes
-          .replace(/\"\s*\"/g, '""') // Remove empty quoted strings with spaces
-          .replace(/\},\s*\}/g, '}}') // Remove double closing braces
-          .replace(/\},\s*\]/g, '}]'); // Remove double closing braces before array end
-
-          // Fix unescaped double quotes inside string values (e.g., in answers)
-          // This is a common LLM bug: "answer": "The title is "Asleep in the Valley".
-          cleanedText = cleanedText.replace(/: "([^"]*?)"([^"]*?)"([^"]*?)"/g, (match: string, p1: string, p2: string, p3: string) => {
-            // Escape inner quotes
-            return ': "' + p1.replace(/"/g, '\\"') + '"' + p2.replace(/"/g, '\\"') + '"' + p3.replace(/"/g, '\\"') + '"';
-          });
-          // Also escape any remaining unescaped quotes inside string values
-          cleanedText = cleanedText.replace(/: "([^"]*?)"([^"]*?)"/g, (match: string, p1: string, p2: string) => {
-            return ': "' + p1.replace(/"/g, '\\"') + '"' + p2.replace(/"/g, '\\"') + '"';
-          });
+          .replace(/,\s*}/g, '}')
+          .replace(/,\s*]/g, ']')
+          .replace(/\r?\n/g, '')
+          .replace(/\s+/g, ' ')
+          .replace(/\'([^']*)\'/g, '"$1"')
+          .replace(/([\{,])\s*([a-zA-Z0-9_]+)\s*:/g, '$1 "$2":')
+          .replace(/([:,])\s*"\s*([^\"]*?)\s*"\s*([,}\]])/g, '$1 "$2"$3')
+          .replace(/\"\s*\"/g, '""')
+          .replace(/\},\s*\}/g, '}}')
+          .replace(/\},\s*\]/g, '}]');
 
         // Try to parse the cleaned text as JSON
-        const jsonData = JSON.parse(cleanedText);
-
-        if (Array.isArray(jsonData)) {
-          const questions = jsonData.map((item) => item.question || "");
-          const answers = jsonData.map((item) => item.answer || "");
-
-          // Filter out empty questions
-          const validQuestions = [];
-          const validAnswers = [];
-
-          for (let i = 0; i < questions.length; i++) {
-            if (questions[i] && questions[i].length > 5) {
-              validQuestions.push(questions[i]);
-              validAnswers.push(answers[i] || generateDefaultAnswer(questions[i]));
+        let jsonData;
+        try {
+          jsonData = JSON.parse(cleanedText);
+        } catch (parseErr) {
+          // Try to repair: remove trailing characters after last closing bracket
+          const lastBracket = cleanedText.lastIndexOf(']');
+          if (lastBracket !== -1) {
+            const repaired = cleanedText.slice(0, lastBracket + 1);
+            try {
+              jsonData = JSON.parse(repaired);
+            } catch (repairErr) {
+              // As a last resort, try to remove any trailing commas before closing brackets
+              const moreRepaired = repaired.replace(/,\s*([}\]])/g, '$1');
+              try {
+                jsonData = JSON.parse(moreRepaired);
+              } catch (finalErr) {
+                console.error("Final JSON parse failed. cleanedText:", cleanedText);
+                jsonData = null;
+              }
             }
           }
-
-          if (validQuestions.length > 0) {
-            return NextResponse.json({
-              success: true,
-              questions: validQuestions,
-              answers: validAnswers,
-            });
+        }
+        if (Array.isArray(jsonData)) {
+          for (const item of jsonData) {
+            if (item && item.question && item.answer) {
+              questions.push(item.question);
+              answers.push(item.answer);
+            }
           }
         }
-      } catch (jsonError) {
-        console.error("Failed to parse JSON response:", jsonError);
-        // Continue to fallback extraction methods
+      } catch (err) {
+        jsonError = err;
+        console.error("Failed to parse JSON response (array extraction):", err);
       }
 
-      // If JSON parsing failed, try to extract questions and answers from text
-      const extractedData = extractQuestionsAndAnswers(text);
-
-      if (extractedData.questions.length > 0) {
-        return NextResponse.json({
-          success: true,
-          questions: extractedData.questions,
-          answers: extractedData.answers,
-        });
+      // Fallback: extract all {question, answer} objects from anywhere in the text (tolerant to missing commas)
+      if (questions.length === 0) {
+        try {
+          const objRegex = /\{[^}]*?"question"\s*:\s*"([^"]+)"[^}]*?"answer"\s*:\s*"([^"]+)"[^}]*?\}/g;
+          let match;
+          while ((match = objRegex.exec(text)) !== null) {
+            questions.push(match[1]);
+            answers.push(match[2]);
+          }
+        } catch (fallbackErr) {
+          console.error("Fallback object extraction failed:", fallbackErr);
+        }
       }
 
-      // Fallback questions based on file name
-      const fileName = file.name.replace(/\.[^/.]+$/, "").replace(/[_-]/g, " ");
-      const fallbackQuestions = generateFallbackQuestions(fileName);
-      const fallbackAnswers = fallbackQuestions.map((q) => generateDefaultAnswer(q));
+      // Fallback: use line-based extraction if still nothing
+      if (questions.length === 0) {
+        const extractedData = extractQuestionsAndAnswers(text);
+        questions = extractedData.questions;
+        answers = extractedData.answers;
+      }
+
+      // Fallback: generate from file name if still nothing
+      if (questions.length === 0) {
+        const fileName = file.name.replace(/\.[^/.]+$/, "").replace(/[_-]/g, " ");
+        questions = generateFallbackQuestions(fileName);
+        answers = questions.map((q) => generateDefaultAnswer(q));
+      }
 
       return NextResponse.json({
         success: true,
-        questions: fallbackQuestions,
-        answers: fallbackAnswers,
+        questions,
+        answers,
       });
     } catch (error: unknown) { // Use unknown to comply with TypeScript
       if (error instanceof AxiosError) {

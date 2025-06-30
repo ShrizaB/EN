@@ -631,6 +631,9 @@ export default function HomePage() {
           50% { transform: translate(-50%, -50%) rotate(360deg) translateX(28px) scale(1.2); }
           100% { transform: translate(-50%, -50%) rotate(540deg) translateX(28px) scale(1); }
         }
+        html, body {
+          overflow-x: hidden;
+        }
         `}</style>
       </div>
     </>

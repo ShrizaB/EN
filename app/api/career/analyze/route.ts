@@ -7,10 +7,86 @@ const genAI = new GoogleGenerativeAI(GEMINI_API_KEY)
 
 export async function POST(req: NextRequest) {
   try {
-    const { sector, salaryRange, jobRole } = await req.json()
+    const { sector, jobRole, interviewPractice, interviewAnswers } = await req.json()
 
     if (!jobRole) {
       return NextResponse.json({ error: "Job role is required" }, { status: 400 })
+    }
+
+    // Interview Practice Section
+    if (interviewPractice) {
+      // Compose prompt for interview questions
+      let prompt = ''
+      if (interviewPractice === 'technical') {
+        prompt = `Generate 10 technical interview questions for the role of "${jobRole}" in the "${sector}" sector. Return as an array of objects: [{question: string, type: 'technical'}]`;
+      } else if (interviewPractice === 'behavioural') {
+        prompt = `Generate 10 behavioural interview questions relevant to the role of "${jobRole}" in the "${sector}" sector. Return as an array of objects: [{question: string, type: 'behavioural'}]`;
+      } else if (interviewPractice === 'both') {
+        prompt = `Generate 5 technical and 5 behavioural interview questions for the role of "${jobRole}" in the "${sector}" sector. Return as an array of objects: [{question: string, type: 'technical'|'behavioural'}]`;
+      }
+
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
+      const result = await model.generateContent(prompt)
+      const response = await result.response
+      const text = response.text()
+      let questions: any[] = []
+      try {
+        const jsonMatch = text.match(/```json\n([\s\S]*?)\n```/) || text.match(/````\n([\s\S]*?)\n```/)
+        const jsonString = jsonMatch ? jsonMatch[1] : text
+        questions = JSON.parse(jsonString)
+        // Enforce correct number and type of questions
+        if (interviewPractice === 'technical') {
+          questions = questions.filter((q: any) => q.type === 'technical').slice(0, 10)
+        } else if (interviewPractice === 'behavioural') {
+          questions = questions.filter((q: any) => q.type === 'behavioural').slice(0, 10)
+        } else if (interviewPractice === 'both') {
+          const tech = questions.filter((q: any) => q.type === 'technical').slice(0, 5)
+          const beh = questions.filter((q: any) => q.type === 'behavioural').slice(0, 5)
+          questions = [...tech, ...beh].slice(0, 10)
+        }
+        // Always enforce max 10 questions
+        questions = questions.slice(0, 10)
+      } catch (e) {
+        // fallback: try to parse as array
+        questions = Array.isArray(text) ? text : []
+      }
+      // If user answers are provided, score and return results
+      if (interviewAnswers && Array.isArray(interviewAnswers) && interviewAnswers.length === questions.length) {
+        // For each question, get best answer and advice
+        const scoredResults = []
+        let totalScore = 0
+        for (let i = 0; i < questions.length; i++) {
+          const userAnswer = interviewAnswers[i]
+          const q = questions[i]
+          // Compose prompt for scoring and advice
+          const evalPrompt = `Question: ${q.question}\nUser Answer: ${userAnswer}\nRole: ${jobRole}\nSector: ${sector}\nType: ${q.type}\nEvaluate the answer on a scale of 0-10.\nReturn a JSON object: {score: number (0-10), bestAnswer: string (the best possible answer), advice: string (advice to improve the answer)}`
+          const evalResult = await model.generateContent(evalPrompt)
+          const evalText = evalResult.response.text()
+          let evalObj = { score: 0, bestAnswer: '', advice: '' }
+          try {
+            const jsonMatch = evalText.match(/```json\n([\s\S]*?)\n```/) || evalText.match(/````\n([\s\S]*?)\n```/)
+            const jsonString = jsonMatch ? jsonMatch[1] : evalText
+            evalObj = JSON.parse(jsonString)
+          } catch (e) {}
+          totalScore += evalObj.score || 0
+          scoredResults.push({
+            question: q.question,
+            type: q.type,
+            userAnswer,
+            score: evalObj.score || 0, // out of 10
+            bestAnswer: evalObj.bestAnswer || '',
+            advice: evalObj.advice || '',
+          })
+        }
+        // Final score out of 10
+        const finalScore = Math.round((totalScore / questions.length) * 10) / 10
+        return NextResponse.json({
+          questions: scoredResults,
+          finalScore, // out of 10
+        })
+      }
+      // If no answers, just return questions
+      return NextResponse.json({ questions })
     }
 
     // Create a model with the correct model name
@@ -19,11 +95,11 @@ export async function POST(req: NextRequest) {
     // Generate career roadmap analysis
     const prompt = `
   Generate a detailed career roadmap analysis for someone interested in the role of "${jobRole}" 
-  in the "${sector}" sector with an expected salary range of ₹${salaryRange[0]}.
+  in the "${sector}" sector.
   
   Provide the following information in a structured JSON format:
   1. Top sectors hiring for this role with percentages (e.g., IT Services: 40%, Product Companies: 30%, etc.)
-  2. Top companies hiring for this role (include the sector for each company - government or private)
+  2. Top companies hiring for this role (for each company, include: name, sector (government or private), 5-10 line details, top 10 facilities/benefits, entrySalary, averageSalary, experiencedSalary)
   3. Required skills (list of 5-7 skills with importance percentage)
   4. Top hiring locations in India with hiring percentage
   5. Average salary, entry-level salary, and experienced salary
@@ -34,7 +110,16 @@ export async function POST(req: NextRequest) {
   10. Additional resources (3-4 resources with title and description)
   11. Recommended YouTube videos for learning key skills (4-6 videos with title, topic, and description)
   12. Role roadmap (15-20 learning steps with title, description, and estimated learning time)
-  
+
+  For each company in topCompanies, always include:
+    - name
+    - sector (government or private)
+    - details (5-10 lines about the company, including what it does, its reputation, work culture, and opportunities)
+    - facilities (array of top 10 facilities/benefits)
+    - entrySalary (number)
+    - averageSalary (number)
+    - experiencedSalary (number)
+
   Format the response as a valid JSON object with the following structure:
   {
     "jobRole": string,
@@ -191,25 +276,49 @@ export async function POST(req: NextRequest) {
 
       // Enhance the role roadmap with YouTube videos if it exists
       if (jsonResponse.roleRoadmap && Array.isArray(jsonResponse.roleRoadmap)) {
-        jsonResponse.roleRoadmap = await fetchYouTubeVideos(jsonResponse.roleRoadmap)
+        try {
+          jsonResponse.roleRoadmap = await fetchYouTubeVideos(jsonResponse.roleRoadmap)
+        } catch (ytError) {
+          // If YouTube API fails, fallback to original roadmap and add error info
+          jsonResponse.roleRoadmap = jsonResponse.roleRoadmap.map((step: any) => ({
+            ...step,
+            youtubeError: 'YouTube API unavailable or quota exceeded.'
+          }))
+          jsonResponse.youtubeApiError = ytError instanceof Error ? ytError.message : String(ytError)
+        }
+      }
+
+      // Ensure all companies have required fields
+      if (Array.isArray(jsonResponse.topCompanies)) {
+        jsonResponse.topCompanies = jsonResponse.topCompanies.map((company: any) => ({
+          ...company,
+          details: company.details || `No details available for ${company.name || 'this company'}.`,
+          facilities: Array.isArray(company.facilities) && company.facilities.length > 0
+            ? company.facilities
+            : ["No facility data available."],
+          entrySalary: typeof company.entrySalary === 'number' ? company.entrySalary : (jsonResponse.entrySalary || 0),
+          averageSalary: typeof company.averageSalary === 'number' ? company.averageSalary : (jsonResponse.averageSalary || 0),
+          experiencedSalary: typeof company.experiencedSalary === 'number' ? company.experiencedSalary : (jsonResponse.experiencedSalary || 0),
+        }))
       }
 
       return NextResponse.json(jsonResponse)
     } catch (error) {
       console.error("Error parsing JSON response:", error)
       // Fallback with mock data
-      return NextResponse.json(generateMockCareerData(jobRole, sector, salaryRange[0]))
+      return NextResponse.json(generateMockCareerData(jobRole, sector))
     }
   } catch (error) {
     console.error("Error in Career Roadmap API:", error)
 
     // Return fallback mock data
-    return NextResponse.json(generateMockCareerData("Software Engineer", "private", 50000))
+    return NextResponse.json(generateMockCareerData("Software Engineer", "private"))
   }
 }
 
 // Update the mock data function to include role roadmap
-function generateMockCareerData(jobRole: string, sector: string, salaryRange: number) {
+function generateMockCareerData(jobRole: string, sector: string) {
+  const salaryRange = 50000; // Fixed salary range for mock data
   const mockData = {
     jobRole: jobRole,
     sector: sector,

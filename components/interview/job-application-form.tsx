@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
 
 interface JobApplicationFormProps {
-  onComplete: (data: { degree: string; skills: string[]; jobTitle: string }) => void
+  onComplete: (data: { degree: string; skills: string[]; jobTitle: string; interviewType: "technical" | "behavioral" | "both" }) => void
 }
 
 // Sample job titles for dropdown
@@ -32,6 +32,7 @@ export default function JobApplicationForm({ onComplete }: JobApplicationFormPro
   const [skillsInput, setSkillsInput] = useState("")
   const [skills, setSkills] = useState<string[]>([])
   const [jobTitle, setJobTitle] = useState("")
+  const [interviewType, setInterviewType] = useState<"technical" | "behavioral" | "both">("technical")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { toast } = useToast()
 
@@ -84,6 +85,7 @@ export default function JobApplicationForm({ onComplete }: JobApplicationFormPro
         degree,
         skills,
         jobTitle,
+        interviewType,
       })
       setIsSubmitting(false)
     }, 1000)
@@ -166,6 +168,42 @@ export default function JobApplicationForm({ onComplete }: JobApplicationFormPro
                   </option>
                 ))}
               </select>
+            </div>
+
+            <div>
+              <Label htmlFor="interviewType">Interview Type</Label>
+              <div className="flex gap-4 mt-2">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="interviewType"
+                    value="technical"
+                    checked={interviewType === "technical"}
+                    onChange={() => setInterviewType("technical")}
+                  />
+                  Technical
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="interviewType"
+                    value="behavioral"
+                    checked={interviewType === "behavioral"}
+                    onChange={() => setInterviewType("behavioral")}
+                  />
+                  Behavioural
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="interviewType"
+                    value="both"
+                    checked={interviewType === "both"}
+                    onChange={() => setInterviewType("both")}
+                  />
+                  Both
+                </label>
+              </div>
             </div>
           </div>
         </Card>

@@ -48,6 +48,37 @@ export async function POST(req: NextRequest) {
     const client = await clientPromise
     const db = client.db()
 
+    // Check for duplicate session if sessionId is provided
+    if (activityData.sessionId) {
+      const existingActivity = await db.collection("activities").findOne({
+        userId,
+        sessionId: activityData.sessionId,
+        type: activityData.type
+      })
+      
+      if (existingActivity) {
+        console.log("Duplicate activity detected, updating existing instead of creating new:", activityData.sessionId)
+        
+        // Update the existing activity instead of creating a new one
+        const updateResult = await db.collection("activities").updateOne(
+          { _id: existingActivity._id },
+          {
+            $set: {
+              ...activityData,
+              timestamp: activityData.timestamp ? new Date(activityData.timestamp) : new Date(),
+              updatedAt: new Date(),
+            }
+          }
+        )
+        
+        return NextResponse.json({ 
+          success: true, 
+          activityId: existingActivity._id, 
+          updated: true 
+        }, { status: 200 })
+      }
+    }
+
     // Insert the activity
     const now = new Date()
     const activity = {

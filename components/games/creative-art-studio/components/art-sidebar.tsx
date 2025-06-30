@@ -69,6 +69,10 @@ interface ArtSidebarProps {
   onChangeSidebarPosition: (position: SidebarPosition) => void
   onTabChange: (tab: string) => void
   onFullScreen: () => void
+  onAnalyse?: () => void;
+  isAnalysing?: boolean;
+  analysis?: string | null;
+  suggestion?: string | null;
 }
 
 const ArtSidebar = ({
@@ -104,6 +108,10 @@ const ArtSidebar = ({
   onChangeSidebarPosition,
   onTabChange,
   onFullScreen,
+  onAnalyse,
+  isAnalysing,
+  analysis,
+  suggestion,
 }: ArtSidebarProps) => {
   // Predefined colors
   const colorPalette = [
@@ -339,6 +347,7 @@ const ArtSidebar = ({
             <div className="bg-[#f1f1f1] p-3 rounded-lg">
               <h3 className="font-bold text-md mb-2">Drawing Tools</h3>
               <div className="grid grid-cols-3 gap-2">
+                {/* Pencil */}
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -358,6 +367,7 @@ const ArtSidebar = ({
                   </Tooltip>
                 </TooltipProvider>
 
+                {/* Eraser */}
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -377,13 +387,14 @@ const ArtSidebar = ({
                   </Tooltip>
                 </TooltipProvider>
 
+                {/* Fill */}
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
                         variant={tool === "bucket" ? "default" : "outline"}
                         size="icon"
-                        className="bg-black text-white transition-all hover:scale-105"
+                        className={`transition-all hover:scale-105 ${tool === "bucket" ? "bg-purple-600 text-white" : "bg-black text-white"}`}
                         onClick={() => {
                           onToolChange("bucket")
                           onSelectionModeToggle()
@@ -396,13 +407,14 @@ const ArtSidebar = ({
                   </Tooltip>
                 </TooltipProvider>
 
+                {/* Spray */}
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
                         variant={tool === "spray" ? "default" : "outline"}
                         size="icon"
-                        className="bg-black text-white transition-all hover:scale-105"
+                        className={`transition-all hover:scale-105 ${tool === "spray" ? "bg-purple-600 text-white" : "bg-black text-white"}`}
                         onClick={() => {
                           onToolChange("spray")
                           onSelectionModeToggle()
@@ -415,14 +427,18 @@ const ArtSidebar = ({
                   </Tooltip>
                 </TooltipProvider>
 
+                {/* Select */}
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
-                        variant={isSelectionMode ? "default" : "outline"}
+                        variant={tool === "select" ? "default" : "outline"}
                         size="icon"
-                        className="bg-black text-white transition-all hover:scale-105"
-                        onClick={onSelectionModeToggle}
+                        className={`transition-all hover:scale-105 ${tool === "select" ? "bg-purple-600 text-white" : "bg-black text-white"}`}
+                        onClick={() => {
+                          onToolChange("select")
+                          onSelectionModeToggle()
+                        }}
                       >
                         <Shapes className="h-4 w-4" />
                       </Button>
@@ -562,133 +578,134 @@ const ArtSidebar = ({
             <div className="bg-[#f1f1f1] p-3 rounded-lg">
               <h3 className="font-bold text-md mb-2">Basic Shapes</h3>
               <div className="grid grid-cols-3 gap-2">
+                {/* SQUARE */}
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
                         variant={tool === "square" ? "default" : "outline"}
                         size="icon"
-                        className="transition-all hover:scale-105"
+                        className="transition-all hover:scale-105 bg-black text-white border-gray-700"
                         onClick={() => {
                           onToolChange("square")
                           onSelectionModeToggle()
                         }}
                       >
-                        <Square className="h-4 w-4" />
+                        <Square className="h-4 w-4 text-white" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>Square</TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-
+                {/* RECTANGLE */}
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
                         variant={tool === "rectangle" ? "default" : "outline"}
                         size="icon"
-                        className="transition-all hover:scale-105"
+                        className="transition-all hover:scale-105 bg-black text-white border-gray-700"
                         onClick={() => {
                           onToolChange("rectangle")
                           onSelectionModeToggle()
                         }}
                       >
-                        <RectangleHorizontal className="h-4 w-4" />
+                        <RectangleHorizontal className="h-4 w-4 text-white" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>Rectangle</TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-
+                {/* CIRCLE */}
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
                         variant={tool === "circle" ? "default" : "outline"}
                         size="icon"
-                        className="transition-all hover:scale-105"
+                        className="transition-all hover:scale-105 bg-black text-white border-gray-700"
                         onClick={() => {
                           onToolChange("circle")
                           onSelectionModeToggle()
                         }}
                       >
-                        <Circle className="h-4 w-4" />
+                        <Circle className="h-4 w-4 text-white" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>Circle</TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-
+                {/* TRIANGLE */}
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
                         variant={tool === "triangle" ? "default" : "outline"}
                         size="icon"
-                        className="transition-all hover:scale-105"
+                        className="transition-all hover:scale-105 bg-black text-white border-gray-700"
                         onClick={() => {
                           onToolChange("triangle")
                           onSelectionModeToggle()
                         }}
                       >
-                        <Triangle className="h-4 w-4" />
+                        <Triangle className="h-4 w-4 text-white" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>Triangle</TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-
+                {/* STAR */}
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
                         variant={tool === "star" ? "default" : "outline"}
                         size="icon"
-                        className="transition-all hover:scale-105"
+                        className="transition-all hover:scale-105 bg-black text-white border-gray-700"
                         onClick={() => {
                           onToolChange("star")
                           onSelectionModeToggle()
                         }}
                       >
-                        <Star className="h-4 w-4" />
+                        <Star className="h-4 w-4 text-white" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>Star</TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-
+                {/* LINE */}
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
                         variant={tool === "line" ? "default" : "outline"}
                         size="icon"
-                        className="transition-all hover:scale-105"
+                        className="transition-all hover:scale-105 bg-black text-white border-gray-700"
                         onClick={() => {
                           onToolChange("line")
                           onSelectionModeToggle()
                         }}
                       >
-                        <Minus className="h-4 w-4" />
+                        <Minus className="h-4 w-4 text-white" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>Line</TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-
+                {/* BENDABLE LINE */}
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
                         variant={tool === "bendableLine" ? "default" : "outline"}
                         size="icon"
-                        className="transition-all hover:scale-105"
+                        className="transition-all hover:scale-105 bg-black text-white border-gray-700"
                         onClick={() => {
                           onToolChange("bendableLine")
                           onSelectionModeToggle()
                         }}
                       >
-                        <Wand className="h-4 w-4" />
+                        <Wand className="h-4 w-4 text-white" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>Bendable Line</TooltipContent>
@@ -697,19 +714,19 @@ const ArtSidebar = ({
               </div>
             </div>
 
-            <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
+            <div className={`bg-[#f1f1f1] p-3 rounded-lg ${theme === "light" ? "text-black" : "text-white"}`}>
               <h3 className="font-bold text-md mb-2">Templates</h3>
               <div className="grid grid-cols-2 gap-2">
-                <Button variant="outline" className="h-auto py-2 transition-all hover:scale-105">
+                <Button variant="outline" className={`h-auto py-2 transition-all hover:scale-105 ${theme === "light" ? "bg-white text-black border-gray-300" : "bg-black text-white border-gray-700"}`}>
                   <div className="flex flex-col items-center">
-                    <ImageIcon className="h-4 w-4 mb-1" />
-                    <span className="text-xs">Color by Number</span>
+                    <ImageIcon className={`h-4 w-4 mb-1 ${theme === "light" ? "text-black" : "text-white"}`} />
+                    <span className={`text-xs ${theme === "light" ? "text-black" : "text-white"}`}>Color by Number</span>
                   </div>
                 </Button>
-                <Button variant="outline" className="h-auto py-2 transition-all hover:scale-105">
+                <Button variant="outline" className={`h-auto py-2 transition-all hover:scale-105 ${theme === "light" ? "bg-white text-black border-gray-300" : "bg-black text-white border-gray-700"}`}>
                   <div className="flex flex-col items-center">
-                    <Shapes className="h-4 w-4 mb-1" />
-                    <span className="text-xs">Symmetry Drawing</span>
+                    <Shapes className={`h-4 w-4 mb-1 ${theme === "light" ? "text-black" : "text-white"}`} />
+                    <span className={`text-xs ${theme === "light" ? "text-black" : "text-white"}`}>Symmetry Drawing</span>
                   </div>
                 </Button>
               </div>
@@ -748,7 +765,17 @@ const ArtSidebar = ({
             {theme === "light" ? <Moon className="h-4 w-4 mr-1" /> : <Sun className="h-4 w-4 mr-1" />}
             {theme === "light" ? "Dark" : "Light"}
           </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onAnalyse}
+            disabled={isAnalysing}
+            className="bg-black text-white transition-all hover:scale-105"
+          >
+            {isAnalysing ? "Analysing..." : "Analyse"}
+          </Button>
         </div>
+        {/* Removed inline analysis/suggestion box to prevent overlay */}
       </div>
     </div>
   )

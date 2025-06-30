@@ -45,6 +45,13 @@ export function HeroSection() {
     <div
       ref={containerRef}
       className="min-h-[700px] max-h-[750px] relative overflow-hidden py-20 md:py-32 bg-[#02010e] hero-glow-section"
+      style={{ 
+        borderBottomLeftRadius: 0, 
+        borderBottomRightRadius: 0, 
+        overflow: 'hidden',
+        scrollbarWidth: 'none',  /* Firefox */
+        msOverflowStyle: 'none',  /* IE and Edge */
+      }}
     >
       {/* Background Image with overlay */}
       <div className="absolute inset-0 flex justify-center items-center h-[1200px]">
@@ -106,7 +113,7 @@ export function HeroSection() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="w-full sm:w-auto group border-primary/20 hover:border-primary/40 hover:scale-105 transition-transform"
+                  className="w-full sm:w-auto group border-[1.5px] border-[#e6c17836] hover:border-[#dbb66b] hover:scale-105 transition-transform bg-transparent hover:bg-transparent text-[#e6c178] hover:text-[#dbb66b]"
                 >
                   Take a Quiz
                   <ChevronRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
@@ -117,14 +124,14 @@ export function HeroSection() {
           <div className="relative animate-slide-up animation-delay-100 hidden md:block">
             <div className="grid grid-cols-2 gap-4 p-1 relative">
               {[
-                { icon: Calculator, color: "text-primary", title: "Mathematics", desc: "Numbers, shapes, and patterns" },
-                { icon: FlaskConical, color: "text-green-500", title: "Science", desc: "Explore the natural world" },
-                { icon: BookOpen, color: "text-orange-500", title: "Reading", desc: "Words, stories, and language" },
-                { icon: Code, color: "text-indigo-500", title: "Coding", desc: "Logic and problem-solving" },
+                { icon: Calculator, color: "text-[#2196F3]", title: "Mathematics", desc: "Numbers, shapes, and patterns" },
+                { icon: FlaskConical, color: "text-[#4CAF50]", title: "Science", desc: "Explore the natural world" },
+                { icon: BookOpen, color: "text-[#FF9800]", title: "Reading", desc: "Words, stories, and language" },
+                { icon: Code, color: "text-[#9C27B0]", title: "Coding", desc: "Logic and problem-solving" },
               ].map((item, index) => (
                 <div
                   key={index}
-                  className="bg-transparent p-6 rounded-xl border-2 border-border/50 hover:border-primary/30 transition-all hover:-translate-y-1"
+                  className="bg-transparent p-6 rounded-xl border-[1.5px] border-[#e6c17836] hover:border-[#dbb66b] transition-all hover:-translate-y-1"
                 >
                   <item.icon className={`h-8 w-8 ${item.color} mb-3`} />
                   <h3 className="font-bold mb-1">{item.title}</h3>
@@ -140,6 +147,10 @@ export function HeroSection() {
           box-shadow: 0 0 80px 0 #ee4b2b44, 0 0 0 8px #05001f22;
           border-radius: 2.5rem;
           position: relative;
+          /* Hide scrollbar for Chrome, Safari and Opera */
+          &::-webkit-scrollbar {
+            display: none;
+          }
         }
         .hero-animated-gradient {
           background: linear-gradient(120deg, rgba(255,82,82,0.08) 0%, rgba(255,152,0,0.08) 40%, rgba(76,175,80,0.08) 70%, rgba(33,150,243,0.08) 100%);

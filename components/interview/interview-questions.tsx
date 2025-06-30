@@ -11,13 +11,11 @@ import { useToast } from "@/components/ui/use-toast"
 interface Question {
   id: string
   question: string
+  type?: string // technical or behavioral
 }
 
 interface InterviewQuestionsProps {
-  questions: {
-    technical: Question[]
-    behavioral: Question[]
-  }
+  questions: Question[]
   onComplete: (answers: Record<string, string>, analysis: any) => void
 }
 
@@ -27,10 +25,19 @@ export default function InterviewQuestions({ questions, onComplete }: InterviewQ
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { toast } = useToast()
 
-  const allQuestions = [...questions.technical, ...questions.behavioral]
-  const totalQuestions = allQuestions.length
-  const currentQuestion = allQuestions[currentQuestionIndex]
-  const isTechnical = currentQuestionIndex < questions.technical.length
+  const allQuestions = questions;
+  const totalQuestions = allQuestions.length;
+  const currentQuestion = allQuestions[currentQuestionIndex];
+  if (!allQuestions || allQuestions.length === 0 || !currentQuestion) {
+    return (
+      <div className="text-center py-10">
+        <h2 className="text-2xl font-bold mb-2">No Questions Available</h2>
+        <p className="text-gray-600 dark:text-gray-400">Sorry, no interview questions could be generated. Please try again or contact support.</p>
+      </div>
+    );
+  }
+
+  const isTechnical = currentQuestion?.type === 'technical'
 
   const handleAnswerChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setAnswers({
@@ -53,7 +60,7 @@ export default function InterviewQuestions({ questions, onComplete }: InterviewQ
 
   const handleSubmit = async () => {
     // Check if all questions are answered
-    const unansweredQuestions = allQuestions.filter((q) => !answers[q.id] || answers[q.id].trim() === "")
+    const unansweredQuestions = questions.filter((q) => !answers[q.id] || answers[q.id].trim() === "")
 
     if (unansweredQuestions.length > 0) {
       toast({
@@ -68,11 +75,11 @@ export default function InterviewQuestions({ questions, onComplete }: InterviewQ
 
     try {
       // Format answers for API
-      const formattedAnswers = allQuestions.map((q) => ({
+      const formattedAnswers = questions.map((q) => ({
         id: q.id,
         question: q.question,
         answer: answers[q.id] || "",
-        isTechnical: questions.technical.some((tq) => tq.id === q.id),
+        isTechnical: q.type === 'technical',
       }))
 
       // Call API to analyze answers
@@ -157,7 +164,7 @@ export default function InterviewQuestions({ questions, onComplete }: InterviewQ
 
       <div className="flex justify-center mt-6">
         <div className="flex space-x-1">
-          {allQuestions.map((q, index) => (
+          {questions.map((q, index) => (
             <button
               key={q.id}
               className={`w-3 h-3 rounded-full ${

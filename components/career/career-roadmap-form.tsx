@@ -8,7 +8,6 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Slider } from "@/components/ui/slider"
 import { CareerRoadmapResults } from "./career-roadmap-results"
 
 export function CareerRoadmapForm() {
@@ -16,7 +15,6 @@ export function CareerRoadmapForm() {
   const [results, setResults] = useState<any>(null)
   const [formData, setFormData] = useState({
     sector: "private",
-    salaryRange: [500000],
     jobRole: "",
   })
 
@@ -44,10 +42,6 @@ export function CareerRoadmapForm() {
     } finally {
       setIsLoading(false)
     }
-  }
-
-  const handleSalaryChange = (value: number[]) => {
-    setFormData({ ...formData, salaryRange: value })
   }
 
   if (results) {
@@ -106,26 +100,6 @@ export function CareerRoadmapForm() {
                   </Label>
                 </div>
               </RadioGroup>
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <Label className="text-base">Expected Annual Salary (₹)</Label>
-                <span className="font-medium">₹{formData.salaryRange[0].toLocaleString()}</span>
-              </div>
-              <Slider
-                defaultValue={[500000]}
-                max={10000000}
-                step={100000}
-                value={formData.salaryRange}
-                onValueChange={handleSalaryChange}
-                className="py-4"
-              />
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>₹0</span>
-                <span>₹50 Lakh</span>
-                <span>₹1 Crore</span>
-              </div>
             </div>
           </div>
 

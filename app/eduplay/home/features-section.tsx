@@ -41,9 +41,8 @@ export default function FeaturesSection() {
 
   return (
     <section className="z-0 py-16 bg-gradient-to-b from-[#0d0717] via-[#0c0014] to-black relative overflow-hidden marvel-theme">
-      {/* Marvel-style animated background elements */}
+      {/* Background elements */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-0 w-full h-full bg-[url('https://i.postimg.cc/8z7W3K3Q/marvel-comic-bg.png')] opacity-5"></div>
         <div className="absolute top-1/4 left-1/4 w-80 h-80 rounded-full bg-red-900/10 blur-3xl animate-pulse-slow"></div>
         <div className="absolute bottom-1/3 right-1/4 w-96 h-96 rounded-full bg-blue-900/10 blur-3xl animate-pulse-slow animation-delay-2000"></div>
       </div>

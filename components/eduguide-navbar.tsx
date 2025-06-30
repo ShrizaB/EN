@@ -96,6 +96,15 @@ export function EduGuideNavbar() {
       hoverColor: "hover:text-amber-400",
       bgColor: "bg-amber-900/20",
     },
+    {
+      name: "AI Code Challenge",
+      href: "/eduguide/ai-code",
+      active: pathname === "/eduguide/ai-code",
+      icon: Code,
+      color: "text-fuchsia-500",
+      hoverColor: "hover:text-fuchsia-400",
+      bgColor: "bg-fuchsia-900/20",
+    },
   ]
 
   const userLinks = user

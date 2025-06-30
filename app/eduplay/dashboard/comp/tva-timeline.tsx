@@ -20,15 +20,43 @@ export function TVATimeline({ data }: TVATimelineProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   const animationFrameRef = useRef<number>(0)
+  const touchTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
 
-  // Optimized mouse enter handler with debouncing
-  const handleMouseEnter = useCallback((_event: React.MouseEvent, index: number) => {
+  // Handle touch/mouse enter with debouncing
+  const handleEnter = useCallback((index: number) => {
     setActiveIndex(index)
     setHoveredIndex(index)
-  }, [])
+    
+    // Clear any existing timeout
+    if (touchTimerRef.current) {
+      clearTimeout(touchTimerRef.current)
+      touchTimerRef.current = null
+    }
+    
+    // Only set timeout for mobile
+    if (isMobile) {
+      // Set a longer timeout for mobile (15 seconds)
+      touchTimerRef.current = setTimeout(() => {
+        setHoveredIndex(null)
+      }, 15000)
+    }
+  }, [isMobile])
 
-  const handleMouseLeave = useCallback(() => {
-    setHoveredIndex(null)
+  const handleLeave = useCallback(() => {
+    // On mobile, don't clear hover state immediately
+    if (!isMobile) {
+      setHoveredIndex(null)
+    }
+  }, [isMobile])
+  
+  // Clean up timeouts on unmount
+  useEffect(() => {
+    return () => {
+      if (touchTimerRef.current) {
+        clearTimeout(touchTimerRef.current)
+      }
+    }
   }, [])
 
   // Enhanced canvas drawing for better performance
@@ -172,8 +200,25 @@ export function TVATimeline({ data }: TVATimelineProps) {
                 outerRadius={80}
                 paddingAngle={2}
                 dataKey="value"
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
+                onMouseEnter={(e, index) => handleEnter(index)}
+                onMouseLeave={handleLeave}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  const touch = e.touches[0];
+                  const target = document.elementFromPoint(touch.clientX, touch.clientY);
+                  // Find the nearest slice
+                  const slice = target?.closest('.recharts-pie-sector');
+                  if (slice) {
+                    const index = parseInt(slice.getAttribute('sector-idx') || '0', 10);
+                    handleEnter(index);
+                  }
+                }}
+                onTouchEnd={(e) => {
+                  // Don't prevent default to allow natural touch behavior
+                  if (!isMobile) {
+                    e.preventDefault();
+                  }
+                }}
                 animationBegin={0}
                 animationDuration={0} // Disabled animations
                 stroke="#1A1A1A"

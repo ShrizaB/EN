@@ -9,7 +9,7 @@ export default function DoctorStrangeLoader() {
           {/* Portal background effect - subtle animated gradient */}
           <div className="absolute inset-0 rounded-full bg-gradient-to-br from-orange-900/80 via-red-800/40 to-yellow-900/60 animate-pulse opacity-60"></div>
 
-          {/* OUTER RINGS - Using SVG with explicit animateTransform */}
+          {/* OUTER RINGS - Using SVG with explicit animateTransform replaced by CSS */}
           <svg className="absolute w-full h-full" viewBox="0 0 200 200">
             {/* Outermost ring - clockwise */}
             <circle 
@@ -20,18 +20,8 @@ export default function DoctorStrangeLoader() {
               stroke="#f97316" 
               strokeWidth="4" 
               strokeOpacity="0.8"
-              className="portal-glow ring-shimmer"
-            >
-              <animateTransform 
-                attributeName="transform" 
-                attributeType="XML" 
-                type="rotate" 
-                from="0 100 100" 
-                to="360 100 100" 
-                dur="10s" 
-                repeatCount="indefinite" 
-              />
-            </circle>
+              className="portal-glow ring-shimmer rotate-cw"
+            />
             
             {/* Second ring - counter-clockwise */}
             <circle 
@@ -42,18 +32,8 @@ export default function DoctorStrangeLoader() {
               stroke="#fbbf24" 
               strokeWidth="2" 
               strokeOpacity="0.7"
-              className="portal-glow-inner"
-            >
-              <animateTransform 
-                attributeName="transform" 
-                attributeType="XML" 
-                type="rotate" 
-                from="0 100 100" 
-                to="-360 100 100" 
-                dur="15s" 
-                repeatCount="indefinite" 
-              />
-            </circle>
+              className="portal-glow-inner rotate-ccw"
+            />
             
             {/* Third ring - clockwise faster */}
             <circle 
@@ -64,18 +44,8 @@ export default function DoctorStrangeLoader() {
               stroke="#fef08a" 
               strokeWidth="1" 
               strokeOpacity="0.6"
-              className="portal-glow-inner"
-            >
-              <animateTransform 
-                attributeName="transform" 
-                attributeType="XML" 
-                type="rotate" 
-                from="0 100 100" 
-                to="360 100 100" 
-                dur="7s" 
-                repeatCount="indefinite" 
-              />
-            </circle>
+              className="portal-glow-inner rotate-cw-fast"
+            />
 
             {/* Main fire ring - counter-clockwise fast */}
             <circle 
@@ -85,18 +55,8 @@ export default function DoctorStrangeLoader() {
               fill="none" 
               stroke="#f97316" 
               strokeWidth="6" 
-              className="portal-glow-intense"
-            >
-              <animateTransform 
-                attributeName="transform" 
-                attributeType="XML" 
-                type="rotate" 
-                from="0 100 100" 
-                to="-360 100 100" 
-                dur="5s" 
-                repeatCount="indefinite" 
-              />
-            </circle>
+              className="portal-glow-intense rotate-ccw-fast"
+            />
 
             {/* Secondary fire ring - clockwise medium */}
             <circle 
@@ -106,18 +66,8 @@ export default function DoctorStrangeLoader() {
               fill="none" 
               stroke="#fbbf24" 
               strokeWidth="3" 
-              className="portal-glow"
-            >
-              <animateTransform 
-                attributeName="transform" 
-                attributeType="XML" 
-                type="rotate" 
-                from="0 100 100" 
-                to="360 100 100" 
-                dur="8s" 
-                repeatCount="indefinite" 
-              />
-            </circle>
+              className="portal-glow rotate-cw-med"
+            />
           </svg>
 
           {/* Mandala patterns - more dynamic */}
@@ -369,7 +319,7 @@ export default function DoctorStrangeLoader() {
           </svg>
 
           {/* Flying spark particles */}
-          {[...Array(40)].map((_, i) => (
+          {[...Array(16)].map((_, i) => (
             <div
               key={i}
               className="absolute w-[3px] h-[3px] bg-orange-400 rounded-full blur-sm"
@@ -382,7 +332,7 @@ export default function DoctorStrangeLoader() {
           ))}
 
           {/* Golden trailing sparks */}
-          {[...Array(15)].map((_, i) => (
+          {[...Array(6)].map((_, i) => (
             <div
               key={`trail-${i}`}
               className="absolute w-[2px] h-[8px] bg-yellow-300 rounded-full blur-sm"
@@ -451,6 +401,35 @@ export default function DoctorStrangeLoader() {
           }
           .ring-shimmer {
             filter: drop-shadow(0 0 8px #ffb34788);
+          }
+          /* SVG ring rotation keyframes */
+          @keyframes rotate-cw {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+          @keyframes rotate-ccw {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(-360deg); }
+          }
+          .rotate-cw {
+            transform-origin: 50% 50%;
+            animation: rotate-cw 10s linear infinite;
+          }
+          .rotate-ccw {
+            transform-origin: 50% 50%;
+            animation: rotate-ccw 15s linear infinite;
+          }
+          .rotate-cw-fast {
+            transform-origin: 50% 50%;
+            animation: rotate-cw 7s linear infinite;
+          }
+          .rotate-ccw-fast {
+            transform-origin: 50% 50%;
+            animation: rotate-ccw 5s linear infinite;
+          }
+          .rotate-cw-med {
+            transform-origin: 50% 50%;
+            animation: rotate-cw 8s linear infinite;
           }
         `}</style>
       </div>

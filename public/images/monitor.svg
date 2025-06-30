@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="700" viewBox="0 0 540 390">
+  <!-- Monitor Base -->
+  <rect x="120" y="350" width="300" height="20" rx="8" ry="8" fill="#1a1a2e" />
+  <rect x="170" y="370" width="200" height="12" rx="4" ry="4" fill="#0f0f1b" />
+  
+
+  <!-- Monitor Frame -->
+  <rect x="40" y="40" width="460" height="310" rx="18" ry="18" fill="#0f0f1b" stroke="#304d6d" stroke-width="4" />
+  
+  <!-- Monitor Screen -->
+  
+  <!-- Batman Logo Watermark -->
+  <path d="M270 160 Q295 110 320 160 Q307 150 270 140 Q233 150 220 160 Q245 110 270 160 Z" fill="#ffe066" fill-opacity="0.05" />
+  
+  <!-- Screen Glow -->
+  <rect x="60" y="60" width="420" height="270" rx="10" ry="10" fill="url(#screenGlow)" opacity="0.2" />
+  
+  <!-- Scanlines -->
+  <rect x="60" y="60" width="420" height="270" rx="10" ry="10" fill="url(#scanlines)" opacity="0.05" />
+  
+
+  <!-- Control Lights -->
+  <circle cx="80" cy="50" r="5" fill="#ff5252" opacity="0.8" />
+  <circle cx="100" cy="50" r="5" fill="#ffeb3b" opacity="0.8" />
+  <circle cx="120" cy="50" r="5" fill="#4caf50" opacity="0.8" />
+  
+  <!-- Definitions -->
+  <defs>
+    <!-- Screen Glow Gradient -->
+    <radialGradient id="screenGlow" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+      <stop offset="0%" stop-color="#00eaff" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#000" stop-opacity="0" />
+    </radialGradient>
+    
+    <!-- Scanlines Pattern -->
+    <pattern id="scanlines" patternUnits="userSpaceOnUse" width="4" height="4" patternTransform="rotate(0)">
+      <line x1="0" y1="0" x2="0" y2="4" stroke="#00eaff" stroke-width="1" />
+    </pattern>
+  </defs>
+</svg>

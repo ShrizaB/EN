@@ -1645,6 +1645,7 @@ export default function TopicPage({ params }: { params: { subject: string; topic
   }
 
   const startQuiz = () => {
+    console.log('startQuiz called'); // DEBUG: Check if this fires on mobile
     setReadingComplete(true)
     setTimerActive(true)
     setQuizStartTime(Date.now())

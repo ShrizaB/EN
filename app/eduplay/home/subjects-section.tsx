@@ -107,12 +107,15 @@ const SubjectsSection = () => {
                 <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
             </Head>
             {/* Subjects Section */}
-            <section className="py-8 sm:py-10 md:py-12 bg-[#080910] rounded-t-[2rem] md:rounded-t-[3rem] relative z-0">
-                {/* Top Shadow */}
+            <section className="py-8 sm:py-10 md:py-12 bg-[#080910] relative z-0 -mt-1" style={{
+              marginTop: '-1px', // Ensures no gap between sections
+              borderTopLeftRadius: '0',
+              borderTopRightRadius: '0',
+            }}>
+                {/* Top Shadow - Adjusted to hide top corners */}
                 <div className="absolute top-0 left-0 w-full h-14 z-20 pointer-events-none" style={{
-                  background: 'linear-gradient(to bottom, #080910 70%, transparent 100%)',
-                  borderTopLeftRadius: '2rem',
-                  borderTopRightRadius: '2rem',
+                  background: '#080910', // Solid color to hide any potential gaps
+                  borderTop: 'none',
                 }} />
                 {/* 1st Background Image */}
                 <div className="absolute inset-0 flex items-center h-[600px] md:h-[1200px]">
@@ -123,11 +126,11 @@ const SubjectsSection = () => {
                     />
                 </div>
                 {/* 2nd Background Image */}
-                <div className="w-full absolute flex justify-between ">
+                <div className="w-full absolute flex justify-between">
                     <img
                         src="https://i.postimg.cc/zDpfzp5P/spider-man-cartoon-web.png"
                         alt=""
-                        className="w-[100px] md:w-[200px] absolute right-0 -top-6 md:-top-10 animate-float"
+                        className="w-[100px] md:w-[200px] absolute right-0 top-8 md:top-8 -mt-6 md:-mt-16 animate-float"
                     />
                 </div>
 

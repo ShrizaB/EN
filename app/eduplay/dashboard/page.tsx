@@ -9,7 +9,6 @@ import {
   BarChart3,
   BookOpen,
   Calculator,
-  Clock,
   Code,
   FlaskRoundIcon as Flask,
   Award,
@@ -414,8 +413,17 @@ function DashboardContent() {
 
   const totalActivities = Object.values(activityCountBySubject).reduce((sum, count) => sum + count, 0)
 
+  // Deduplicate by subject+topic, only show most recent per topic, and filter for major completions
+  const seen = new Set()
   const recentActivities = dashboardData.learningHistory
-    .filter((item) => item && item.subject && item.topic)
+    .filter((item) => item && item.subject && item.topic && (item.progress === undefined || item.progress >= 90) && item.difficulty !== 'beginner')
+    .reverse() // Most recent first
+    .filter((item) => {
+      const key = `${item.subject.toLowerCase()}-${item.topic.toLowerCase()}`
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
     .slice(0, 3)
     .map((item) => {
       const subjectKey = item.subject.toLowerCase().replace(/\s+/g, "") as keyof typeof subjectNames
@@ -526,13 +534,22 @@ function DashboardContent() {
         <div className="energy-pulse"></div>
         <div className="energy-pulse"></div>
         <div className="energy-pulse"></div>
+        {/* Extra floating orbs for more magic */}
+        <div className="absolute top-1/6 left-1/5 w-6 h-6 bg-loki-green/30 rounded-full animate-float-slow shadow-lg shadow-loki-green/20"></div>
+        <div className="absolute top-1/2 right-1/6 w-4 h-4 bg-tva-gold/40 rounded-full animate-float-medium shadow-lg shadow-tva-gold/20"></div>
+        <div className="absolute bottom-1/5 left-1/3 w-8 h-8 bg-loki-green/20 rounded-full animate-float-fast shadow-lg shadow-loki-green/20"></div>
+        <div className="absolute top-1/4 right-1/3 w-5 h-5 bg-tva-orange/30 rounded-full animate-float-slow shadow-lg shadow-tva-orange/20"></div>
+        {/* Aurora/mist overlay */}
+        <div className="absolute inset-0 z-0 pointer-events-none" style={{background: 'radial-gradient(ellipse at 60% 40%, rgba(80,255,180,0.10) 0%, rgba(120,0,255,0.08) 60%, transparent 100%)', mixBlendMode: 'screen', animation: 'aurora-move 12s ease-in-out infinite alternate'}}></div>
+        {/* Animated runes/Norse pattern overlay */}
+        <div className="absolute inset-0 z-0 pointer-events-none norse-runes-bg opacity-10 animate-runes-fade"></div>
       </div>
 
       {/* Horn Divider */}
-      <div className="horn-divider mb-8"></div>
+      <div className="horn-divider mb-8 animate-glow-divider"></div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-        <div className="group relative overflow-hidden rounded-md bg-tva-brown border border-tva-gold hover:border-loki-green p-6 transition-all duration-500 hover:-translate-y-1 hover:shadow-md hover:shadow-loki-green/30 tva-hover-glow">
+        <div className="group relative overflow-hidden rounded-md bg-tva-brown border border-tva-gold hover:border-loki-green p-6 transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl hover:shadow-loki-green/40 tva-hover-glow animate-card-glow">
           <div className="absolute inset-0 crt-overlay opacity-5"></div>
           <div className="absolute inset-0 tva-logo-bg opacity-5"></div>
           <div className="absolute inset-0 timeline-spiral-bg opacity-10"></div>
@@ -542,7 +559,7 @@ function DashboardContent() {
                 <Hourglass className="h-6 w-6 text-loki-green" />
               </div>
               <div>
-                <h3 className="font-mono font-medium text-tva-gold group-hover:text-loki-green group-hover:animate-glitch-text transition-colors">
+                <h3 className="font-mono font-medium text-tva-gold group-hover:text-loki-green group-hover:animate-glitch-flicker animate-glow-text transition-colors">
                   TIMELINE EXPOSURE
                 </h3>
                 <p className="text-light-gray text-sm">All time</p>
@@ -557,7 +574,7 @@ function DashboardContent() {
           <div className="absolute top-2 right-2 w-3 h-3 bg-loki-green/50 rounded-full animate-ping"></div>
         </div>
 
-        <div className="group relative overflow-hidden rounded-md bg-tva-brown border border-tva-gold hover:border-loki-green p-6 transition-all duration-500 hover:-translate-y-1 hover:shadow-md hover:shadow-loki-green/30 tva-hover-glow">
+        <div className="group relative overflow-hidden rounded-md bg-tva-brown border border-tva-gold hover:border-loki-green p-6 transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl hover:shadow-loki-green/40 tva-hover-glow animate-card-glow">
           <div className="absolute inset-0 crt-overlay opacity-5"></div>
           <div className="absolute inset-0 tva-logo-bg opacity-5"></div>
           <div className="absolute inset-0 timeline-spiral-bg opacity-10"></div>
@@ -567,7 +584,7 @@ function DashboardContent() {
                 <FileText className="h-6 w-6 text-loki-green" />
               </div>
               <div>
-                <h3 className="font-mono font-medium text-tva-gold group-hover:text-loki-green group-hover:animate-glitch-text transition-colors">
+                <h3 className="font-mono font-medium text-tva-gold group-hover:text-loki-green group-hover:animate-glitch-flicker animate-glow-text transition-colors">
                   TIMELINE BRANCHES
                 </h3>
                 <p className="text-light-gray text-sm">All time</p>
@@ -582,7 +599,7 @@ function DashboardContent() {
           <div className="absolute top-2 right-2 w-3 h-3 bg-loki-green/50 rounded-full animate-ping"></div>
         </div>
 
-        <div className="group relative overflow-hidden rounded-md bg-tva-brown border border-tva-gold hover:border-loki-green p-6 transition-all duration-500 hover:-translate-y-1 hover:shadow-md hover:shadow-loki-green/30 tva-hover-glow">
+        <div className="group relative overflow-hidden rounded-md bg-tva-brown border border-tva-gold hover:border-loki-green p-6 transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl hover:shadow-loki-green/40 tva-hover-glow animate-card-glow">
           <div className="absolute inset-0 crt-overlay opacity-5"></div>
           <div className="absolute inset-0 tva-logo-bg opacity-5"></div>
           <div className="absolute inset-0 timeline-spiral-bg opacity-10"></div>
@@ -592,7 +609,7 @@ function DashboardContent() {
                 <Award className="h-6 w-6 text-loki-green" />
               </div>
               <div>
-                <h3 className="font-mono font-medium text-tva-gold group-hover:text-loki-green group-hover:animate-glitch-text transition-colors">
+                <h3 className="font-mono font-medium text-tva-gold group-hover:text-loki-green group-hover:animate-glitch-flicker animate-glow-text transition-colors">
                   VARIANT COMMENDATIONS
                 </h3>
                 <p className="text-light-gray text-sm">Total earned</p>
@@ -609,7 +626,7 @@ function DashboardContent() {
       </div>
 
       {/* Horn Divider */}
-      <div className="horn-divider mb-8"></div>
+      <div className="horn-divider mb-8 animate-glow-divider"></div>
 
       {/* Subject Progress and Timeline */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
@@ -621,7 +638,7 @@ function DashboardContent() {
 
           <div className="relative z-10">
             <div className="flex justify-between items-center mb-3">
-              <TVAGlitchText text="TIMELINE BRANCHES" className="text-xl font-mono font-bold text-tva-gold" />
+              <TVAGlitchText text="TIMELINE BRANCHES" className="text-xl font-mono font-bold text-tva-gold animate-glitch-flicker animate-glow-text" />
               <div className="w-10 h-10 rounded-full bg-tva-gold/10 flex items-center justify-center">
                 <BarChart3 className="h-5 w-5 text-tva-gold" />
               </div>
@@ -642,22 +659,15 @@ function DashboardContent() {
         </div>
 
         {/* Recent Activities */}
-        <div className="lg:col-span-2">
-          <div className="absolute inset-0 flex justify-center items-center h-[1200px]">
-            <img
-              src=""
-              alt=""
-              className="opacity-30 w-[100px] h-auto mb-80 transform scale-x-[-1]"
-            />
-          </div>
-          <div className="relative overflow-hidden rounded-md bg-tva-brown border border-tva-gold hover:border-loki-green p-6 tva-hover-glow">
+        <div className="lg:col-span-2 relative">
+          <div className="relative overflow-hidden rounded-md bg-transparent border border-tva-gold hover:border-loki-green p-6 tva-hover-glow">
             <div className="absolute inset-0 pattern-diagonal opacity-5"></div>
             <div className="absolute inset-0 crt-overlay opacity-5"></div>
             <div className="absolute inset-0 tva-logo-bg opacity-5"></div>
             <div className="absolute inset-0 timeline-spiral-bg opacity-10"></div>
             <div className="relative z-10">
               <div className="flex justify-between items-center mb-6">
-                <TVAGlitchText text="RECENT TIMELINE ACTIVITY" className="text-xl font-mono font-bold text-tva-gold" />
+                <TVAGlitchText text="RECENT TIMELINE ACTIVITY" className="text-xl font-mono font-bold text-tva-gold animate-glitch-flicker animate-glow-text" />
                 <Button
                   variant="ghost"
                   size="sm"
@@ -711,13 +721,13 @@ function DashboardContent() {
       </div>
 
       {/* Horn Divider */}
-      <div className="horn-divider mb-8"></div>
+      <div className="horn-divider mb-8 animate-glow-divider"></div>
 
       {/* Achievements and Recommended Topics Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
         {/* Enhanced Achievements Section */}
         <div>
-          <TVAGlitchText text="VARIANT COMMENDATIONS" className="text-xl font-mono font-bold text-tva-gold mb-6" />
+          <TVAGlitchText text="VARIANT COMMENDATIONS" className="text-xl font-mono font-bold text-tva-gold mb-6 animate-glitch-flicker animate-glow-text" />
           <div className="grid grid-cols-1 gap-4">
             {achievements.map((achievement, index) => (
               <div
@@ -733,7 +743,7 @@ function DashboardContent() {
                       <achievement.icon className={`h-6 w-6 ${achievement.color}`} />
                     </div>
                     <div>
-                      <h3 className="font-mono font-medium text-tva-gold group-hover:text-loki-green group-hover:animate-glitch-text transition-colors">
+                      <h3 className="font-mono font-medium text-tva-gold group-hover:text-loki-green group-hover:animate-glitch-flicker animate-glow-text transition-colors">
                         {achievement.title}
                       </h3>
                       <p className="text-light-gray text-sm font-mono">{achievement.description}</p>
@@ -762,7 +772,7 @@ function DashboardContent() {
               <div className="flex justify-between items-center mb-6">
                 <TVAGlitchText
                   text="RECOMMENDED TIMELINE PATHS"
-                  className="text-xl font-mono font-bold text-tva-gold"
+                  className="text-xl font-mono font-bold text-tva-gold animate-glitch-flicker animate-glow-text"
                 />
                 <Button
                   variant="ghost"
@@ -792,7 +802,7 @@ function DashboardContent() {
                           </span>
                           <span className="text-xs text-light-gray font-mono">Ages {topic.ageRange}</span>
                         </div>
-                        <h3 className="font-mono font-medium text-tva-gold group-hover:text-loki-green group-hover:animate-glitch-text transition-colors">
+                        <h3 className="font-mono font-medium text-tva-gold group-hover:text-loki-green group-hover:animate-glitch-flicker animate-glow-text transition-colors">
                           {topic.title}
                         </h3>
                         <p className="text-xs text-light-gray mb-2 font-mono">{topic.subject}</p>
@@ -848,8 +858,17 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-dark-gray via-tva-brown to-dark-gray relative overflow-hidden pt-8">
+      {/* Main Character - Fixed Position */}
+      <div className="fixed inset-0 w-screen h-screen overflow-hidden pointer-events-none z-0">
+        <img
+          src="https://i.postimg.cc/LX6R9WZw/Daco-4295490.png"
+          alt="Miss Minutes - Timeline Keeper"
+          className="absolute right-0 md:right-[10%] top-1/2 -translate-y-1/2 h-[120%] w-auto max-w-none object-contain opacity-50 hover:opacity-70 transition-opacity duration-300"
+        />
+      </div>
+
       {/* Enhanced Animated Background Elements */}
-      <div className="fixed inset-0 pointer-events-none">
+      <div className="fixed inset-0 pointer-events-none z-10">
         <div className="absolute inset-0 timeline-spiral-bg opacity-10"></div>
         <div className="absolute top-1/4 left-1/4 w-3 h-3 bg-loki-green/40 rounded-full animate-float-slow shadow-lg shadow-loki-green/20"></div>
         <div className="absolute top-1/3 right-1/4 w-2 h-2 bg-tva-gold/50 rounded-full animate-float-medium shadow-lg shadow-tva-gold/20"></div>
@@ -877,16 +896,45 @@ export default function Dashboard() {
       </div>
 
       <main className="container py-8 relative z-10">
-        <div className="flex items-center justify-between mb-8">
-          <div>
+        {/* TVA Badge - Full width on mobile, positioned at top */}
+        <div className="flex justify-center mb-6 md:hidden">
+          <TVABadge userId={user.id} userName={user.name} />
+        </div>
+
+        {/* Header section */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+          <div className="text-center md:text-left">
             <TVAGlitchText
               text="SACRED TIMELINE DASHBOARD"
-              className="text-2xl font-mono font-bold text-loki-green"
+              className="text-2xl font-mono font-bold text-loki-green animate-glitch-flicker animate-glow-text"
               glitchIntensity="high"
             />
             <p className="text-light-gray font-mono mt-1">MONITOR YOUR PROGRESS ACROSS THE SACRED TIMELINE</p>
           </div>
-          <div className="flex-shrink-0">
+
+          {/* Miss Minutes with speech bubble */}
+          <div className="hidden lg:flex flex-col items-center absolute left-1/2 bottom-0 -translate-x-1/2 z-20 mt-8">
+            {/* Speech bubble */}
+            <div className="bg-dark-gray/90 border-2 border-loki-green/50 rounded-lg p-3 relative max-w-xs text-center mt-4">
+              <p className="text-loki-green font-mono text-sm">
+                "Hey y'all! I'm Miss Minutes, and I'm here to help you learn!"
+              </p>
+              {/* Speech bubble pointer */}
+              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-dark-gray/90 border-b-2 border-r-2 border-loki-green/50 transform rotate-45"></div>
+            </div>
+            
+            {/* Miss Minutes image */}
+            <div className="w-[200px] h-[200px] pointer-events-none mt-2">
+              <img
+                src="https://i.postimg.cc/d3srVF1Z/miss-minutes-mcu-transparent-by-matuta2002-djfjfck.png"
+                alt="Miss Minutes"
+                className="w-full h-full object-contain opacity-30 hover:opacity-60 transition-opacity duration-300 scale-x-[-1]"
+              />
+            </div>
+          </div>
+
+          {/* TVA Badge - Hidden on mobile, shown on md and up */}
+          <div className="hidden md:block flex-shrink-0">
             <TVABadge userId={user.id} userName={user.name} />
           </div>
         </div>

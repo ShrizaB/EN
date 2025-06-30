@@ -18,9 +18,12 @@ export interface UserActivity {
   type: string // 'quiz', 'game', 'video', etc.
   subject?: string
   topic?: string
+  difficulty?: string
   score?: number
+  totalQuestions?: number
   timeSpent: number // in seconds
   timestamp: Date
+  sessionId?: string // Add session ID to prevent duplicates
 }
 
 export interface UserData {

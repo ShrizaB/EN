@@ -1,12 +1,31 @@
-import { Loader2 } from "lucide-react"
+"use client"
+
+import { useEffect, useState } from "react"
+import "./ultron-loading.css"
 
 export default function Loading() {
+  const [show, setShow] = useState(true)
+
+  useEffect(() => {
+    const timeout = setTimeout(() => setShow(false), 2000)
+    return () => clearTimeout(timeout)
+  }, [])
+
+  if (!show) return null
+
   return (
-    <div className="container py-12 md:py-20 flex items-center justify-center min-h-[60vh]">
-      <div className="flex flex-col items-center gap-4">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="text-muted-foreground">Loading video search...</p>
+    <div className="ultron-loader-screen">
+      <div className="ultron-bg-circuit" />
+      <div className="ultron-bg-scanlines" />
+      <div className="ultron-pulse-glow" />
+
+      <div className="ultron-loader">
+        <div className="loader-ring"></div>
+        <div className="loader-ring"></div>
+        <div className="loader-ring"></div>
       </div>
+
+      <p className="ultron-text">Activating Ultron Protocol...</p>
     </div>
   )
 }

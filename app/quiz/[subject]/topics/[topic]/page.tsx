@@ -7,6 +7,7 @@ import { ArrowLeft, RefreshCw, Zap, Shield, Target, Award, Clock } from "lucide-
 import { Button } from "@/components/ui/button"
 import { QuizEngine } from "@/components/quiz-engine"
 import { GoogleGenerativeAI } from "@google/generative-ai"
+import "./quiz-topics.css"
 
 // Initialize the Gemini API
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "AIzaSyDiaCC3dAZS8ZiDU1uF8YfEu9PoWy8YLoA"
@@ -21,7 +22,7 @@ const topicsData = {
       description: "Learn to count and recognize numbers",
       subject: "Mathematics",
       subjectSlug: "math",
-      subjectColor: "bg-math",
+      subjectColor: "hq-red",
       level: "Beginner",
       ageRange: "3-5",
     },
@@ -30,7 +31,7 @@ const topicsData = {
       description: "Master the basics of adding numbers",
       subject: "Mathematics",
       subjectSlug: "math",
-      subjectColor: "bg-math",
+      subjectColor: "hq-red",
       level: "Beginner",
       ageRange: "5-7",
     },
@@ -39,7 +40,7 @@ const topicsData = {
       description: "Learn how to subtract numbers",
       subject: "Mathematics",
       subjectSlug: "math",
-      subjectColor: "bg-math",
+      subjectColor: "hq-red",
       level: "Beginner",
       ageRange: "5-7",
     },
@@ -48,7 +49,7 @@ const topicsData = {
       description: "Understand multiplication concepts",
       subject: "Mathematics",
       subjectSlug: "math",
-      subjectColor: "bg-math",
+      subjectColor: "hq-red",
       level: "Intermediate",
       ageRange: "7-9",
     },
@@ -57,7 +58,7 @@ const topicsData = {
       description: "Learn how to divide numbers",
       subject: "Mathematics",
       subjectSlug: "math",
-      subjectColor: "bg-math",
+      subjectColor: "hq-red",
       level: "Intermediate",
       ageRange: "7-9",
     },
@@ -66,7 +67,7 @@ const topicsData = {
       description: "Understand parts of a whole",
       subject: "Mathematics",
       subjectSlug: "math",
-      subjectColor: "bg-math",
+      subjectColor: "hq-red",
       level: "Advanced",
       ageRange: "8-10",
     },
@@ -77,7 +78,7 @@ const topicsData = {
       description: "Learn about different animals and where they live",
       subject: "Science",
       subjectSlug: "science",
-      subjectColor: "bg-science",
+      subjectColor: "hq-green",
       level: "Beginner",
       ageRange: "3-6",
     },
@@ -86,7 +87,7 @@ const topicsData = {
       description: "Discover how plants grow and change",
       subject: "Science",
       subjectSlug: "science",
-      subjectColor: "bg-science",
+      subjectColor: "hq-green",
       level: "Beginner",
       ageRange: "4-7",
     },
@@ -95,7 +96,7 @@ const topicsData = {
       description: "Learn about different weather patterns and seasons",
       subject: "Science",
       subjectSlug: "science",
-      subjectColor: "bg-science",
+      subjectColor: "hq-green",
       level: "Beginner",
       ageRange: "4-7",
     },
@@ -104,7 +105,7 @@ const topicsData = {
       description: "Explore the amazing human body and how it works",
       subject: "Science",
       subjectSlug: "science",
-      subjectColor: "bg-science",
+      subjectColor: "hq-green",
       level: "Intermediate",
       ageRange: "6-9",
     },
@@ -113,7 +114,7 @@ const topicsData = {
       description: "Journey through our solar system and beyond",
       subject: "Science",
       subjectSlug: "science",
-      subjectColor: "bg-science",
+      subjectColor: "hq-green",
       level: "Intermediate",
       ageRange: "7-10",
     },
@@ -122,7 +123,7 @@ const topicsData = {
       description: "Learn about levers, pulleys, and other simple machines",
       subject: "Science",
       subjectSlug: "science",
-      subjectColor: "bg-science",
+      subjectColor: "hq-green",
       level: "Advanced",
       ageRange: "8-11",
     },
@@ -133,7 +134,7 @@ const topicsData = {
       description: "Learn to recognize and sound out letters",
       subject: "Reading",
       subjectSlug: "reading",
-      subjectColor: "bg-reading",
+      subjectColor: "hq-purple",
       level: "Beginner",
       ageRange: "3-5",
     },
@@ -142,7 +143,7 @@ const topicsData = {
       description: "Connect letters with their sounds",
       subject: "Reading",
       subjectSlug: "reading",
-      subjectColor: "bg-reading",
+      subjectColor: "hq-purple",
       level: "Beginner",
       ageRange: "4-6",
     },
@@ -151,7 +152,7 @@ const topicsData = {
       description: "Learn common words by sight",
       subject: "Reading",
       subjectSlug: "reading",
-      subjectColor: "bg-reading",
+      subjectColor: "hq-purple",
       level: "Beginner",
       ageRange: "4-7",
     },
@@ -160,7 +161,7 @@ const topicsData = {
       description: "Expand your word knowledge",
       subject: "Reading",
       subjectSlug: "reading",
-      subjectColor: "bg-reading",
+      subjectColor: "hq-purple",
       level: "Intermediate",
       ageRange: "6-9",
     },
@@ -169,7 +170,7 @@ const topicsData = {
       description: "Understand and analyze what you read",
       subject: "Reading",
       subjectSlug: "reading",
-      subjectColor: "bg-reading",
+      subjectColor: "hq-purple",
       level: "Intermediate",
       ageRange: "7-10",
     },
@@ -178,7 +179,7 @@ const topicsData = {
       description: "Learn the rules of language",
       subject: "Reading",
       subjectSlug: "reading",
-      subjectColor: "bg-reading",
+      subjectColor: "hq-purple",
       level: "Advanced",
       ageRange: "8-11",
     },
@@ -189,7 +190,7 @@ const topicsData = {
       description: "Learn fundamental coding concepts",
       subject: "Coding",
       subjectSlug: "coding",
-      subjectColor: "bg-coding",
+      subjectColor: "hq-red",
       level: "Beginner",
       ageRange: "5-8",
     },
@@ -198,7 +199,7 @@ const topicsData = {
       description: "Create step-by-step instructions",
       subject: "Coding",
       subjectSlug: "coding",
-      subjectColor: "bg-coding",
+      subjectColor: "hq-red",
       level: "Beginner",
       ageRange: "6-9",
     },
@@ -207,7 +208,7 @@ const topicsData = {
       description: "Learn how to repeat actions efficiently",
       subject: "Coding",
       subjectSlug: "coding",
-      subjectColor: "bg-coding",
+      subjectColor: "hq-red",
       level: "Intermediate",
       ageRange: "7-10",
     },
@@ -216,7 +217,7 @@ const topicsData = {
       description: "Make decisions in your code",
       subject: "Coding",
       subjectSlug: "coding",
-      subjectColor: "bg-coding",
+      subjectColor: "hq-red",
       level: "Intermediate",
       ageRange: "8-11",
     },
@@ -225,7 +226,7 @@ const topicsData = {
       description: "Create reusable blocks of code",
       subject: "Coding",
       subjectSlug: "coding",
-      subjectColor: "bg-coding",
+      subjectColor: "hq-red",
       level: "Advanced",
       ageRange: "9-12",
     },
@@ -234,7 +235,7 @@ const topicsData = {
       description: "Find and fix errors in code",
       subject: "Coding",
       subjectSlug: "coding",
-      subjectColor: "bg-coding",
+      subjectColor: "hq-red",
       level: "Advanced",
       ageRange: "9-12",
     },
@@ -245,7 +246,7 @@ const topicsData = {
       description: "Learn about different musical instruments",
       subject: "Music",
       subjectSlug: "music",
-      subjectColor: "bg-purple-500",
+      subjectColor: "hq-purple",
       level: "Beginner",
       ageRange: "4-7",
     },
@@ -254,7 +255,7 @@ const topicsData = {
       description: "Understand basic musical notation",
       subject: "Music",
       subjectSlug: "music",
-      subjectColor: "bg-purple-500",
+      subjectColor: "hq-purple",
       level: "Beginner",
       ageRange: "5-8",
     },
@@ -263,7 +264,7 @@ const topicsData = {
       description: "Learn about classical music composers",
       subject: "Music",
       subjectSlug: "music",
-      subjectColor: "bg-purple-500",
+      subjectColor: "hq-purple",
       level: "Intermediate",
       ageRange: "7-10",
     },
@@ -272,7 +273,7 @@ const topicsData = {
       description: "Explore different styles of music",
       subject: "Music",
       subjectSlug: "music",
-      subjectColor: "bg-purple-500",
+      subjectColor: "hq-purple",
       level: "Intermediate",
       ageRange: "8-11",
     },
@@ -283,7 +284,7 @@ const topicsData = {
       description: "Learn about primary and secondary colors",
       subject: "Art",
       subjectSlug: "art",
-      subjectColor: "bg-pink-500",
+      subjectColor: "hq-red",
       level: "Beginner",
       ageRange: "3-6",
     },
@@ -292,7 +293,7 @@ const topicsData = {
       description: "Discover well-known artists and their work",
       subject: "Art",
       subjectSlug: "art",
-      subjectColor: "bg-pink-500",
+      subjectColor: "hq-red",
       level: "Intermediate",
       ageRange: "6-9",
     },
@@ -301,7 +302,7 @@ const topicsData = {
       description: "Explore different artistic movements",
       subject: "Art",
       subjectSlug: "art",
-      subjectColor: "bg-pink-500",
+      subjectColor: "hq-red",
       level: "Intermediate",
       ageRange: "7-10",
     },
@@ -310,7 +311,7 @@ const topicsData = {
       description: "Learn about different ways to create art",
       subject: "Art",
       subjectSlug: "art",
-      subjectColor: "bg-pink-500",
+      subjectColor: "hq-red",
       level: "Advanced",
       ageRange: "8-11",
     },
@@ -321,7 +322,7 @@ const topicsData = {
       description: "Learn about the major landmasses and bodies of water",
       subject: "Geography",
       subjectSlug: "geography",
-      subjectColor: "bg-green-500",
+      subjectColor: "hq-green",
       level: "Beginner",
       ageRange: "5-8",
     },
@@ -330,7 +331,7 @@ const topicsData = {
       description: "Discover countries and their capital cities",
       subject: "Geography",
       subjectSlug: "geography",
-      subjectColor: "bg-green-500",
+      subjectColor: "hq-green",
       level: "Intermediate",
       ageRange: "7-10",
     },
@@ -339,7 +340,7 @@ const topicsData = {
       description: "Explore mountains, rivers, deserts, and more",
       subject: "Geography",
       subjectSlug: "geography",
-      subjectColor: "bg-green-500",
+      subjectColor: "hq-green",
       level: "Intermediate",
       ageRange: "7-10",
     },
@@ -348,7 +349,7 @@ const topicsData = {
       description: "Learn about different cultures around the world",
       subject: "Geography",
       subjectSlug: "geography",
-      subjectColor: "bg-green-500",
+      subjectColor: "hq-green",
       level: "Advanced",
       ageRange: "8-11",
     },
@@ -359,7 +360,7 @@ const topicsData = {
       description: "Explore early human societies and achievements",
       subject: "History",
       subjectSlug: "history",
-      subjectColor: "bg-amber-500",
+      subjectColor: "hq-purple",
       level: "Intermediate",
       ageRange: "7-10",
     },
@@ -368,7 +369,7 @@ const topicsData = {
       description: "Learn about people who discovered new lands",
       subject: "History",
       subjectSlug: "history",
-      subjectColor: "bg-amber-500",
+      subjectColor: "hq-purple",
       level: "Intermediate",
       ageRange: "7-10",
     },
@@ -377,7 +378,7 @@ const topicsData = {
       description: "Discover inventions that changed the world",
       subject: "History",
       subjectSlug: "history",
-      subjectColor: "bg-amber-500",
+      subjectColor: "hq-purple",
       level: "Intermediate",
       ageRange: "8-11",
     },
@@ -386,7 +387,7 @@ const topicsData = {
       description: "Learn about influential people throughout history",
       subject: "History",
       subjectSlug: "history",
-      subjectColor: "bg-amber-500",
+      subjectColor: "hq-purple",
       level: "Advanced",
       ageRange: "9-12",
     },
@@ -400,6 +401,57 @@ interface Question {
   explanation: string
   id?: string
   difficulty?: string
+}
+
+function CustomCursor() {
+  useEffect(() => {
+    // Remove any existing custom cursor
+    const old = document.getElementById("custom-cursor-img")
+    if (old) old.remove()
+
+    // Remove all pointer cursors from the page (force override)
+    const style = document.createElement("style")
+    style.innerHTML = `
+      *:hover, *:active, *:focus, button:hover, a:hover, [role=button]:hover {
+        cursor: none !important;
+      }
+      * {
+        cursor: none !important;
+      }
+    `
+    style.id = "force-no-pointer-cursor"
+    document.head.appendChild(style)
+
+    // Create the image element
+    const img = document.createElement("img")
+    img.src = "https://i.postimg.cc/MTq9RcCn/gun-pointer.png"
+    img.id = "custom-cursor-img"
+    img.style.position = "fixed"
+    img.style.pointerEvents = "none"
+    img.style.zIndex = "999999"
+    img.style.width = "40px"
+    img.style.height = "40px"
+    img.style.transform = "translate(-8px, -8px)"
+    img.style.filter = "invert(1)"
+    document.body.appendChild(img)
+
+    // Move the image with the mouse
+    const move = (e: MouseEvent) => {
+      img.style.left = e.clientX + "px"
+      img.style.top = e.clientY + "px"
+    }
+    window.addEventListener("mousemove", move)
+    // Hide the default cursor
+    document.body.style.cursor = "none"
+    return () => {
+      window.removeEventListener("mousemove", move)
+      img.remove()
+      document.body.style.cursor = ""
+      const styleTag = document.getElementById("force-no-pointer-cursor")
+      if (styleTag) styleTag.remove()
+    }
+  }, [])
+  return null
 }
 
 export default function QuizTopicPage({ params }: { params: { subject: string; topic: string } }) {
@@ -496,13 +548,13 @@ export default function QuizTopicPage({ params }: { params: { subject: string; t
         difficulty === "easy"
           ? 300
           : // 5 minutes
-            difficulty === "beginner"
+          difficulty === "beginner"
             ? 240
             : // 4 minutes
-              difficulty === "intermediate"
+            difficulty === "intermediate"
               ? 180
               : // 3 minutes
-                120 // 2 minutes for hard
+              120 // 2 minutes for hard
 
       setTimeLimit(newTimeLimit)
 
@@ -536,237 +588,227 @@ export default function QuizTopicPage({ params }: { params: { subject: string; t
 
   if (!mounted) {
     return (
-      <div className="container py-12 flex items-center justify-center min-h-[60vh]">
-        <div className="w-8 h-8 rounded-full border-4 border-primary border-t-transparent animate-spin"></div>
-        <span className="ml-3 text-muted-foreground">Loading...</span>
+      <div className="hq-container hq-loading">
+        <div className="hq-spinner"></div>
+        <span className="hq-loading-text">Loading...</span>
       </div>
     )
   }
 
   const topicData = topicsData[params.subject as keyof typeof topicsData][params.topic as any]
 
+  // Helper to check for mobile
+  const isMobile = () => {
+    if (typeof window === "undefined") return false
+    const ua = navigator.userAgent
+    return (
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua) ||
+      window.innerWidth <= 768
+    )
+  }
+
   return (
-    <div className="container py-12 md:py-20">
-      <div className="mb-8">
-        <Link
-          href={`/quiz/${params.subject}`}
-          className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-4"
-        >
-          <ArrowLeft className="mr-1 h-4 w-4" />
-          Back to {topicData.subject} Quizzes
-        </Link>
+    <>
+      {/* Only render custom cursor on desktop */}
+      {typeof window !== 'undefined' && !isMobile() && <CustomCursor />}
+      <div className="hq-main-container mt-4 bg-gradient-to-tr from-[#dc143c]/10 via-black to-[#4b0082]/20 ">
 
-        <div className="relative overflow-hidden rounded-xl bg-secondary/30 border border-secondary p-8 mb-12">
-          <div className="absolute inset-0 pattern-dots opacity-10"></div>
-          <div className="relative z-10">
-            <div className="flex items-center gap-2 mb-2">
-              <div className={`px-2 py-0.5 rounded-full text-xs font-medium ${topicData.subjectColor} text-white`}>
-                {topicData.level}
+        <img
+          src="https://i.postimg.cc/3wq9WSKx/erasebg-transformed.webp"
+          alt="background"
+          className=" absolute bottom-20 left-0 w-[600px] h-auto opacity-70 scale-x-[-1]"
+        />
+        <img
+          src="https://i.postimg.cc/LhF8sT1Y/The-Joker-Comics.webp"
+          alt="background"
+          className=" absolute top-20 right-10 w-[300px] h-auto opacity-90 scale-x-[-1]"
+        />
+
+        <div className="hq-content-wrapper">
+          <Link href={`/quiz/${params.subject}`} className="hq-back-link">
+            <ArrowLeft className="mr-1 h-4 w-4" />
+            Back to {topicData.subject} Quizzes
+          </Link>
+
+          <div className="hq-hero-section bg-transparent">
+            <div className="hq-hero-content">
+              <div className="hq-badges">
+                <div className={`hq-level-badge ${topicData.subjectColor}`}>{topicData.level}</div>
+                <div className="hq-age-badge">Ages {topicData.ageRange}</div>
               </div>
-              <div className="text-xs text-muted-foreground">Ages {topicData.ageRange}</div>
+              <h1 className="hq-hero-title">{topicData.title} Quiz</h1>
+              <p className="hq-hero-description">Test your knowledge of {topicData.title.toLowerCase()}.</p>
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold mb-4">{topicData.title} Quiz</h1>
-            <p className="text-lg text-muted-foreground max-w-3xl">
-              Test your knowledge of {topicData.title.toLowerCase()} with our interactive quiz.
-            </p>
           </div>
-        </div>
 
-        {!selectedDifficulty && !showQuiz ? (
-          <div className="p-8 rounded-xl bg-card border shadow-md">
-            <h2 className="text-2xl font-bold mb-8 text-center">Select Difficulty Level</h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <button
-                onClick={() => {
-                  setSelectedDifficulty("easy")
-                  generateNewQuestionsWithDifficulty("easy")
-                }}
-                className="group relative overflow-hidden rounded-xl border border-green-200 dark:border-green-800 hover:border-green-400 dark:hover:border-green-600 transition-all duration-300"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-green-500/20 opacity-50 group-hover:opacity-100 transition-opacity"></div>
-                <div className="relative p-6 flex flex-col items-center text-center">
-                  <div className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mb-4">
-                    <Shield className="h-8 w-8 text-green-500" />
+          {!selectedDifficulty && !showQuiz ? (
+            <div className="hq-difficulty-selector bg-transparent">
+              <h2 className="hq-selector-title">Select Difficulty Level</h2>
+              <div className="hq-difficulty-grid">
+                <button
+                  onClick={() => {
+                    setSelectedDifficulty("easy")
+                    generateNewQuestionsWithDifficulty("easy")
+                  }}
+                  className="hq-difficulty-card hq-easy bg-gradient-to-tr from-[#04a21c]/15 via-black to-gray-600/10 "
+                >
+                  <div className="hq-card-icon hq-green">
+                    <Shield className="h-8 w-8" />
                   </div>
-                  <h3 className="text-xl font-bold mb-2 text-green-600 dark:text-green-400">Easy</h3>
-                  <p className="text-muted-foreground">Basic concepts for beginners</p>
-                  <div className="mt-4 text-xs text-muted-foreground">
-                    <div className="flex items-center gap-1 mb-1">
+                  <h3 className="hq-card-title">Easy</h3>
+                  <p className="hq-card-description">Basic concepts for beginners</p>
+                  <div className="hq-card-details">
+                    <div className="hq-time-info">
                       <Clock className="h-3 w-3" />
                       <span>5 minutes</span>
                     </div>
-                    <div>Simple questions with obvious answers</div>
+                    <div className="hq-detail-text">Simple questions with obvious answers</div>
                   </div>
-                </div>
-              </button>
-
-              <button
-                onClick={() => {
-                  setSelectedDifficulty("beginner")
-                  generateNewQuestionsWithDifficulty("beginner")
-                }}
-                className="group relative overflow-hidden rounded-xl border border-blue-200 dark:border-blue-800 hover:border-blue-400 dark:hover:border-blue-600 transition-all duration-300"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-blue-500/20 opacity-50 group-hover:opacity-100 transition-opacity"></div>
-                <div className="relative p-6 flex flex-col items-center text-center">
-                  <div className="w-16 h-16 rounded-full bg-blue-500/10 flex items-center justify-center mb-4">
-                    <Zap className="h-8 w-8 text-blue-500" />
+                </button>
+                <button
+                  onClick={() => {
+                    setSelectedDifficulty("beginner")
+                    generateNewQuestionsWithDifficulty("beginner")
+                  }}
+                  className="hq-difficulty-card hq-beginner bg-gradient-to-tr from-yellow-500/10 via-black to-gray-600/10 "
+                >
+                  <div className="hq-card-icon hq-yellow">
+                    <Zap className="h-8 w-8 text-yellow-400 " />
                   </div>
-                  <h3 className="text-xl font-bold mb-2 text-blue-600 dark:text-blue-400">Beginner</h3>
-                  <p className="text-muted-foreground">Straightforward questions with some challenge</p>
-                  <div className="mt-4 text-xs text-muted-foreground">
-                    <div className="flex items-center gap-1 mb-1">
+                  <h3 className="hq-card-title">Beginner</h3>
+                  <p className="hq-card-description">Straightforward questions with some challenge</p>
+                  <div className="hq-card-details">
+                    <div className="hq-time-info">
                       <Clock className="h-3 w-3" />
                       <span>4 minutes</span>
                     </div>
-                    <div>Basic concepts requiring some thought</div>
+                    <div className="hq-detail-text">Basic concepts requiring some thought</div>
                   </div>
-                </div>
-              </button>
-
-              <button
-                onClick={() => {
-                  setSelectedDifficulty("intermediate")
-                  generateNewQuestionsWithDifficulty("intermediate")
-                }}
-                className="group relative overflow-hidden rounded-xl border border-orange-200 dark:border-orange-800 hover:border-orange-400 dark:hover:border-orange-600 transition-all duration-300"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-orange-500/20 opacity-50 group-hover:opacity-100 transition-opacity"></div>
-                <div className="relative p-6 flex flex-col items-center text-center">
-                  <div className="w-16 h-16 rounded-full bg-orange-500/10 flex items-center justify-center mb-4">
-                    <Target className="h-8 w-8 text-orange-500" />
+                </button>
+                <button
+                  onClick={() => {
+                    setSelectedDifficulty("intermediate")
+                    generateNewQuestionsWithDifficulty("intermediate")
+                  }}
+                  className="hq-difficulty-card hq-intermediate bg-gradient-to-tr from-[#4b0082]/15 via-black to-gray-600/10 "
+                >
+                  <div className="hq-card-icon hq-purple">
+                    <Target className="h-8 w-8" />
                   </div>
-                  <h3 className="text-xl font-bold mb-2 text-orange-600 dark:text-orange-400">Intermediate</h3>
-                  <p className="text-muted-foreground">More complex concepts for experienced learners</p>
-                  <div className="mt-4 text-xs text-muted-foreground">
-                    <div className="flex items-center gap-1 mb-1">
+                  <h3 className="hq-card-title">Intermediate</h3>
+                  <p className="hq-card-description">More complex concepts for experienced learners</p>
+                  <div className="hq-card-details">
+                    <div className="hq-time-info">
                       <Clock className="h-3 w-3" />
                       <span>3 minutes</span>
                     </div>
-                    <div>Requires good understanding of the topic</div>
+                    <div className="hq-detail-text">Requires good understanding of the topic</div>
                   </div>
-                </div>
-              </button>
-
-              <button
-                onClick={() => {
-                  setSelectedDifficulty("hard")
-                  generateNewQuestionsWithDifficulty("hard")
-                }}
-                className="group relative overflow-hidden rounded-xl border border-red-200 dark:border-red-800 hover:border-red-400 dark:hover:border-red-600 transition-all duration-300"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-red-500/20 opacity-50 group-hover:opacity-100 transition-opacity"></div>
-                <div className="relative p-6 flex flex-col items-center text-center">
-                  <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
-                    <Award className="h-8 w-8 text-red-500" />
+                </button>
+                <button
+                  onClick={() => {
+                    setSelectedDifficulty("hard")
+                    generateNewQuestionsWithDifficulty("hard")
+                  }}
+                  className="hq-difficulty-card hq-hard bg-gradient-to-tr from-[#dc143c]/15 via-black to-gray-600/10"
+                >
+                  <div className="hq-card-icon hq-red">
+                    <Award className="h-8 w-8" />
                   </div>
-                  <h3 className="text-xl font-bold mb-2 text-red-600 dark:text-red-400">Hard</h3>
-                  <p className="text-muted-foreground">Advanced concepts for experts</p>
-                  <div className="mt-4 text-xs text-muted-foreground">
-                    <div className="flex items-center gap-1 mb-1">
+                  <h3 className="hq-card-title">Hard</h3>
+                  <p className="hq-card-description">Advanced concepts for experts</p>
+                  <div className="hq-card-details">
+                    <div className="hq-time-info">
                       <Clock className="h-3 w-3" />
                       <span>2 minutes</span>
                     </div>
-                    <div>Challenging questions requiring deep understanding</div>
+                    <div className="hq-detail-text">Challenging questions requiring deep understanding</div>
                   </div>
-                </div>
-              </button>
-            </div>
-
-            <div className="mt-8 text-center">
-              <p className="text-sm text-muted-foreground mb-4">Not sure which level to choose?</p>
-              <Link href={`/test-your-level?subject=${params.subject}`}>
-                <Button variant="outline">Test Your Level</Button>
-              </Link>
-            </div>
-          </div>
-        ) : loading ? (
-          <div className="p-8 rounded-xl bg-card border shadow-md text-center">
-            <div className="w-16 h-16 rounded-full border-4 border-primary border-t-transparent animate-spin mx-auto mb-6"></div>
-            <p className="text-xl font-medium mb-2">Generating {selectedDifficulty} questions...</p>
-            <p className="text-muted-foreground">
-              This may take a moment as our AI creates personalized questions for you
-            </p>
-          </div>
-        ) : error ? (
-          <div className="p-8 rounded-xl bg-card border shadow-md text-center">
-            <div className="text-red-500 mb-6 text-xl">⚠️ {error}</div>
-            <Button
-              onClick={() => setSelectedDifficulty(null)}
-              className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90"
-            >
-              Try Again
-            </Button>
-          </div>
-        ) : questions.length > 0 && showQuiz ? (
-          <>
-            {selectedDifficulty && (
-              <div className="mb-4 flex justify-between items-center">
-                <div className="flex items-center">
-                  <span className="text-sm font-medium mr-2">Difficulty:</span>
-                  <span
-                    className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                      selectedDifficulty === "easy"
-                        ? "bg-green-500"
-                        : selectedDifficulty === "beginner"
-                          ? "bg-blue-500"
-                          : selectedDifficulty === "intermediate"
-                            ? "bg-orange-500"
-                            : "bg-red-500"
-                    } text-white`}
-                  >
-                    {selectedDifficulty.charAt(0).toUpperCase() + selectedDifficulty.slice(1)}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">Time Limit: {formatTime(timeLimit)}</span>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setSelectedDifficulty(null)
-                    setShowQuiz(false)
-                  }}
-                >
-                  Change Difficulty
-                </Button>
+                </button>
               </div>
-            )}
-            <QuizEngine
-              questions={questions}
-              subjectColor={topicData.subjectColor}
-              subject={params.subject}
-              topic={params.topic}
-              difficulty={selectedDifficulty || undefined}
-              timeLimit={timeLimit}
-              onComplete={(score, total) => {
-                console.log(`Quiz completed with score ${score}/${total}`)
-                // Here you would typically save the progress to a database
-              }}
-            />
-          </>
-        ) : (
-          <div className="p-8 rounded-xl bg-card border shadow-md text-center">
-            <p className="text-muted-foreground">No questions available for this topic yet.</p>
-          </div>
-        )}
-
-        {showQuiz && !loading && (
-          <div className="mt-8 flex justify-center">
-            <Button
-              onClick={() => generateNewQuestionsWithDifficulty(selectedDifficulty || "beginner")}
-              className={`${topicData.subjectColor} text-white flex items-center gap-2`}
-              disabled={loading}
-            >
-              <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-              Generate New Questions
-            </Button>
-          </div>
-        )}
+              <div className="hq-test-level-section">
+                <p className="hq-test-prompt">Not sure which level to choose?</p>
+                <Link href={`/test-your-level?subject=${params.subject}`}>
+                  <Button variant="outline" className="hq-test-button">
+                    Test Your Level
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          ) : loading ? (
+            <div className="hq-loading-section">
+              <div className="hq-loading-spinner"></div>
+              <p className="hq-loading-title">Generating {selectedDifficulty} questions...</p>
+              <p className="hq-loading-subtitle">
+                This may take a moment as our AI creates personalized questions for you
+              </p>
+            </div>
+          ) : error ? (
+            <div className="hq-error-section">
+              <div className="hq-error-icon">⚠️ {error}</div>
+              <Button onClick={() => setSelectedDifficulty(null)} className="hq-retry-button">
+                Try Again
+              </Button>
+            </div>
+          ) : questions.length > 0 && showQuiz ? (
+            <>
+              {selectedDifficulty && (
+                <div className="hq-quiz-header">
+                  <div className="hq-difficulty-info">
+                    <span className="hq-difficulty-label">Difficulty:</span>
+                    <span className={`hq-difficulty-badge ${selectedDifficulty}`}>
+                      {selectedDifficulty.charAt(0).toUpperCase() + selectedDifficulty.slice(1)}
+                    </span>
+                  </div>
+                  <div className="hq-time-display">
+                    <Clock className="h-4 w-4" />
+                    <span>Time Limit: {formatTime(timeLimit)}</span>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setSelectedDifficulty(null)
+                      setShowQuiz(false)
+                    }}
+                    className="hq-change-difficulty"
+                  >
+                    Change Difficulty
+                  </Button>
+                </div>
+              )}
+              <QuizEngine
+                questions={questions}
+                subjectColor={topicData.subjectColor}
+                subject={params.subject}
+                topic={params.topic}
+                difficulty={selectedDifficulty || undefined}
+                timeLimit={timeLimit}
+                onComplete={(score, total) => {
+                  console.log(`Quiz completed with score ${score}/${total}`)
+                  // Here you would typically save the progress to a database
+                }}
+              />
+            </>
+          ) : (
+            <div className="hq-no-questions">
+              <p>No questions available for this topic yet.</p>
+            </div>
+          )}
+          {showQuiz && !loading && (
+            <div className="hq-generate-section">
+              <Button
+                onClick={() => generateNewQuestionsWithDifficulty(selectedDifficulty || "beginner")}
+                className={`hq-generate-button ${topicData.subjectColor}`}
+                disabled={loading}
+              >
+                <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+                Generate New Questions
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   )
 }

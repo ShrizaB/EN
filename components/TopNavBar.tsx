@@ -1,6 +1,7 @@
 "use client"
 
 import { Menu } from "lucide-react"
+import Link from "next/link"
 
 interface TopNavBarProps {
   onMenuClick: () => void
@@ -12,9 +13,11 @@ export const TopNavBar = ({ onMenuClick }: TopNavBarProps) => {
       <button onClick={onMenuClick} className="text-white hover:text-white transition">
         <Menu className="w-6 h-6" />
       </button>
-      <span className="text-[18px] uppercase font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-red-100 via-white to-white animate-pulse">
-        ✦ EduPlay ✦
-      </span>
+      <Link href="/eduplay/home" className="flex items-center gap-2 group">
+        <span className="text-[22px] font-bold tracking-[0.15em] text-white uppercase transition-colors duration-300 font-['Orbitron',_monospace]">
+          EduPlay
+        </span>
+      </Link>
     </header>
   )
 }

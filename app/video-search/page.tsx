@@ -1,14 +1,16 @@
 "use client"
 
-import type React from "react"
+import React from "react"
 
 import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Send, Loader2, Youtube } from "lucide-react"
+import { Send, Youtube, Maximize2, Minimize2, Bot } from "lucide-react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { GoogleGenerativeAI } from "@google/generative-ai"
 import { useAuth } from "@/contexts/auth-context"
+import "./ultron-theme.css"
+import Loading from "./loading"
 
 // Initialize the Gemini API
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "AIzaSyDiaCC3dAZS8ZiDU1uF8YfEu9PoWy8YLoA"
@@ -36,6 +38,7 @@ interface YouTubeVideo {
 }
 
 export default function VideoSearchPage() {
+  const [showLoader, setShowLoader] = useState(true);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
@@ -46,13 +49,68 @@ export default function VideoSearchPage() {
   ])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [isFullscreen, setIsFullscreen] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const chatContainerRef = useRef<HTMLDivElement>(null)
   const { user } = useAuth()
+  const audioRef = useRef<HTMLAudioElement | null>(null)
 
   // Scroll to bottom of chat when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
+
+  // Fullscreen toggle handler
+  const handleFullscreen = () => {
+    const el = chatContainerRef.current
+    if (!el) return
+    if (!isFullscreen) {
+      if (el.requestFullscreen) el.requestFullscreen()
+      else if ((el as any).webkitRequestFullscreen) (el as any).webkitRequestFullscreen()
+      else if ((el as any).msRequestFullscreen) (el as any).msRequestFullscreen()
+    } else {
+      if (document.exitFullscreen) document.exitFullscreen()
+      else if ((document as any).webkitExitFullscreen) (document as any).webkitExitFullscreen()
+      else if ((document as any).msExitFullscreen) (document as any).msExitFullscreen()
+    }
+  }
+
+  // Listen for fullscreen change to update state
+  useEffect(() => {
+    const onChange = () => {
+      setIsFullscreen(!!document.fullscreenElement)
+    }
+    document.addEventListener("fullscreenchange", onChange)
+    document.addEventListener("webkitfullscreenchange", onChange)
+    document.addEventListener("msfullscreenchange", onChange)
+    return () => {
+      document.removeEventListener("fullscreenchange", onChange)
+      document.removeEventListener("webkitfullscreenchange", onChange)
+      document.removeEventListener("msfullscreenchange", onChange)
+    }
+  }, [])
+
+  // Preload the sound effect
+  useEffect(() => {
+    if (!audioRef.current) {
+      const audio = new window.Audio('/sounds/ultron-key.mp3')
+      audio.volume = 0.18 // Not too loud
+      audioRef.current = audio
+    }
+    // Keydown handler
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Play the sound for every key
+      if (audioRef.current) {
+        // Restart sound if already playing
+        audioRef.current.currentTime = 0
+        audioRef.current.play()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [])
 
   // Update the searchYouTubeVideos function to search for kid-friendly content
   const searchYouTubeVideos = async (query: string): Promise<YouTubeVideo[]> => {
@@ -232,127 +290,348 @@ export default function VideoSearchPage() {
     }
   }
 
+  useEffect(() => {
+    const timeout = setTimeout(() => setShowLoader(false), 2000);
+    return () => clearTimeout(timeout);
+  }, []);
+
+  if (showLoader) return <Loading />;
+
   return (
-    <div className="container py-12 md:py-20">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-8 text-center">
-          <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium mb-2">
-            <Youtube className="h-3.5 w-3.5 mr-1.5" />
-            <span>Video Search</span>
+    <div className="ultron-container">
+
+      {/* Background Image with overlay */}
+      <div className="absolute inset-0 flex items-center h-full w-full max-w-7xl mx-auto px-4">
+        <div className="flex gap-4">
+          <div className="relative">
+            <img
+              src="https://i.postimg.cc/QMSVs16b/ultron-marvel-rivals-by-tettris11-djvjdtn.png"
+              alt="Ultron 1"
+              className="opacity-100 w-[300px] fixed bottom-16 left-10 h-auto md:visible invisible"
+            />
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight gradient-text from-primary via-purple-500 to-pink-500 mb-4">
-            Educational Video Search
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Ask me to find educational videos on any topic. I'll search YouTube and show you the best results.
-          </p>
         </div>
+      </div>
 
-        {/* Chat container */}
-        <div className="border rounded-xl overflow-hidden bg-background shadow-sm">
-          {/* Messages area */}
-          <div className="h-[600px] overflow-y-auto p-4 space-y-4">
-            {messages.map((message) => (
-              <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-                <div className={`flex gap-3 max-w-[80%] ${message.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
-                  <Avatar className={message.role === "assistant" ? "bg-primary/10" : "bg-secondary"}>
-                    <AvatarFallback>
-                      {message.role === "assistant" ? "AI" : user?.name?.charAt(0) || "U"}
-                    </AvatarFallback>
-                  </Avatar>
+      <div className="absolute inset-0 flex items-center h-full w-full max-w-7xl mx-auto px-4">
+        <div className="flex gap-4">
+          <div className="relative">
+            <img
+              src="https://i.postimg.cc/SQgfS1TB/pngegg-5.png"
+              alt="Ultron 2"
+              className="ultron-image opacity-80 w-[360px] fixed top-16 right-10 h-auto scale-x-[-1]"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Hide default cursor and render a custom cursor image that follows the mouse */}
+      <style>{`
+        html, body, #__next, .ultron-container, * {
+          cursor: none !important;
+        }
+      `}</style>
+      {/* Custom cursor image */}
+      <CustomCursor />
+
+      {/* Dynamic Background */}
+      <div className="ultron-background">
+        <div className="ultron-grid"></div>
+        <div className="ultron-particles"></div>
+        <div className="ultron-matrix"></div>
+        <div className="ultron-scanlines"></div>
+      </div>
+
+      {/* Neural Network Overlay */}
+      <div className="ultron-neural-network">
+        <div className="neural-node neural-node-1"></div>
+        <div className="neural-node neural-node-2"></div>
+        <div className="neural-node neural-node-3"></div>
+        <div className="neural-node neural-node-4"></div>
+        <div className="neural-connection neural-connection-1"></div>
+        <div className="neural-connection neural-connection-2"></div>
+        <div className="neural-connection neural-connection-3"></div>
+      </div>
+
+      <div className="container py-12 md:py-20 relative z-10">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-8 text-center">
+            <div className="ultron-badge">
+              <div className="badge-glow"></div>
+              <Youtube className="h-5 w-5 mr-1.5" />
+              <span>Video Search</span>
+              <div className="badge-pulse"></div>
+            </div>
+            <h1 className="ultron-title" style={{ WebkitTextFillColor: 'unset', color: 'var(--ultron-red)', textShadow: '0 0 16px var(--ultron-glow-red), 0 2px 8px #000' }}>
+              <span className="title-glitch" data-text="Educational Video Search" style={{ WebkitTextFillColor: 'unset', color: 'var(--ultron-red)', textShadow: '0 0 16px var(--ultron-glow-red), 0 2px 8px #000' }}>
+                Educational Video Search
+              </span>
+            </h1>
+            <p className="ultron-subtitle">
+              Ask me to find educational videos on any topic. I'll search YouTube and show you the best results.
+            </p>
+          </div>
+
+          {/* Chat container */}
+          <div
+            className="ultron-chat-container"
+            ref={chatContainerRef}
+            style={{
+              minHeight: isFullscreen ? '100vh' : '520px',
+              height: isFullscreen ? '100vh' : '48vh',
+              maxHeight: isFullscreen ? '100vh' : '700px',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            {isFullscreen && false && (
+              <div style={{
+                position: 'absolute',
+                top: 12,
+                right: 16,
+                zIndex: 20,
+                color: 'var(--ultron-red)',
+                fontWeight: 700,
+                fontSize: 16,
+                letterSpacing: 2,
+                textShadow: '0 0 12px var(--ultron-glow-red)',
+                pointerEvents: 'none',
+                userSelect: 'none',
+              }}>
+                FULL SCREEN
+              </div>
+            )}
+            <div className="chat-header flex flex-row items-center justify-between gap-2 w-full">
+              <div className="flex flex-row items-center gap-2 w-full">
+                <div className="status-indicator flex flex-row items-center gap-2">
+                  <div className="status-dot"></div>
+                  <span className="hidden sm:inline">AI SYSTEM ONLINE</span>
+                  <span className="inline sm:hidden text-xs">AI ONLINE</span>
+                </div>
+                <button
+                  type="button"
+                  aria-label={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+                  onClick={handleFullscreen}
+                  className="ultron-fullscreen-btn ml-2"
+                  title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+                  style={{
+                    padding: window.innerWidth <= 768 ? '7px 14px' : undefined,
+                    fontSize: window.innerWidth <= 768 ? 12 : undefined,
+                    minWidth: window.innerWidth <= 768 ? 0 : undefined,
+                    gap: window.innerWidth <= 768 ? 6 : undefined,
+                  }}
+                >
+                  {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
+                  <span style={{ fontSize: window.innerWidth <= 768 ? 11 : 13, fontWeight: 600, letterSpacing: 1, userSelect: 'none' }}>
+                    {isFullscreen ? (window.innerWidth <= 768 ? 'Exit Full Screen' : 'Exit Full Screen') : (window.innerWidth <= 768 ? 'Full Screen' : 'Full Screen')}
+                  </span>
+                </button>
+              </div>
+              {/* Hide system metrics on mobile */}
+              <div className="system-metrics hidden md:flex">
+                <div className="metric">
+                  <span>CPU</span>
+                  <div className="metric-bar">
+                    <div className="metric-fill"></div>
+                  </div>
+                </div>
+                <div className="metric">
+                  <span>MEM</span>
+                  <div className="metric-bar">
+                    <div className="metric-fill metric-fill-2"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Messages area */}
+            <div
+              className="ultron-messages-area text-[11px] md:text-xs lg:text-sm"
+              style={{
+                flex: 1,
+                minHeight: 0,
+                height: isFullscreen ? 'auto' : 'calc(48vh - 140px)',
+                maxHeight: isFullscreen ? 'none' : '600px',
+                overflowY: 'auto',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              {messages.map((message) => (
+                <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
                   <div
-                    className={`rounded-lg p-4 ${
-                      message.role === "user"
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-secondary text-secondary-foreground"
-                    }`}
+                    className={`flex gap-3 max-w-[80%] ${message.role === "user" ? "flex-row-reverse" : "flex-row"}`}
                   >
-                    <p className="whitespace-pre-wrap">{message.content}</p>
+                    <Avatar
+                      className={`ultron-avatar ${message.role === "assistant" ? "ultron-avatar-ai" : "ultron-avatar-user"}`}
+                    >
+                      {message.role === "assistant" ? (
+                        <Bot className="w-6 h-6 text-white" />
+                      ) : (
+                        <AvatarFallback>
+                          {user?.name?.charAt(0) || "U"}
+                        </AvatarFallback>
+                      )}
+                      <div className="avatar-pulse"></div>
+                    </Avatar>
+                    <div
+                      className={`ultron-message ${message.role === "user" ? "ultron-message-user" : "ultron-message-ai"} text-[11px] md:text-xs lg:text-sm`}
+                    >
+                      <div className="message-border"></div>
+                      <p className="whitespace-pre-wrap text-[11px] md:text-xs lg:text-sm">{message.content}</p>
 
-                    {/* Video results */}
-                    {message.videos && message.videos.length > 0 && (
-                      <div className="mt-4">
-                        <div className="grid grid-cols-1 gap-4">
-                          {message.videos.map((video) => (
-                            <div key={video.id} className="rounded-lg overflow-hidden bg-background shadow-sm">
-                              <div className="flex flex-col md:flex-row">
-                                <div className="md:w-1/2 aspect-video">
-                                  <iframe
-                                    width="100%"
-                                    height="100%"
-                                    src={`https://www.youtube.com/embed/${video.id}`}
-                                    title={video.title}
-                                    frameBorder="0"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                    allowFullScreen
-                                  ></iframe>
-                                </div>
-                                <div className="p-4 md:w-1/2 flex flex-col">
-                                  <h4 className="font-medium text-base">{video.title}</h4>
-                                  <p className="text-sm text-muted-foreground mt-1">{video.channelTitle}</p>
-                                  <p className="text-xs text-muted-foreground mt-2 line-clamp-3">{video.description}</p>
-                                  <div className="mt-auto pt-2">
-                                    <a
-                                      href={`https://www.youtube.com/watch?v=${video.id}`}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="text-xs text-primary hover:underline"
-                                    >
-                                      Watch on YouTube
-                                    </a>
+                      {/* Video results */}
+                      {message.videos && message.videos.length > 0 && (
+                        <div className="mt-4">
+                          <div className="grid grid-cols-1 gap-4">
+                            {message.videos.map((video, index) => (
+                              <div
+                                key={video.id}
+                                className="ultron-video-card"
+                                style={{ animationDelay: `${index * 0.1}s` }}
+                              >
+                                <div className="video-card-glow"></div>
+                                <div className="flex flex-col md:flex-row">
+                                  <div className="md:w-1/2 aspect-video ultron-video-frame">
+                                    <div className="video-overlay"></div>
+                                    <iframe
+                                      width="100%"
+                                      height="100%"
+                                      src={`https://www.youtube.com/embed/${video.id}`}
+                                      title={video.title}
+                                      frameBorder="0"
+                                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                      allowFullScreen
+                                    ></iframe>
+                                  </div>
+                                  <div className="p-4 md:w-1/2 flex flex-col">
+                                    <h4 className="ultron-video-title">{video.title}</h4>
+                                    <p className="ultron-video-channel">{video.channelTitle}</p>
+                                    <p className="ultron-video-description">{video.description}</p>
+                                    <div className="mt-auto pt-2">
+                                      <a
+                                        href={`https://www.youtube.com/watch?v=${video.id}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="ultron-video-link"
+                                      >
+                                        <span>Watch on YouTube</span>
+                                        <div className="link-glow"></div>
+                                      </a>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
-                            </div>
-                          ))}
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-
-            {isLoading && (
-              <div className="flex justify-start">
-                <div className="flex gap-3">
-                  <Avatar className="bg-primary/10">
-                    <AvatarFallback>AI</AvatarFallback>
-                  </Avatar>
-                  <div className="rounded-lg p-4 bg-secondary text-secondary-foreground">
-                    <div className="flex items-center gap-2">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      <p>Searching for videos...</p>
+                      )}
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
+              ))}
 
-            <div ref={messagesEndRef} />
+              {isLoading && (
+                <div className="flex justify-start">
+                  <div className="flex gap-3">
+                    <Avatar className="ultron-avatar ultron-avatar-ai">
+                      <AvatarFallback>AI</AvatarFallback>
+                      <div className="avatar-pulse"></div>
+                    </Avatar>
+                    <div className="ultron-message ultron-message-ai">
+                      <div className="message-border"></div>
+                      <div className="flex items-center gap-2">
+                        <div className="ultron-loader">
+                          <div className="loader-ring"></div>
+                          <div className="loader-ring"></div>
+                          <div className="loader-ring"></div>
+                        </div>
+                        <p>Searching for videos...</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* Input area */}
+            <div className="ultron-input-area" style={{ flexShrink: 0 }}>
+              <div className="input-glow"></div>
+              <form onSubmit={handleSubmit} className="flex gap-2">
+                <div className="input-wrapper">
+                  <Input
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder="Ask me to find videos on any topic..."
+                    disabled={isLoading}
+                    className="ultron-input flex-1 text-[10px] md:text-[16px] "
+                  />
+                  <div className="input-border"></div>
+                </div>
+                <Button type="submit" disabled={isLoading || !input.trim()} className="ultron-button">
+                  <div className="button-glow"></div>
+                  {isLoading ? (
+                    <div className="ultron-loader-small">
+                      <div className="loader-ring"></div>
+                    </div>
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
+                </Button>
+              </form>
+            </div>
           </div>
 
-          {/* Input area */}
-          <div className="border-t p-4">
-            <form onSubmit={handleSubmit} className="flex gap-2">
-              <Input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask me to find videos on any topic..."
-                disabled={isLoading}
-                className="flex-1"
-              />
-              <Button type="submit" disabled={isLoading || !input.trim()}>
-                {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-              </Button>
-            </form>
+          <div className="ultron-footer">
+            <div className="footer-glow"></div>
+            <p>
+              <span className="footer-highlight">POWERED BY</span> YouTube and Gemini AI. Results are based on YouTube's
+              search algorithm and may vary.
+            </p>
           </div>
-        </div>
-
-        <div className="mt-4 text-center text-sm text-muted-foreground">
-          <p>Powered by YouTube and Gemini AI. Results are based on YouTube's search algorithm and may vary.</p>
         </div>
       </div>
     </div>
   )
+}
+
+// Custom cursor component
+function CustomCursor() {
+  const [pos, setPos] = React.useState({ x: 0, y: 0 });
+  const lastPos = React.useRef({ x: 0, y: 0 });
+  React.useEffect(() => {
+    // Lower sensitivity: only update if mouse moved > 8px
+    const move = (e: MouseEvent) => {
+      const dx = Math.abs(e.clientX - lastPos.current.x);
+      const dy = Math.abs(e.clientY - lastPos.current.y);
+      if (dx > 9 || dy > 9) {
+        setPos({ x: e.clientX, y: e.clientY });
+        lastPos.current = { x: e.clientX, y: e.clientY };
+      }
+    };
+    window.addEventListener('mousemove', move);
+    return () => window.removeEventListener('mousemove', move);
+  }, []);
+  return (
+    <img
+      src="/ultron-cursor.png"
+      alt="Ultron Cursor"
+      className="md:visible invisible"
+      style={{
+        position: 'fixed',
+        left: pos.x,
+        top: pos.y,
+        width: 52,
+        height: 52,
+        pointerEvents: 'none',
+        zIndex: 999999999,
+        userSelect: 'none',
+        mixBlendMode: 'exclusion',
+        transform: 'translate(0, 0)',
+      }}
+      draggable={false}
+    />
+  );
 }

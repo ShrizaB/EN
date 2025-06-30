@@ -1,3 +1,5 @@
+"use client"
+
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import {
@@ -12,6 +14,8 @@ import {
   Globe,
   Brain,
 } from "lucide-react"
+import "./quiz-subject.css"
+import { useState, useEffect } from "react"
 
 // This would typically come from a database or API
 const subjectsData = {
@@ -21,10 +25,10 @@ const subjectsData = {
     longDescription:
       "Our mathematics curriculum is designed to make numbers fun and engaging. Through interactive quizzes, puzzles, and activities, children develop strong foundational math skills while enjoying the learning process.",
     icon: Calculator,
-    color: "text-math",
-    bgColor: "bg-math/10",
-    buttonColor: "bg-math",
-    gradientText: "from-math to-blue-400",
+    color: "text-harley-blood",
+    bgColor: "bg-harley-blood/10",
+    buttonColor: "bg-harley-blood",
+    gradientText: "from-harley-blood to-black",
     topics: [
       {
         id: "counting",
@@ -82,10 +86,10 @@ const subjectsData = {
     longDescription:
       "Our science curriculum encourages curiosity and exploration. Through interactive quizzes and experiments, children learn about the natural world, scientific principles, and develop critical thinking skills.",
     icon: Flask,
-    color: "text-science",
-    bgColor: "bg-science/10",
-    buttonColor: "bg-science",
-    gradientText: "from-science to-green-400",
+    color: "text-harley-blood",
+    bgColor: "bg-harley-blood/10",
+    buttonColor: "bg-harley-blood",
+    gradientText: "from-harley-blood to-black",
     topics: [
       {
         id: "animals",
@@ -143,10 +147,10 @@ const subjectsData = {
     longDescription:
       "Our reading curriculum helps children develop strong literacy skills. Through engaging quizzes and activities, children improve their vocabulary, comprehension, and develop a love for reading.",
     icon: BookOpen,
-    color: "text-reading",
-    bgColor: "bg-reading/10",
-    buttonColor: "bg-reading",
-    gradientText: "from-reading to-orange-400",
+    color: "text-harley-blood",
+    bgColor: "bg-harley-blood/10",
+    buttonColor: "bg-harley-blood",
+    gradientText: "from-harley-blood to-black",
     topics: [
       {
         id: "alphabet",
@@ -204,10 +208,10 @@ const subjectsData = {
     longDescription:
       "Our coding curriculum introduces children to the world of programming. Through interactive quizzes and challenges, children learn computational thinking, problem-solving, and basic coding concepts.",
     icon: Code,
-    color: "text-coding",
-    bgColor: "bg-coding/10",
-    buttonColor: "bg-coding",
-    gradientText: "from-coding to-indigo-400",
+    color: "text-harley-blood",
+    bgColor: "bg-harley-blood/10",
+    buttonColor: "bg-harley-blood",
+    gradientText: "from-harley-blood to-black",
     topics: [
       {
         id: "basics",
@@ -265,10 +269,10 @@ const subjectsData = {
     longDescription:
       "Our music curriculum introduces children to the wonderful world of music. Through interactive quizzes, children learn about musical instruments, notes, rhythms, and famous composers.",
     icon: Music,
-    color: "text-purple-500",
-    bgColor: "bg-purple-500/10",
-    buttonColor: "bg-purple-500",
-    gradientText: "from-purple-500 to-purple-300",
+    color: "text-harley-blood",
+    bgColor: "bg-harley-blood/10",
+    buttonColor: "bg-harley-blood",
+    gradientText: "from-harley-blood to-black",
     topics: [
       {
         id: "instruments",
@@ -310,10 +314,10 @@ const subjectsData = {
     longDescription:
       "Our art curriculum encourages creativity and appreciation for visual arts. Through interactive quizzes, children learn about famous artists, art styles, colors, and artistic techniques.",
     icon: Palette,
-    color: "text-pink-500",
-    bgColor: "bg-pink-500/10",
-    buttonColor: "bg-pink-500",
-    gradientText: "from-pink-500 to-pink-300",
+    color: "text-harley-blood",
+    bgColor: "bg-harley-blood/10",
+    buttonColor: "bg-harley-blood",
+    gradientText: "from-harley-blood to-black",
     topics: [
       {
         id: "colors",
@@ -355,10 +359,10 @@ const subjectsData = {
     longDescription:
       "Our geography curriculum helps children understand the world around them. Through interactive quizzes, children learn about countries, continents, landforms, and different cultures.",
     icon: Globe,
-    color: "text-green-500",
-    bgColor: "bg-green-500/10",
-    buttonColor: "bg-green-500",
-    gradientText: "from-green-500 to-green-300",
+    color: "text-harley-blood",
+    bgColor: "bg-harley-blood/10",
+    buttonColor: "bg-harley-blood",
+    gradientText: "from-harley-blood to-black",
     topics: [
       {
         id: "continents",
@@ -400,10 +404,10 @@ const subjectsData = {
     longDescription:
       "Our history curriculum brings the past to life. Through interactive quizzes, children learn about important historical events, influential figures, and how the past has shaped our present.",
     icon: Brain,
-    color: "text-amber-500",
-    bgColor: "bg-amber-500/10",
-    buttonColor: "bg-amber-500",
-    gradientText: "from-amber-500 to-amber-300",
+    color: "text-harley-blood",
+    bgColor: "bg-harley-blood/10",
+    buttonColor: "bg-harley-blood",
+    gradientText: "from-harley-blood to-black",
     topics: [
       {
         id: "ancient",
@@ -451,90 +455,172 @@ export default function QuizSubjectPage({ params }: { params: { subject: string 
 
   const subjectData = subjectsData[subject as keyof typeof subjectsData]
   const SubjectIcon = subjectData.icon
+  const [cursorPos, setCursorPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [isHovering, setIsHovering] = useState(false);
+  const [hoverAngle, setHoverAngle] = useState(0);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      // Center the bat image on the cursor for a more natural feel
+      setCursorPos({ x: e.clientX - 30, y: e.clientY - 20 }); // 60x40 image, center
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
+
+  // Only apply transform for position and mirroring, no rotation or animation
+  const batTransform = `translate3d(${cursorPos.x}px, ${cursorPos.y}px, 0) scaleX(-1)`;
+  const batTransition = "none";
 
   return (
-    <div className="container py-12 md:py-20">
-      <div className="mb-8">
-        <Link
-          href="/quiz"
-          className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-4"
-        >
-          <ArrowLeft className="mr-1 h-4 w-4" />
-          Back to Quizzes
-        </Link>
-
-        <div className="relative overflow-hidden rounded-xl bg-secondary/30 border border-secondary p-8 mb-12">
-          <div className="absolute inset-0 pattern-diagonal opacity-10"></div>
-          <div className="relative z-10 flex flex-col md:flex-row gap-6 items-center md:items-start">
-            <div className={`w-20 h-20 rounded-full ${subjectData.bgColor} flex items-center justify-center shrink-0`}>
-              <SubjectIcon className={`h-10 w-10 ${subjectData.color}`} />
-            </div>
-            <div>
-              <h1 className={`text-3xl md:text-4xl font-bold mb-4 gradient-text ${subjectData.gradientText}`}>
-                {subjectData.title} Quizzes
-              </h1>
-              <p className="text-lg text-muted-foreground max-w-3xl">{subjectData.longDescription}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-6 mb-8">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div>
-              <h2 className="text-2xl font-bold">Quiz Topics</h2>
-              <p className="text-muted-foreground">Choose a topic to test your knowledge</p>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                <span>Beginner</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                <span>Intermediate</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                <span>Advanced</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {subjectData.topics.map((topic) => {
-              const levelColor =
-                topic.level === "Beginner"
-                  ? "bg-green-500"
-                  : topic.level === "Intermediate"
-                    ? "bg-yellow-500"
-                    : "bg-red-500"
-
-              return (
-                <Link key={topic.id} href={`/quiz/${subject}/topics/${topic.id}`} className="group">
-                  <div className="relative overflow-hidden rounded-xl bg-secondary/30 border border-secondary hover:border-primary/50 p-6 h-full transition-all duration-300">
-                    <div className="absolute -inset-px bg-gradient-to-r from-primary/0 to-primary/0 group-hover:from-primary/5 group-hover:to-primary/10 rounded-xl transition-all duration-300"></div>
-                    <div className="relative z-10">
-                      <div className="flex justify-between items-start mb-4">
-                        <h3 className="text-xl font-bold group-hover:text-primary transition-colors">{topic.title}</h3>
-                        <div className={`w-2.5 h-2.5 rounded-full ${levelColor} mt-2`}></div>
-                      </div>
-                      <p className="text-muted-foreground mb-4">{topic.description}</p>
-                      <div className="flex justify-between items-center text-sm text-muted-foreground">
-                        <div>Ages {topic.ageRange}</div>
-                        <div>{topic.questionsCount} questions</div>
-                      </div>
-                      <div className="mt-4 flex items-center text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                        <span>Take Quiz</span>
-                        <ArrowRight className="ml-1 h-4 w-4" />
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              )
-            })}
+    <div
+      className="min-h-screen bg-harley-void text-white harley-ultra-dark-bg"
+      style={{ cursor: "none" }}
+    >
+      {/* Custom PNG cursor */}
+      <div
+        style={{
+          position: "fixed",
+          left: 0,
+          top: 0,
+          width: "60px",
+          height: "40px",
+          background: "url('https://i.postimg.cc/DzdQ3bH2/Baseball-Bat-PNG-Background.png') center/contain no-repeat",
+          pointerEvents: "none",
+          zIndex: 99999,
+          transform: batTransform,
+          transition: batTransition,
+        }}
+        id="custom-bat-cursor"
+      />
+      {/* Background Image with overlay */}
+      <div className="absolute inset-0 flex items-center h-full w-full max-w-7xl mx-auto px-4">
+        <div className="flex gap-4">
+          <div className="relative">
+            <img
+              src="https://i.postimg.cc/854XM5jG/Daco-196740.png"
+              alt="Joker"
+              className="opacity-80 w-[270px] fixed top-16 right-5 scale-x-[-1] h-auto"
+            />
           </div>
         </div>
       </div>
+      <div className="harley-graffiti-overlay">
+        <div className="harley-diamond-grid-backdrop">
+          <div className="container py-12 md:py-20 relative z-10">
+            <div className="mb-8 harley-entrance-left">
+              <Link
+                href="/quiz"
+                className="inline-flex items-center text-sm font-black text-harley-gunmetal hover:text-harley-neon-pink mb-4 transition-all duration-500 harley-anarchic-link group"
+              >
+                <ArrowLeft className="mr-1 h-4 w-4 harley-icon-electric group-hover:harley-spark-effect" />
+                <span>BACK TO QUIZZES</span>
+              </Link>
+
+              <div className="relative overflow-hidden bg-gradient-to-br from-harley-void/98 to-harley-gunmetal/30 border border-harley-gunmetal/40 p-8 mb-12 harley-hero-container harley-metal-scratches">
+                <div className="harley-diamond-grid-fine absolute inset-0 opacity-8"></div>
+                <div className="harley-electric-crackle absolute inset-0"></div>
+                <div className="harley-particle-field absolute inset-0"></div>
+                <div className="relative z-10 flex flex-col md:flex-row gap-6 items-center md:items-start">
+                  <div
+                    className={`w-20 h-20 ${subjectData.bgColor} flex items-center justify-center shrink-0 harley-icon-vault border border-harley-gunmetal/60 backdrop-blur-sm harley-neon-pulse`}
+                  >
+                    <SubjectIcon className={`h-10 w-10 harley-icon-chaos`} />
+                  </div>
+                  <div>
+                    <h1
+                      className={`text-3xl md:text-4xl font-black mb-4 harley-title-chaos bg-gradient-to-r ${subjectData.gradientText} bg-clip-text text-transparent harley-slash-dynamic`}
+                    >
+                      {subjectData.title.toUpperCase()} QUIZZES
+                    </h1>
+                    <p className="text-lg text-[#ffbbec] max-w-3xl font-bold leading-relaxed harley-text-distressed">
+                      {subjectData.longDescription}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-6 mb-8">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 harley-entrance-right">
+                  <div>
+                    <h2 className="text-2xl font-black text-white harley-title-chaos harley-slash-dynamic">
+                      QUIZ TOPICS
+                    </h2>
+                    <p className="text-harley-gunmetal font-bold harley-anarchic-subtitle">CHOOSE YOUR BATTLEFIELD</p>
+                  </div>
+                  <div className="flex items-center gap-4 text-sm font-black">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 bg-harley-electric-blue harley-neon-electric border border-white harley-level-indicator"></div>
+                      <span className="text-white harley-level-text">BEGINNER</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 bg-harley-neon-pink harley-neon-pink-glow border border-white harley-level-indicator"></div>
+                      <span className="text-white harley-level-text">INTERMEDIATE</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 bg-harley-blood harley-neon-blood border border-white harley-level-indicator"></div>
+                      <span className="text-white harley-level-text">ADVANCED</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {subjectData.topics.map((topic, index) => {
+                    const levelColor =
+                      topic.level === "Beginner"
+                        ? "bg-harley-electric-blue harley-neon-electric border border-white"
+                        : topic.level === "Intermediate"
+                          ? "bg-harley-neon-pink harley-neon-pink-glow border border-white"
+                          : "bg-harley-blood harley-neon-blood border border-white"
+
+                    return (
+                      <Link key={topic.id} href={`/quiz/${subject}/topics/${topic.id}`} className="group">
+                        <div
+                          className={`harley-topic-vault harley-card-entrance-${index % 3} relative overflow-hidden bg-gradient-to-br from-harley-void/95 to-harley-gunmetal/20 border border-harley-gunmetal/50 p-6 h-full harley-metal-scratches`}
+                        >
+                          <div className="harley-diamond-grid-micro absolute inset-0 opacity-5"></div>
+                          <div className="harley-card-electric-field absolute inset-0"></div>
+                          <div className="harley-card-particle-sparks absolute inset-0"></div>
+                          <div className="harley-card-glitch-overlay absolute inset-0"></div>
+
+                          <div className="relative z-10">
+                            <div className="flex justify-between items-start mb-4">
+                              <h3 className="text-xl font-black group-hover:text-harley-neon-pink transition-all duration-500 harley-card-title harley-slash-micro text-white">
+                                {topic.title.toUpperCase()}
+                              </h3>
+                              <div className={`w-3 h-3 ${levelColor} mt-2 harley-level-indicator`}></div>
+                            </div>
+                            <p className="mb-4 font-bold leading-relaxed harley-text-distressed text-white">
+                              {topic.description}
+                            </p>
+                            <div className="flex justify-between items-center text-sm text-white font-black harley-info-text">
+                              <div>AGES {topic.ageRange}</div>
+                              <div className="text-harley-neon-pink">{topic.questionsCount} QUESTIONS</div>
+                            </div>
+                            <div className="mt-4 flex items-center text-sm font-black text-harley-neon-pink opacity-0 group-hover:opacity-100 transition-all duration-500 harley-cta-text">
+                              <span className="harley-glitch-text-micro text-white">TAKE QUIZ</span>
+                              <ArrowRight className="ml-1 h-4 w-4 group-hover:translate-x-2 transition-transform duration-500 harley-arrow-electric" />
+                            </div>
+                          </div>
+                        </div>
+                      </Link>
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* Remove pointer cursor from all interactive elements */}
+      <style>{`
+        html, body, * {
+          cursor: none !important;
+        }
+        html, body {
+          overflow-x: hidden;
+        }
+      `}</style>
     </div>
   )
 }

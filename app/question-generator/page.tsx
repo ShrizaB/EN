@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ImportantQuestionsList } from "@/components/important-questions-list"
 import { Loader2, FileText, ImageIcon, AlertCircle, Upload, RefreshCw } from "lucide-react"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 
 export default function QuestionGeneratorPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -16,6 +17,7 @@ export default function QuestionGeneratorPage() {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
   const [filePreview, setFilePreview] = useState<string | null>(null)
   const [retryCount, setRetryCount] = useState(0)
+  const [marks, setMarks] = useState(1)
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -78,35 +80,26 @@ export default function QuestionGeneratorPage() {
       // For demo purposes, generate mock questions and answers after a delay
       // This ensures the feature works even if the API is not functioning
       await new Promise((resolve) => setTimeout(resolve, 2000))
-
-      // Generate mock questions based on the file name
       const fileName = file.name.replace(/\.[^/.]+$/, "").replace(/[_-]/g, " ")
-      const mockQuestions = generateMockQuestions(fileName)
+      const mockQuestions = generateMockQuestions(fileName, marks)
       const mockAnswers = mockQuestions.map((q) => generateMockAnswer(q))
-
       setQuestions(mockQuestions)
       setAnswers(mockAnswers)
-
-      // Try the actual API call in parallel
       try {
         const formData = new FormData()
         formData.append("file", file)
-
+        formData.append("marks", String(marks))
         const response = await fetch("/api/gemini/extract-questions", {
           method: "POST",
           body: formData,
         })
-
-        // If API call succeeds, use those results instead
         const data = await response.json()
-
         if (data.success && data.questions && data.questions.length > 0) {
           setQuestions(data.questions)
           setAnswers(data.answers || [])
         }
       } catch (apiError) {
         console.error("API error (using fallback questions):", apiError)
-        // We already have fallback questions, so no need to show error
       }
     } catch (err: any) {
       console.error("Error generating questions:", err)
@@ -237,18 +230,60 @@ export default function QuestionGeneratorPage() {
           </Card>
         </div>
       </div>
+
+      <div className="mb-6">
+        <label className="block font-medium mb-2">Marks per Question</label>
+        <ToggleGroup type="single" value={String(marks)} onValueChange={v => v && setMarks(Number(v))}>
+          {[1,2,3,4,5].map((mark) => (
+            <ToggleGroupItem key={mark} value={String(mark)}>{mark}</ToggleGroupItem>
+          ))}
+        </ToggleGroup>
+      </div>
     </div>
   )
 }
 
-// Helper function to generate mock questions based on file name
-function generateMockQuestions(fileName: string): string[] {
+// Update generateMockQuestions to accept marks
+function generateMockQuestions(fileName: string, marks: number = 1): string[] {
   const topics = fileName.split(/\s+/).filter((word) => word.length > 3)
-
-  // If we can't extract meaningful topics, use generic educational topics
   const subjectTopics = topics.length > 1 ? topics : ["science", "math", "history", "literature", "geography"]
-
-  const questions = [
+  if (marks === 1) return [
+    `What is ${subjectTopics[0]}?`,
+    `Define ${subjectTopics[0]}.`,
+    `List one fact about ${subjectTopics[0]}.`,
+    `Name a key term in ${subjectTopics[0]}.`,
+    `State a property of ${subjectTopics[0]}.`,
+  ]
+  if (marks === 2) return [
+    `Explain the concept of ${subjectTopics[0]}.`,
+    `Give two examples of ${subjectTopics[0]}.`,
+    `What are two uses of ${subjectTopics[0]}?`,
+    `Describe a feature of ${subjectTopics[0]}.`,
+    `List two facts about ${subjectTopics[0]}.`,
+  ]
+  if (marks === 3) return [
+    `Describe the process of ${subjectTopics[0]}.`,
+    `Summarize the main idea of ${subjectTopics[0]}.`,
+    `What is the importance of ${subjectTopics[0]}?`,
+    `How does ${subjectTopics[0]} relate to ${subjectTopics[1] || "other topics"}?`,
+    `List three characteristics of ${subjectTopics[0]}.`,
+  ]
+  if (marks === 4) return [
+    `Compare and contrast ${subjectTopics[0]} and ${subjectTopics[1] || "another topic"}.`,
+    `Discuss the advantages and disadvantages of ${subjectTopics[0]}.`,
+    `Explain why ${subjectTopics[0]} is important.`,
+    `Analyze the impact of ${subjectTopics[0]} on ${subjectTopics[1] || "society"}.`,
+    `Describe four features of ${subjectTopics[0]}.`,
+  ]
+  if (marks === 5) return [
+    `Critically evaluate ${subjectTopics[0]}.`,
+    `Discuss in detail the significance of ${subjectTopics[0]}.`,
+    `How would you solve a complex problem in ${subjectTopics[0]}?`,
+    `Debate the pros and cons of ${subjectTopics[0]}.`,
+    `Explain with examples the applications of ${subjectTopics[0]}.`,
+  ]
+  // fallback
+  return [
     `What are the key concepts of ${subjectTopics[0] || "this topic"}?`,
     `How does ${subjectTopics[0] || "this subject"} relate to ${subjectTopics[1] || "other fields"}?`,
     `Why is ${subjectTopics[0] || "this topic"} important in modern education?`,
@@ -260,8 +295,6 @@ function generateMockQuestions(fileName: string): string[] {
     `How would you summarize the core ideas presented in this material?`,
     `What further research questions emerge from studying ${subjectTopics[0] || "this topic"}?`,
   ]
-
-  return questions
 }
 
 // Helper function to generate mock answers

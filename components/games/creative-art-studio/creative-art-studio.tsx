@@ -1,9 +1,10 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useRef, useState, useEffect } from "react"
 import ArtSidebar from "./components/art-sidebar"
 import ArtCanvas from "./components/art-canvas"
 import type { Element } from "./components/art-canvas"
+import { toast } from "@/hooks/use-toast"
 
 type SidebarPosition = "left" | "right" | "top" | "bottom"
 
@@ -13,8 +14,6 @@ const CreativeArtStudio = () => {
   const [brushSize, setBrushSize] = useState(5)
   const [tool, setTool] = useState("pencil")
   const [zoom, setZoom] = useState(1)
-  const [history, setHistory] = useState<ImageData[]>([])
-  const [historyIndex, setHistoryIndex] = useState(-1)
   const [customColors, setCustomColors] = useState<string[]>([])
   const [showStickers, setShowStickers] = useState(false)
   const [theme, setTheme] = useState<"light" | "dark">("light")
@@ -26,6 +25,15 @@ const CreativeArtStudio = () => {
   const [rotationAxis, setRotationAxis] = useState<"x" | "y" | "z">("z")
   const [activeTab, setActiveTab] = useState("accessories")
   const [isMobile, setIsMobile] = useState(false)
+  const [isAnalysing, setIsAnalysing] = useState(false)
+  const [analysis, setAnalysis] = useState<string | null>(null)
+  const [suggestion, setSuggestion] = useState<string | null>(null)
+  // Undo/redo history for elements and baseImageData
+  const [history, setHistory] = useState<any[]>([])
+  const [historyIndex, setHistoryIndex] = useState(-1)
+  const [elements, setElements] = useState<Element[]>([])
+  const [baseImageData, setBaseImageData] = useState<any>(null)
+  const canvasRef = useRef<any>(null)
 
   // Check if device is mobile
   useEffect(() => {
@@ -37,23 +45,29 @@ const CreativeArtStudio = () => {
     return () => window.removeEventListener("resize", checkMobile)
   }, [])
 
-  // Save current canvas state to history
-  const saveToHistory = (imageData: ImageData) => {
-    // If we're not at the end of the history, remove future states
-    if (historyIndex < history.length - 1) {
-      setHistory(history.slice(0, historyIndex + 1))
-    }
-
-    // Add current state to history
-    setHistory((prev) => [...prev, imageData])
-    setHistoryIndex((prev) => prev + 1)
+  // Save current state to history
+  const saveToHistory = (els: Element[], baseImg: any) => {
+    const newHistory = history.slice(0, historyIndex + 1)
+    newHistory.push({ elements: JSON.parse(JSON.stringify(els)), baseImageData: baseImg })
+    setHistory(newHistory)
+    setHistoryIndex(newHistory.length - 1)
   }
 
   // Undo function
   const handleUndo = () => {
     if (historyIndex <= 0) return
+    const prev = history[historyIndex - 1]
+    setElements(prev.elements)
+    setBaseImageData(prev.baseImageData)
     setHistoryIndex(historyIndex - 1)
   }
+
+  // When elements or baseImageData change, save to history
+  useEffect(() => {
+    if (elements.length === 0 && !baseImageData) return
+    saveToHistory(elements, baseImageData)
+    // eslint-disable-next-line
+  }, [elements, baseImageData])
 
   // Toggle selection mode
   const toggleSelectionMode = () => {
@@ -85,6 +99,49 @@ const CreativeArtStudio = () => {
       fs?.requestFullscreen().catch((err) => {
         console.log("Request fullscreen error:", err)
       })
+    }
+  }
+
+  // Analyse handler
+  const handleAnalyse = async () => {
+    setIsAnalysing(true)
+    setAnalysis(null)
+    setSuggestion(null)
+    try {
+      // Get canvas image as data URL
+      const canvas = canvasRef.current?.getCanvas?.() || document.querySelector("canvas")
+      if (!canvas) throw new Error("Canvas not found")
+      const image = canvas.toDataURL("image/png")
+      const res = await fetch("/api/groq-analyze-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image }),
+      })
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
+      setAnalysis(data.analysis)
+      setSuggestion(data.suggestion)
+      toast({
+        title: "Art Analysis",
+        description: (
+          <div>
+            <div><b>Analysis:</b> {data.analysis}</div>
+            <div className="mt-1"><b>Suggestion:</b> {data.suggestion}</div>
+          </div>
+        ),
+        duration: 10000,
+        variant: "default",
+      })
+    } catch (e: any) {
+      setAnalysis("Analysis failed: " + e.message)
+      toast({
+        title: "Art Analysis Failed",
+        description: e.message,
+        duration: 8000,
+        variant: "destructive",
+      })
+    } finally {
+      setIsAnalysing(false)
     }
   }
 
@@ -157,10 +214,15 @@ const CreativeArtStudio = () => {
         onChangeSidebarPosition={setSidebarPosition}
         onTabChange={setActiveTab}
         onFullScreen={handleFullScreen}
+        onAnalyse={handleAnalyse}
+        isAnalysing={isAnalysing}
+        analysis={analysis}
+        suggestion={suggestion}
       />
 
       {/* Canvas */}
       <ArtCanvas
+        ref={canvasRef}
         color={color}
         brushSize={brushSize}
         tool={tool}
@@ -168,6 +230,10 @@ const CreativeArtStudio = () => {
         theme={theme}
         isSelectionMode={isSelectionMode}
         rotationAxis={rotationAxis}
+        elements={elements}
+        setElements={setElements}
+        baseImageData={baseImageData}
+        setBaseImageData={setBaseImageData}
         onSaveToHistory={saveToHistory}
       />
     </div>

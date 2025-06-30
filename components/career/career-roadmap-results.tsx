@@ -26,12 +26,25 @@ interface CareerRoadmapResultsProps {
 
 export function CareerRoadmapResults({ results, onReset }: CareerRoadmapResultsProps) {
   const [activeTab, setActiveTab] = useState("overview")
+  const [selectedCompany, setSelectedCompany] = useState<any | null>(null)
 
-  // Filter sectors based on user's preference
-  const filteredSectors = results.topSectors.filter((sector: any) => {
-    if (results.sector === "both") return true
-    return sector.category.toLowerCase() === results.sector.toLowerCase()
-  })
+  // Defensive: fallback to all if filter is empty or data missing
+  // Use original data if filter results in empty array
+  const filteredSectors = Array.isArray(results.topSectors) && results.topSectors.length > 0
+    ? (results.sector === "both"
+        ? results.topSectors
+        : (results.topSectors.filter((sector: any) => sector && sector.category && sector.category.toLowerCase() === results.sector?.toLowerCase())
+            || results.topSectors)
+      )
+    : [];
+
+  const filteredCompanies = Array.isArray(results.topCompanies) && results.topCompanies.length > 0
+    ? (results.sector === "both"
+        ? results.topCompanies
+        : (results.topCompanies.filter((company: any) => company && company.sector && company.sector.toLowerCase() === results.sector?.toLowerCase())
+            || results.topCompanies)
+      )
+    : [];
 
   // Colors for charts
   const COLORS = ["#4f46e5", "#0ea5e9", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899"]
@@ -77,27 +90,30 @@ export function CareerRoadmapResults({ results, onReset }: CareerRoadmapResultsP
                     Top Hiring Sectors
                   </h3>
                   <div className="h-[250px] bg-white dark:bg-gray-800 p-4 rounded-lg">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={filteredSectors}
-                          cx="50%"
-                          cy="50%"
-                          labelLine={false}
-                          outerRadius={80}
-                          fill="#8884d8"
-                          dataKey="percentage"
-                          nameKey="name"
-                          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                        >
-                          {filteredSectors.map((entry: any, index: number) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                          ))}
-                        </Pie>
-                        <Tooltip formatter={(value) => `${value}%`} />
-                        <Legend />
-                      </PieChart>
-                    </ResponsiveContainer>
+                    {filteredSectors.length > 0 ? (
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={filteredSectors}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            outerRadius={80}
+                            fill="#8884d8"
+                            dataKey="percentage"
+                            label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                          >
+                            {filteredSectors.map((entry: any, index: number) => (
+                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            ))}
+                          </Pie>
+                          <Tooltip formatter={(value) => `${value}%`} />
+                          <Legend />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="text-center text-muted-foreground py-12">No sector data available.</div>
+                    )}
                   </div>
                 </div>
 
@@ -134,20 +150,95 @@ export function CareerRoadmapResults({ results, onReset }: CareerRoadmapResultsP
                 Top Companies Hiring
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {results.topCompanies
-                  .filter((company: any) => {
-                    if (results.sector === "both") return true
-                    return company.sector.toLowerCase() === results.sector.toLowerCase()
-                  })
-                  .map((company: any, index: number) => (
-                    <div key={index} className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-600 dark:text-indigo-300 font-semibold">
-                        {typeof company === "string" ? company.charAt(0) : company.name.charAt(0)}
+                {filteredCompanies.length > 0 ? (
+                  filteredCompanies.slice(0, Math.max(6, Math.min(filteredCompanies.length, 10))).map((company: any, index: number) => (
+                    <div
+                      key={index}
+                      className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg flex flex-col gap-2 cursor-pointer hover:ring-2 hover:ring-indigo-400 transition"
+                      onClick={() => setSelectedCompany(company)}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-600 dark:text-indigo-300 font-semibold">
+                          {typeof company === "string" ? company.charAt(0) : company.name?.charAt(0) || "?"}
+                        </div>
+                        <div className="font-medium text-lg">{typeof company === "string" ? company : company.name || "Unknown"}</div>
                       </div>
-                      <div className="font-medium">{typeof company === "string" ? company : company.name}</div>
                     </div>
-                  ))}
+                  ))
+                ) : (
+                  <div className="col-span-full text-center text-muted-foreground py-12">No company data available.</div>
+                )}
               </div>
+
+              {/* Company Details Modal */}
+              {selectedCompany && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+                  <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl max-w-lg w-full p-8 relative animate-fade-in">
+                    <button
+                      className="absolute top-3 right-3 text-gray-400 hover:text-gray-700 dark:hover:text-white text-2xl font-bold"
+                      onClick={() => setSelectedCompany(null)}
+                      aria-label="Close"
+                    >
+                      ×
+                    </button>
+                    <h2 className="text-2xl font-bold mb-2 text-indigo-700 dark:text-indigo-300 flex items-center gap-2">
+                      <Building className="h-6 w-6" />
+                      {selectedCompany.name || (typeof selectedCompany === "string" ? selectedCompany : "Unknown")}
+                    </h2>
+                    <div className="mb-4 text-gray-700 dark:text-gray-200 text-base">
+                      {/* Show up to 5 lines of details, fallback to user-friendly message if missing */}
+                      {selectedCompany.details && typeof selectedCompany.details === "string" ? (
+                        <>
+                          {selectedCompany.details.split("\n").slice(0, 5).map((line: string, i: number) => (
+                            <div key={i}>{line}</div>
+                          ))}
+                        </>
+                      ) : selectedCompany.description ? (
+                        <div>{selectedCompany.description}</div>
+                      ) : (
+                        <div className="text-muted-foreground italic">No details available for this company yet.</div>
+                        // <pre className="whitespace-pre-wrap bg-gray-100 dark:bg-gray-800 p-2 rounded mt-2 text-xs text-red-500">{JSON.stringify(selectedCompany, null, 2)}</pre>
+                      )}
+                    </div>
+                    <div className="mb-4">
+                      <h4 className="font-semibold mb-1">Top 10 Facilities:</h4>
+                      <ul className="list-disc pl-6 text-sm text-gray-600 dark:text-gray-300">
+                        {Array.isArray(selectedCompany.facilities) && selectedCompany.facilities.length > 0 ? (
+                          selectedCompany.facilities.slice(0, 10).map((facility: string, i: number) => (
+                            <li key={i}>{facility}</li>
+                          ))
+                        ) : selectedCompany.facility ? (
+                          <li>{selectedCompany.facility}</li>
+                        ) : (
+                          <li className="text-muted-foreground italic">No facility data available for this company.</li>
+                          // <li className="text-xs text-red-500"><pre className="whitespace-pre-wrap bg-gray-100 dark:bg-gray-800 p-2 rounded mt-2">{JSON.stringify(selectedCompany, null, 2)}</pre></li>
+                        )}
+                      </ul>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm mt-4">
+                      <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
+                        <div className="text-xs text-muted-foreground mb-1">Entry Level</div>
+                        <div className="font-bold text-lg">₹{selectedCompany.entrySalary?.toLocaleString() || selectedCompany.entry_level_salary?.toLocaleString?.() || selectedCompany.salaryEntry?.toLocaleString?.() || <span className='text-muted-foreground'>Not available</span>}</div>
+                      </div>
+                      <div className="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-lg">
+                        <div className="text-xs text-muted-foreground mb-1">Experienced</div>
+                        <div className="font-bold text-lg">₹{selectedCompany.experiencedSalary?.toLocaleString() || selectedCompany.experienced_salary?.toLocaleString?.() || selectedCompany.salaryExperienced?.toLocaleString?.() || <span className='text-muted-foreground'>Not available</span>}</div>
+                      </div>
+                      <div className="bg-indigo-50 dark:bg-indigo-900/20 p-3 rounded-lg">
+                        <div className="text-xs text-muted-foreground mb-1">Average</div>
+                        <div className="font-bold text-lg">₹{selectedCompany.averageSalary?.toLocaleString() || selectedCompany.average_salary?.toLocaleString?.() || selectedCompany.salaryAverage?.toLocaleString?.() || <span className='text-muted-foreground'>Not available</span>}</div>
+                      </div>
+                    </div>
+                    {/* User-friendly fallback for missing salary data */}
+                    {!(selectedCompany.entrySalary || selectedCompany.entry_level_salary || selectedCompany.salaryEntry) &&
+                      !(selectedCompany.experiencedSalary || selectedCompany.experienced_salary || selectedCompany.salaryExperienced) &&
+                      !(selectedCompany.averageSalary || selectedCompany.average_salary || selectedCompany.salaryAverage) && (
+                        <div className="mt-4 text-muted-foreground italic">No salary data available for this company.</div>
+                        // <div className="mt-4 text-xs text-red-500"><pre className="whitespace-pre-wrap bg-gray-100 dark:bg-gray-800 p-2 rounded mt-2">{JSON.stringify(selectedCompany, null, 2)}</pre></div>
+                    )}
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -189,7 +280,7 @@ export function CareerRoadmapResults({ results, onReset }: CareerRoadmapResultsP
                     <XAxis type="number" domain={[0, 100]} />
                     <YAxis dataKey="name" type="category" width={100} />
                     <Tooltip formatter={(value) => `${value}%`} />
-                    <Bar dataKey="value" nameKey="name" radius={[0, 4, 4, 0]}>
+                    <Bar dataKey="value" radius={[0, 4, 4, 0]}>
                       {results.requiredSkills.map((skill: any, index: number) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
@@ -239,7 +330,7 @@ export function CareerRoadmapResults({ results, onReset }: CareerRoadmapResultsP
                     <XAxis type="number" domain={[0, 100]} />
                     <YAxis dataKey="name" type="category" width={100} />
                     <Tooltip formatter={(value) => `${value}%`} />
-                    <Bar dataKey="value" nameKey="name" radius={[0, 4, 4, 0]}>
+                    <Bar dataKey="value" radius={[0, 4, 4, 0]}>
                       {results.hiringLocations.map((location: any, index: number) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
@@ -353,6 +444,14 @@ export function CareerRoadmapResults({ results, onReset }: CareerRoadmapResultsP
         </TabsContent>
 
         <TabsContent value="role-roadmap" className="space-y-6">
+          {results.youtubeApiError && (
+            <div className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg p-4 mb-4 text-center">
+              <strong>YouTube videos could not be loaded:</strong> {results.youtubeApiError}
+              <br />
+              <span className="text-xs">You may have reached the API quota or there is a configuration issue. Video links may be missing or incomplete.</span>
+            </div>
+          )}
+
           <Card>
             <CardContent className="pt-6">
               <h3 className="text-xl font-semibold mb-6">Learning Roadmap for {results.jobRole}</h3>
