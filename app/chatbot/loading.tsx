@@ -21,7 +21,9 @@ export default function ChatbotLoading() {
   }, []);
 
   return (
-    <div className="venom-loading-container">
+    <div className="venom-loading-container overflow-x-hidden" style={{overflowX: 'hidden', width: '100vw'}}>
+      {/* Custom cursor for loading screen */}
+      <style>{`body { overflow-x: hidden !important; }`}</style>
       {/* Custom cursor for loading screen */}
       <div
         style={{
@@ -136,8 +138,8 @@ export default function ChatbotLoading() {
 
       {/* Main Loading Content */}
       <div className="loading-content">
-        {/* Dark Symbiotic Spinner */}
-        <div className="dark-symbiotic-spinner">
+        {/* Dark Symbiotic Spinner - responsive size */}
+        <div className="dark-symbiotic-spinner" style={{width: 'clamp(180px, 40vw, 340px)', height: 'clamp(180px, 40vw, 340px)', maxWidth: '90vw', maxHeight: '90vw', margin: '0 auto'}}>
           <div className="dark-spinner-core">
             <div className="dark-core-center"></div>
             <div className="dark-symbiote-arm dark-arm-1"></div>
@@ -149,12 +151,12 @@ export default function ChatbotLoading() {
             <div className="dark-symbiote-arm dark-arm-7"></div>
             <div className="dark-symbiote-arm dark-arm-8"></div>
           </div>
-          <div className="dark-spinner-ring dark-outer-ring"></div>
-          <div className="dark-spinner-ring dark-middle-ring"></div>
-          <div className="dark-spinner-ring dark-inner-ring"></div>
+          <div className="dark-spinner-ring dark-outer-ring" style={{width: '100%', height: '100%'}}></div>
+          <div className="dark-spinner-ring dark-middle-ring" style={{width: '80%', height: '80%'}}></div>
+          <div className="dark-spinner-ring dark-inner-ring" style={{width: '60%', height: '60%'}}></div>
           
           {/* Symbiotic Orb */}
-          <div className="symbiotic-orb">
+          <div className="symbiotic-orb" style={{width: '40%', height: '40%'}}>
             <div className="orb-core"></div>
             <div className="orb-pulse pulse-1"></div>
             <div className="orb-pulse pulse-2"></div>

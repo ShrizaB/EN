@@ -1,0 +1,162 @@
+.green-goblin-word-scramble {
+    /* Green Goblin Marvel Theme - Darker Palette */
+    --green-goblin-black: #050805; /* Deepest green-black */
+    --green-goblin-lair: #121512; /* Darker lair background */
+    --green-goblin-green: #1e7b22; /* Sinister dark green */
+    --green-goblin-purple: #4b237b; /* Deep mischievous purple */
+    --green-goblin-red: #6b1212; /* Dark menacing red */
+    --green-goblin-white: #c0d8c0; /* Muted eerie greenish-white */
+    --green-goblin-gray: #4b5563; /* Darker ominous gray */
+    --green-goblin-border: #151b15; /* Darkest border */
+    --green-goblin-shadow: 0 4px 16px rgba(30, 123, 34, 0.3), 0 2px 8px rgba(75, 35, 123, 0.2);
+  }
+  
+  .green-goblin-word-scramble {
+    background: var(--green-goblin-black) !important;
+    color: var(--green-goblin-white);
+    min-height: 100vh;
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  /* Background animation with subtle smoke effect */
+  .goblin-background {
+    background: linear-gradient(135deg, rgba(5,8,5,0.6) 0%, rgba(18,21,18,0.4) 100%);
+    animation: goblin-glow 12s ease-in-out infinite;
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+  
+  @keyframes goblin-glow {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.4; }
+  }
+  
+  /* Button styling with no background and cool border */
+  .goblin-button {
+    background: none;
+    border: 2px solid;
+    border-image: linear-gradient(45deg, var(--green-goblin-green), var(--green-goblin-purple)) 1;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 10;
+  }
+  
+  .goblin-button:hover {
+    box-shadow: 0 0 12px rgba(30, 123, 34, 0.5);
+    transform: translateY(-2px);
+    background-color: transparent;
+  }
+  
+  .goblin-button:disabled {
+    border-image: none;
+    border-color: var(--green-goblin-gray);
+    color: var(--green-goblin-gray);
+    cursor: not-allowed;
+  }
+  
+  /* Shake animation for incorrect letters */
+  @keyframes goblin-shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+    20%, 40%, 60%, 80% { transform: translateX(4px); }
+  }
+  
+  /* Bounce animation for correct letters */
+  @keyframes goblin-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+  
+  /* Fade-in animation for hints and text */
+  @keyframes goblin-fade-in {
+    0% { opacity: 0; transform: translateY(8px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  
+  /* Pulse animation for text only */
+  @keyframes goblin-pulse {
+    0%, 100% { transform: scale(1); text-shadow: 0 0 8px rgba(30, 123, 34, 0.3); }
+    50% { transform: scale(1.03); text-shadow: 0 0 12px rgba(30, 123, 34, 0.5); }
+  }
+  
+  /* Letter tile hover effect */
+  .goblin-letter {
+    position: relative;
+    transition: all 0.3s ease;
+    z-index: 10;
+  }
+  
+  .goblin-letter:hover:not(:disabled)::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 8px;
+    background: radial-gradient(circle, rgba(30, 123, 34, 0.2) 0%, transparent 70%);
+    z-index: -1;
+    animation: goblin-letter-glow 1.5s ease-in-out infinite;
+  }
+  
+  @keyframes goblin-letter-glow {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.8; }
+  }
+  
+  /* Confetti animation */
+  .confetti {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: var(--green-goblin-green);
+    opacity: 0.9;
+    animation: confetti-fall 3s ease-out forwards;
+  }
+  
+  @keyframes confetti-fall {
+    0% { transform: translateY(-100%) rotate(0deg); opacity: 0.9; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+  
+  .green-goblin-word-scramble button, .green-goblin-word-scramble .Button {
+    background: none;
+    color: var(--green-goblin-white);
+    border-radius: 8px;
+    padding: 0.6em 1.4em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .green-goblin-word-scramble .gradient-text {
+    background: linear-gradient(to right, var(--green-goblin-green), var(--green-goblin-purple));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  
+  .green-goblin-word-scramble hr {
+    border: none;
+    border-top: 1px solid var(--green-goblin-border);
+    margin: 1.5em 0;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 600px) {
+    .green-goblin-word-scramble {
+      padding: 1rem;
+    }
+    .green-goblin-word-scramble .w-12 {
+      width: 2.5rem;
+      height: 2.5rem;
+      font-size: 1.2rem;
+    }
+    .green-goblin-word-scramble .text-4xl {
+      font-size: 2rem;
+    }
+    .green-goblin-word-scramble .max-w-md {
+      max-width: 90%;
+    }
+  }

@@ -3,34 +3,47 @@ import './memory-match.css'
 
 import { useState, useEffect, useRef } from "react"
 import {
-  Rocket,
+  HelpCircle,
+  Brain,
   Zap,
-  Heart,
-  Star,
-  Sun,
-  Moon,
-  Cloud,
-  CloudLightningIcon as Lightning,
-  Umbrella,
-  Wind,
-  Rainbow,
-  Snowflake,
-  Flame,
-  Leaf,
-  Flower,
-  TreesIcon as Tree,
-  Bird,
-  Fish,
-  Bug,
-  FlowerIcon as Butterfly,
-  Diamond,
+  Puzzle,
   Crown,
-  Gift,
-  Music,
-  Camera,
+  Diamond,
+  Star,
+  Sparkles,
+  Eye,
+  Target,
+  Crosshair,
+  Shield,
+  Swords,
+  Key,
+  Lock,
+  Gem,
+  Trophy,
+  Flame,
+  Skull,
+  Calculator,
+  Code,
+  Cog,
+  Lightbulb,
   Fullscreen,
-  Spade,
-  Club,
+  MapPin,
+  Search,
+  Compass,
+  Lightbulb as LightbulbIcon,
+  Fingerprint,
+  Microscope,
+  BookOpen,
+  Globe,
+  Smartphone,
+  Watch,
+  Gamepad2,
+  Headphones,
+  Camera,
+  Music,
+  Gift,
+  Bell,
+  Archive,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -49,69 +62,97 @@ type CardType = {
 }
 
 const icons = [
-  { Icon: Rocket, name: "rocket" },
-  { Icon: Zap, name: "zap" },
-  { Icon: Heart, name: "heart" },
-  { Icon: Star, name: "star" },
-  { Icon: Sun, name: "sun" },
-  { Icon: Moon, name: "moon" },
-  { Icon: Cloud, name: "cloud" },
-  { Icon: Lightning, name: "lightning" },
-  { Icon: Umbrella, name: "umbrella" },
-  { Icon: Wind, name: "wind" },
-  { Icon: Rainbow, name: "rainbow" },
-  { Icon: Snowflake, name: "snowflake" },
-  { Icon: Flame, name: "flame" },
-  { Icon: Leaf, name: "leaf" },
-  { Icon: Flower, name: "flower" },
-  { Icon: Tree, name: "tree" },
-  { Icon: Bird, name: "bird" },
-  { Icon: Fish, name: "fish" },
-  { Icon: Bug, name: "bug" },
-  { Icon: Butterfly, name: "butterfly" },
+  { Icon: HelpCircle, name: "question" },
+  { Icon: Brain, name: "brain" },
+  { Icon: Puzzle, name: "puzzle" },
+  { Icon: Key, name: "key" },
+  { Icon: Lock, name: "lock" },
+  { Icon: Eye, name: "eye" },
+  { Icon: Target, name: "target" },
+  { Icon: Lightbulb, name: "lightbulb" },
+  { Icon: Search, name: "search" },
+  { Icon: Compass, name: "compass" },
+  { Icon: Fingerprint, name: "fingerprint" },
+  { Icon: Microscope, name: "microscope" },
+  { Icon: BookOpen, name: "book" },
+  { Icon: Code, name: "code" },
+  { Icon: Cog, name: "cog" },
+  { Icon: Calculator, name: "calculator" },
+  { Icon: Globe, name: "globe" },
+  { Icon: Crosshair, name: "crosshair" },
+  { Icon: Shield, name: "shield" },
   { Icon: Diamond, name: "diamond" },
+  { Icon: Gem, name: "gem" },
   { Icon: Crown, name: "crown" },
-  { Icon: Gift, name: "gift" },
-  { Icon: Music, name: "music" },
+  { Icon: Trophy, name: "trophy" },
+  { Icon: Star, name: "star" },
+  { Icon: Zap, name: "zap" },
+  { Icon: Flame, name: "flame" },
+  { Icon: Skull, name: "skull" },
+  { Icon: Sparkles, name: "sparkles" },
+  { Icon: MapPin, name: "pin" },
+  { Icon: Swords, name: "swords" },
+  { Icon: Smartphone, name: "phone" },
+  { Icon: Watch, name: "watch" },
+  { Icon: Gamepad2, name: "gamepad" },
+  { Icon: Headphones, name: "headphones" },
   { Icon: Camera, name: "camera" },
+  { Icon: Music, name: "music" },
+  { Icon: Gift, name: "gift" },
+  { Icon: Bell, name: "bell" },
+  { Icon: Archive, name: "archive" },
 ]
 
 const getIconColor = (name: string) => {
   const map: Record<string, string> = {
-    rocket: "text-sky-500",
-    zap: "text-yellow-400",
-    heart: "text-red-500",
-    star: "text-yellow-300",
-    sun: "text-yellow-500",
-    moon: "text-indigo-300",
-    cloud: "text-gray-400",
-    lightning: "text-yellow-300",
-    umbrella: "text-blue-400",
-    wind: "text-cyan-300",
-    rainbow: "text-pink-400",
-    snowflake: "text-blue-300",
-    flame: "text-orange-500",
-    leaf: "text-green-500",
-    flower: "text-pink-500",
-    tree: "text-green-700",
-    bird: "text-sky-400",
-    fish: "text-blue-500",
-    bug: "text-green-600",
-    butterfly: "text-purple-400",
+    question: "text-green-400",
+    brain: "text-purple-400",
+    puzzle: "text-green-300",
+    key: "text-yellow-400",
+    lock: "text-purple-500",
+    eye: "text-green-500",
+    target: "text-red-400",
+    lightbulb: "text-yellow-300",
+    search: "text-green-400",
+    compass: "text-purple-400",
+    fingerprint: "text-green-300",
+    microscope: "text-purple-300",
+    book: "text-green-500",
+    code: "text-purple-400",
+    cog: "text-gray-400",
+    calculator: "text-green-400",
+    globe: "text-blue-400",
+    crosshair: "text-red-500",
+    shield: "text-green-500",
     diamond: "text-cyan-400",
-    crown: "text-yellow-500",
-    gift: "text-red-400",
-    music: "text-purple-500",
+    gem: "text-purple-400",
+    crown: "text-yellow-400",
+    trophy: "text-yellow-300",
+    star: "text-yellow-400",
+    zap: "text-yellow-500",
+    flame: "text-orange-400",
+    skull: "text-purple-500",
+    sparkles: "text-green-300",
+    pin: "text-red-400",
+    swords: "text-gray-400",
+    phone: "text-green-400",
+    watch: "text-purple-400",
+    gamepad: "text-green-500",
+    headphones: "text-purple-300",
     camera: "text-gray-300",
+    music: "text-purple-500",
+    gift: "text-red-400",
+    bell: "text-yellow-400",
+    archive: "text-green-400",
   }
 
-  return map[name] || "text-white"
+  return map[name] || "text-green-400"
 }
 
 const difficultySettings = {
   easy: { grid: 4, pairs: 8 },
-  medium: { grid: 5, pairs: 12 },
-  hard: { grid: 8, pairs: 24 },
+  medium: { grid: 4, pairs: 8 },
+  hard: { grid: 5, pairs: 10 },
 }
 
 const MemoryMatch = () => {
@@ -274,13 +315,14 @@ const MemoryMatch = () => {
       <div className="orb orb3"></div>
       <div className="orb orb4"></div>
 
-      {/* Background elements */}
+      {/* Riddler Background elements */}
       <div className="memory-match-background">
         <div className="memory-match-overlay"></div>
-        {[...Array(12)].map((_, i) => (
+        {/* Clean animated blobs without emojis */}
+        {[...Array(8)].map((_, i) => (
           <div
-            key={i}
-            className="memory-match-blob"
+            key={`blob-${i}`}
+            className="memory-match-blob riddler-blob"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
@@ -304,7 +346,10 @@ const MemoryMatch = () => {
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="text-center mb-6"
         >
-          <h1 className="memory-match-title">Memory Match</h1>
+          <h1 className="riddler-title">
+            <span className="riddler-title-main">RIDDLER'S</span>
+            <span className="riddler-title-sub">CHALLENGE</span>
+          </h1>
 
           <AnimatePresence>
             {showDifficultySelect && (
@@ -315,7 +360,7 @@ const MemoryMatch = () => {
                 transition={{ duration: 0.4 }}
                 className="flex flex-col items-center justify-center gap-6 p-6 mb-8 rounded-2xl bg-gradient-to-tl from-[#180b23] via-[#a0ffa009] to-[#050510] shadow-xl shadow-[#14271158] border-2 border-[#16691333]"
               >
-                <h2 className="text-2xl font-semibold text-white drop-shadow-glow">Choose Difficulty</h2>
+                <h2 className="text-2xl font-semibold text-green-400 drop-shadow-glow">Choose Your Challenge Level</h2>
 
                 <div className="flex flex-col sm:flex-row gap-4">
                   {(["easy", "medium", "hard"] as Difficulty[]).map((diff, index) => (
@@ -330,7 +375,7 @@ const MemoryMatch = () => {
                         variant="default"
                         className="difficulty-button px-6 py-3 text-lg rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-glow"
                       >
-                        {diff.charAt(0).toUpperCase() + diff.slice(1)}
+                        {diff === "easy" ? "EASY" : diff === "medium" ? "MEDIUM" : "HARD"}
                       </Button>
                     </motion.div>
                   ))}
@@ -393,9 +438,12 @@ const MemoryMatch = () => {
               ))}
             </div>
             <div className="complete-message">
-              <h2 className="text-2xl font-bold text-white mb-3">Game Complete!</h2>
-              <p className="text-lg text-green-300">
-                You completed {difficulty} mode in {formatTime(gameTime)} with {moves} moves!
+              <h2 className="text-2xl font-bold text-green-400 mb-3">🎭 Riddle Solved! 🎭</h2>
+              <p className="text-lg text-purple-300">
+                You cracked the {difficulty} challenge in {formatTime(gameTime)} with {moves} moves!
+              </p>
+              <p className="text-sm text-green-300 mt-2 italic">
+                "Congratulations, you've proven yourself worthy of the Riddler's respect!"
               </p>
             </div>
             <Button onClick={resetGame} className="play-again-button">
@@ -440,7 +488,7 @@ const MemoryMatch = () => {
                 <div className="memory-match-card-inner">
                   <div className="memory-match-card-front">
                     <div className="memory-match-card-content">
-                      <div className="text-xl font-bold text-[#5fd291]">?</div>
+                      <div className="riddler-question-mark">?</div>
                     </div>
                   </div>
                   <div className="memory-match-card-back">

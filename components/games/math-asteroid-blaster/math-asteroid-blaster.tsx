@@ -50,7 +50,7 @@ interface PowerUp {
   id: string
   x: number
   y: number
-  type: "multishot" | "shield" | "slowmo"
+  type: "multishot" | "slowmo"
   duration: number
 }
 
@@ -63,7 +63,6 @@ interface GameState {
   currentProblem: MathProblem
   combo: number
   maxCombo: number
-  shield: number
   multishot: number
   slowmo: number
 }
@@ -151,7 +150,6 @@ const MathAsteroidBlaster = () => {
     currentProblem: generateMathProblem(1),
     combo: 0,
     maxCombo: 0,
-    shield: 0,
     multishot: 0,
     slowmo: 0,
   })
@@ -232,9 +230,14 @@ const MathAsteroidBlaster = () => {
 
   const playSound = (soundName: string, volume = 0.2) => {
     try {
-      if (typeof window !== "undefined" && isClient) {
+      // Only play laser sound to reduce lag - all other sounds are disabled for performance
+      if (typeof window !== "undefined" && isClient && soundName === 'laser') {
         const audio = new Audio(`/sounds/${soundName}.mp3`)
-        audio.volume = volume
+        audio.volume = Math.min(volume * 0.5, 0.1) // Reduced volume further
+
+        // Set audio properties for better performance
+        audio.preload = 'none'
+        audio.currentTime = 0
 
         const playPromise = audio.play()
 
@@ -249,25 +252,25 @@ const MathAsteroidBlaster = () => {
     }
   }
 
-  const createExplosion = useCallback((x: number, y: number, color: string, count = 5) => {
+  const createExplosion = useCallback((x: number, y: number, color: string, count = 3) => {
     if (!isMounted.current) return
 
     const newParticles: Particle[] = []
     const timestamp = Date.now()
     const randomId = Math.random().toString(36).substring(2, 9)
 
-    // Reduced particle count for better performance
+    // Further reduced particle count for better performance (3 instead of 5)
     for (let i = 0; i < count; i++) {
       newParticles.push({
         id: `particle-${timestamp}-${randomId}-${i}`,
         x,
         y,
-        size: Math.random() * 1.5 + 0.5, // Smaller particles
+        size: Math.random() * 1 + 0.5, // Even smaller particles
         color,
-        speed: Math.random() * 1.2 + 0.3, // Reduced speed
+        speed: Math.random() * 1 + 0.3, // Slightly reduced speed
         angle: Math.random() * Math.PI * 2,
         opacity: 1,
-        life: Math.random() * 10 + 5, // Shorter life
+        life: Math.random() * 8 + 3, // Even shorter life for better performance
       })
     }
 
@@ -488,7 +491,6 @@ const MathAsteroidBlaster = () => {
       // Update powerup timers
       setGameState((prev) => ({
         ...prev,
-        shield: Math.max(0, prev.shield - 1),
         multishot: Math.max(0, prev.multishot - 1),
         slowmo: Math.max(0, prev.slowmo - 1),
       }))
@@ -500,12 +502,12 @@ const MathAsteroidBlaster = () => {
 
       bulletsRef.current = updatedBullets
 
-      // Move particles - reduced count for better performance
+      // Move particles - further reduced count for better performance
       let updatedParticles = particlesRef.current
 
-      // If we have too many particles, remove the oldest ones (reduced from 30 to 15)
-      if (updatedParticles.length > 15) {
-        updatedParticles = updatedParticles.slice(-15)
+      // If we have too many particles, remove the oldest ones (reduced from 15 to 8)
+      if (updatedParticles.length > 8) {
+        updatedParticles = updatedParticles.slice(-8)
       }
 
       updatedParticles = updatedParticles
@@ -514,8 +516,8 @@ const MathAsteroidBlaster = () => {
           ...particle,
           x: particle.x + Math.cos(particle.angle) * particle.speed,
           y: particle.y + Math.sin(particle.angle) * particle.speed,
-          opacity: particle.opacity - 0.05, // Faster fade for better performance
-          life: particle.life - 1.5, // Shorter life for better performance
+          opacity: particle.opacity - 0.08, // Faster fade for better performance
+          life: particle.life - 2, // Shorter life for better performance
         }))
 
       particlesRef.current = updatedParticles
@@ -571,7 +573,7 @@ const MathAsteroidBlaster = () => {
               asteroid.x,
               asteroid.y,
               asteroid.isCorrect ? "#10b981" : "#ef4444",
-              asteroid.isCorrect ? 8 : 5, // Reduced particle count for performance
+              asteroid.isCorrect ? 4 : 2, // Further reduced particle count for performance
             )
 
             // Mark bullet for removal
@@ -593,7 +595,7 @@ const MathAsteroidBlaster = () => {
 
                 // Chance to spawn power-up on correct hit
                 if (Math.random() < 0.2) {
-                  const powerUpTypes = ["multishot", "shield", "slowmo"] as const
+                  const powerUpTypes = ["multishot", "slowmo"] as const
                   const type = powerUpTypes[Math.floor(Math.random() * powerUpTypes.length)]
                   const timestamp = Date.now()
                   const randomId = Math.random().toString(36).substring(2, 9)
@@ -631,34 +633,21 @@ const MathAsteroidBlaster = () => {
                 }
               })
             } else {
-              // Hit incorrect asteroid - check shield first
+              // Hit incorrect asteroid - lose life
               newAsteroids.splice(i, 1)
 
-              // Update game state - lose combo and life (unless shielded)
+              // Update game state - lose combo and life
               setGameState((prev) => {
-                // If shield is active, use it up instead of losing life
-                if (prev.shield > 0) {
-                  // Play shield sound
-                  playSound("powerup", 0.2)
-                  
-                  return {
-                    ...prev,
-                    combo: 0,
-                    shield: 0, // Use up the shield
-                  }
-                } else {
-                  // No shield - lose life
-                  const newLives = prev.lives - 0.5
+                const newLives = prev.lives - 0.5
 
-                  // Play sound effect
-                  playSound("wrong", 0.2)
+                // Play sound effect
+                playSound("wrong", 0.2)
 
-                  return {
-                    ...prev,
-                    combo: 0,
-                    lives: newLives,
-                    isGameOver: newLives <= 0,
-                  }
+                return {
+                  ...prev,
+                  combo: 0,
+                  lives: newLives,
+                  isGameOver: newLives <= 0,
                 }
               })
             }
@@ -684,16 +673,6 @@ const MathAsteroidBlaster = () => {
           if (asteroid.isCorrect) {
             // Missed correct answer
             setGameState((prev) => {
-              // Don't lose life if shield is active
-              if (prev.shield > 0) {
-                return {
-                  ...prev,
-                  shield: 0, // Use up the shield
-                  combo: 0,
-                  currentProblem: generateMathProblem(prev.level),
-                }
-              }
-
               const newLives = prev.lives - 0.5
 
               // Play sound effect
@@ -709,7 +688,7 @@ const MathAsteroidBlaster = () => {
             })
 
             // Create explosion at bottom
-            createExplosion(asteroid.x, 90, "#ef4444", 8) // Reduced particle count
+            createExplosion(asteroid.x, 90, "#ef4444", 3) // Further reduced particle count
           }
         })
 
@@ -733,8 +712,6 @@ const MathAsteroidBlaster = () => {
             switch (powerUp.type) {
               case "multishot":
                 return { ...prevState, multishot: powerUp.duration }
-              case "shield":
-                return { ...prevState, shield: powerUp.duration }
               case "slowmo":
                 return { ...prevState, slowmo: powerUp.duration }
               default:
@@ -761,8 +738,8 @@ const MathAsteroidBlaster = () => {
 
       // Update the state for rendering, but only periodically to avoid too many re-renders
       const now = Date.now()
-      if (now - lastUpdateTimeRef.current > 200 || powerUpCollected || needNewProblem) {
-        // Update less frequently (200ms instead of 150ms) to reduce lag further
+      if (now - lastUpdateTimeRef.current > 250 || powerUpCollected || needNewProblem) {
+        // Update even less frequently (250ms instead of 200ms) to reduce lag significantly
         lastUpdateTimeRef.current = now
         setBullets([...bulletsRef.current])
         setAsteroids([...asteroidsRef.current])
@@ -799,7 +776,6 @@ const MathAsteroidBlaster = () => {
       currentProblem: initialProblem,
       combo: 0,
       maxCombo: 0,
-      shield: 0,
       multishot: 0,
       slowmo: 0,
     })
@@ -813,7 +789,6 @@ const MathAsteroidBlaster = () => {
       currentProblem: initialProblem,
       combo: 0,
       maxCombo: 0,
-      shield: 0,
       multishot: 0,
       slowmo: 0,
     }
@@ -873,14 +848,14 @@ const MathAsteroidBlaster = () => {
         {/* Outer Space Background */}
         {isClient && showStars && (
           <div className="absolute inset-0 overflow-hidden">
-            {/* Reduced stars for better performance */}
-            {Array.from({ length: 40 }).map((_, i) => (
+            {/* Further reduced stars for better performance */}
+            {Array.from({ length: 25 }).map((_, i) => (
               <div
                 key={`star-${i}`}
-                className="absolute rounded-full bg-white opacity-50"
+                className="absolute rounded-full bg-white opacity-40"
                 style={{
-                  width: `${Math.random() * 1.5 + 0.5}px`,
-                  height: `${Math.random() * 1.5 + 0.5}px`,
+                  width: `${Math.random() * 1.2 + 0.4}px`,
+                  height: `${Math.random() * 1.2 + 0.4}px`,
                   left: `${Math.random() * 100}%`,
                   top: `${Math.random() * 100}%`,
                 }}
@@ -888,17 +863,17 @@ const MathAsteroidBlaster = () => {
             ))}
 
             {/* Simplified distant objects */}
-            <div className="absolute top-[10%] left-[15%] w-[20%] h-[20%] rounded-full bg-gradient-to-br from-red-900/20 to-red-700/10 blur-2xl"></div>
-            <div className="absolute bottom-[20%] right-[10%] w-[25%] h-[15%] rounded-full bg-gradient-to-tl from-orange-800/15 to-red-900/10 blur-2xl"></div>
-            
-            {/* Reduced space debris */}
-            {Array.from({ length: 8 }).map((_, i) => (
+            <div className="absolute top-[10%] left-[15%] w-[20%] h-[20%] rounded-full bg-gradient-to-br from-red-900/15 to-red-700/8 blur-2xl"></div>
+            <div className="absolute bottom-[20%] right-[10%] w-[25%] h-[15%] rounded-full bg-gradient-to-tl from-orange-800/12 to-red-900/8 blur-2xl"></div>
+
+            {/* Further reduced space debris */}
+            {Array.from({ length: 5 }).map((_, i) => (
               <div
                 key={`debris-${i}`}
-                className="absolute rounded-full bg-gray-400 opacity-20"
+                className="absolute rounded-full bg-gray-400 opacity-15"
                 style={{
-                  width: `${Math.random() * 1 + 0.3}px`,
-                  height: `${Math.random() * 1 + 0.3}px`,
+                  width: `${Math.random() * 0.8 + 0.2}px`,
+                  height: `${Math.random() * 0.8 + 0.2}px`,
                   left: `${Math.random() * 100}%`,
                   top: `${Math.random() * 100}%`,
                 }}
@@ -946,21 +921,22 @@ const MathAsteroidBlaster = () => {
                   <div>
                     <h3 className="font-semibold text-orange-300">Power Enhancements</h3>
                     <p className="text-sm text-gray-300">
-                      Collect power-ups: Red multishot • Orange shield • Red slowmo
+                      Collect power-ups: Red multishot • Orange slowmo
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="flex justify-center">              <Button
-                onClick={startGame}
-                className="bg-gradient-to-r from-red-600 to-orange-500 hover:from-red-500 hover:to-orange-400 px-8 py-3 rounded-lg text-lg font-bold transition-all border border-orange-400/50"
-              >
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 bg-gradient-to-r from-orange-300 to-red-400 rounded-full"></div>
-                  Initialize Combat
-                </div>
-              </Button>
+              <div className="flex justify-center">
+                <Button
+                  onClick={startGame}
+                  className="bg-gradient-to-r from-red-600 to-orange-500 hover:from-red-500 hover:to-orange-400 px-8 py-3 rounded-lg text-lg font-bold transition-all border border-orange-400/50"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 bg-gradient-to-r from-orange-300 to-red-400 rounded-full"></div>
+                    Initialize Combat
+                  </div>
+                </Button>
               </div>
             </Card>
           </div>
@@ -968,20 +944,20 @@ const MathAsteroidBlaster = () => {
           <div className="relative z-10 text-center max-w-2xl px-4">
             <div>
               <h1 className="text-4xl md:text-6xl font-bold mb-2 bg-gradient-to-r from-red-500 via-orange-400 to-red-400 bg-clip-text text-transparent">
-                IRON MAN: MATH COMBAT
+                MATH ASTEROID BLASTER
               </h1>
               <div className="flex justify-center mb-10 mt-3">
                 <Badge
                   variant="outline"
                   className="text-lg px-4 py-1 border-orange-400/50 text-orange-300 uppercase tracking-widest"
                 >
-                  MARK 85 EDITION
+                  MARK VII EDITION
                 </Badge>
               </div>
             </div>
 
             <p className="text-xl mb-8 text-gray-300 max-w-lg mx-auto">
-              Engage in mathematical combat! Use your repulsor technology to 
+              Engage in mathematical combat! Use your repulsor technology to
               destroy asteroids with correct answers and protect Earth from numerical threats!
             </p>
 
@@ -1021,16 +997,16 @@ const MathAsteroidBlaster = () => {
       {isClient && (
         <>
           {/* Game UI */}
-          <div className="relative z-10 p-3 md:p-4 bg-gradient-to-b from-black via-red-950/10 to-black iron-man-hud-overlay" id="gameScreen">
+          <div className="relative z-10 p-2 sm:p-3 md:p-4 bg-gradient-to-b from-black via-red-950/10 to-black iron-man-hud-overlay" id="gameScreen">
             {/* Math Problem with UI elements on sides */}
-            <div className="flex items-center justify-between mb-4 p-3 rounded-lg backdrop-blur-sm bg-gradient-to-r from-red-900/30 to-orange-900/20 border border-red-500/30">
+            <div className="flex flex-col sm:flex-row items-center justify-between mb-3 sm:mb-4 p-2 sm:p-3 rounded-lg backdrop-blur-sm bg-gradient-to-r from-red-900/30 to-orange-900/20 border border-red-500/30 gap-2 sm:gap-0">
               {/* Lives and Level - Left Side */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 sm:gap-2 order-1 sm:order-1">
                 <div className="flex items-center">
                   {Array.from({ length: Math.ceil(gameState.lives) }).map((_, i) => (
                     <span
                       key={i}
-                      className={`text-red-500 mx-0.5 animate-scaleIn`}
+                      className={`text-red-500 mx-0.5 animate-scaleIn text-sm sm:text-base`}
                       style={{ animationDelay: `${i * 0.1}s` }}
                     >
                       {i < gameState.lives && gameState.lives % 1 !== 0 && Math.ceil(gameState.lives) - 1 === i
@@ -1039,20 +1015,20 @@ const MathAsteroidBlaster = () => {
                     </span>
                   ))}
                 </div>
-                <Badge variant="outline" className="bg-red-900/60 border-red-500/40 text-red-300">
+                <Badge variant="outline" className="bg-red-900/60 border-red-500/40 text-red-300 text-xs sm:text-sm">
                   Lv.{gameState.level}
                 </Badge>
 
                 <button className="z-10" onClick={handleFullscreen}>
-                  <Fullscreen className="z-10 w-6 h-6 text-orange-400 hover:text-orange-200 transition" />
+                  <Fullscreen className="z-10 w-4 h-4 sm:w-6 sm:h-6 text-orange-400 hover:text-orange-200 transition" />
                 </button>
               </div>
 
               {/* Math Problem - Center */}
-              <div className="text-center">
-                <div className="text-sm text-orange-300 mb-1">Solve:</div>
+              <div className="text-center order-3 sm:order-2 w-full sm:w-auto">
+                <div className="text-xs sm:text-sm text-orange-300 mb-1">Solve:</div>
                 <div
-                  className="text-2xl md:text-3xl font-bold text-white animate-popIn"
+                  className="text-lg sm:text-2xl md:text-3xl font-bold text-white animate-popIn"
                   key={gameState.currentProblem.question}
                 >
                   {gameState.currentProblem.question}
@@ -1060,11 +1036,11 @@ const MathAsteroidBlaster = () => {
               </div>
 
               {/* Score - Right Side */}
-              <div className="flex flex-col items-end gap-1">
-                <div className="text-lg md:text-xl font-bold text-white">{gameState.score}</div>
+              <div className="flex flex-col items-end gap-1 order-2 sm:order-3">
+                <div className="text-base sm:text-lg md:text-xl font-bold text-white">{gameState.score}</div>
                 {gameState.combo > 1 && (
                   <div className="animate-scaleIn">
-                    <Badge variant="outline" className="bg-orange-500/20 text-orange-300 border-orange-500/50">
+                    <Badge variant="outline" className="bg-orange-500/20 text-orange-300 border-orange-500/50 text-xs sm:text-sm">
                       x{gameState.combo}
                     </Badge>
                   </div>
@@ -1074,22 +1050,15 @@ const MathAsteroidBlaster = () => {
 
             {/* Active power-ups */}
             <div className="flex gap-2 mb-2">
-              {gameState.shield > 0 && (
-                <div className="animate-slideRight">
-                  <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/50">
-                    🛡️ {Math.ceil(gameState.shield / 60)}s
-                  </Badge>
-                </div>
-              )}
               {gameState.multishot > 0 && (
-                <div className="animate-slideRight" style={{ animationDelay: "0.1s" }}>
+                <div className="animate-slideRight">
                   <Badge className="bg-red-500/20 text-red-400 border-red-500/50">
                     🔫 {Math.ceil(gameState.multishot / 60)}s
                   </Badge>
                 </div>
               )}
               {gameState.slowmo > 0 && (
-                <div className="animate-slideRight" style={{ animationDelay: "0.2s" }}>
+                <div className="animate-slideRight" style={{ animationDelay: "0.1s" }}>
                   <Badge className="bg-orange-500/20 text-orange-300 border-orange-500/50">
                     ⏱️ {Math.ceil(gameState.slowmo / 60)}s
                   </Badge>
@@ -1215,7 +1184,7 @@ const MathAsteroidBlaster = () => {
             {/* Game Area */}
             <div
               ref={gameAreaRef}
-              className="relative h-[350px] sm:h-[400px] md:h-[450px] lg:h-[500px] border border-[#2a2a4a]/50 rounded-lg bg-black/30 backdrop-blur-sm overflow-hidden shadow-inner"
+              className="relative h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] xl:h-[500px] border border-[#2a2a4a]/50 rounded-lg bg-black/30 backdrop-blur-sm overflow-hidden shadow-inner"
               id="gameArea"
               onMouseMove={handleTouchMove}
               onTouchMove={handleTouchMove}
@@ -1225,14 +1194,14 @@ const MathAsteroidBlaster = () => {
             >
               {/* Outer Space Background */}
               <div className="absolute inset-0 overflow-hidden">
-                {/* Reduced stars for game area performance */}
-                {Array.from({ length: 30 }).map((_, i) => (
+                {/* Further reduced stars for game area performance */}
+                {Array.from({ length: 20 }).map((_, i) => (
                   <div
                     key={`game-star-${i}`}
-                    className="absolute rounded-full bg-white opacity-60"
+                    className="absolute rounded-full bg-white opacity-50"
                     style={{
-                      width: `${Math.random() * 1.5 + 0.5}px`,
-                      height: `${Math.random() * 1.5 + 0.5}px`,
+                      width: `${Math.random() * 1.2 + 0.4}px`,
+                      height: `${Math.random() * 1.2 + 0.4}px`,
                       left: `${Math.random() * 100}%`,
                       top: `${Math.random() * 100}%`,
                     }}
@@ -1240,17 +1209,17 @@ const MathAsteroidBlaster = () => {
                 ))}
 
                 {/* Simplified distant space objects */}
-                <div className="absolute top-[15%] left-[5%] w-[15%] h-[12%] rounded-full bg-gradient-to-br from-red-900/15 to-orange-800/8 blur-xl"></div>
-                <div className="absolute bottom-[25%] right-[8%] w-[18%] h-[15%] rounded-full bg-gradient-to-tl from-orange-900/12 to-red-800/8 blur-xl"></div>
-                
-                {/* Reduced space dust */}
-                {Array.from({ length: 12 }).map((_, i) => (
+                <div className="absolute top-[15%] left-[5%] w-[12%] h-[10%] rounded-full bg-gradient-to-br from-red-900/12 to-orange-800/6 blur-xl"></div>
+                <div className="absolute bottom-[25%] right-[8%] w-[15%] h-[12%] rounded-full bg-gradient-to-tl from-orange-900/10 to-red-800/6 blur-xl"></div>
+
+                {/* Further reduced space dust */}
+                {Array.from({ length: 6 }).map((_, i) => (
                   <div
                     key={`dust-${i}`}
-                    className="absolute rounded-full bg-gray-300 opacity-15"
+                    className="absolute rounded-full bg-gray-300 opacity-10"
                     style={{
-                      width: `${Math.random() * 0.8 + 0.2}px`,
-                      height: `${Math.random() * 0.8 + 0.2}px`,
+                      width: `${Math.random() * 0.6 + 0.2}px`,
+                      height: `${Math.random() * 0.6 + 0.2}px`,
                       left: `${Math.random() * 100}%`,
                       top: `${Math.random() * 100}%`,
                     }}
@@ -1258,10 +1227,10 @@ const MathAsteroidBlaster = () => {
                 ))}
 
                 {/* Simplified HUD Elements */}
-                <div className="absolute top-2 left-2 w-10 h-10 border border-red-500/15 rounded-lg opacity-30"></div>
-                <div className="absolute top-2 right-2 w-10 h-10 border border-orange-400/15 rounded-lg opacity-30"></div>
-                <div className="absolute bottom-2 left-2 w-10 h-10 border border-red-500/15 rounded-lg opacity-30"></div>
-                <div className="absolute bottom-2 right-2 w-10 h-10 border border-orange-400/15 rounded-lg opacity-30"></div>
+                <div className="absolute top-2 left-2 w-8 h-8 border border-red-500/10 rounded-lg opacity-25"></div>
+                <div className="absolute top-2 right-2 w-8 h-8 border border-orange-400/10 rounded-lg opacity-25"></div>
+                <div className="absolute bottom-2 left-2 w-8 h-8 border border-red-500/10 rounded-lg opacity-25"></div>
+                <div className="absolute bottom-2 right-2 w-8 h-8 border border-orange-400/10 rounded-lg opacity-25"></div>
               </div>
 
               {/* Particles */}
@@ -1293,19 +1262,14 @@ const MathAsteroidBlaster = () => {
                     backgroundColor:
                       powerUp.type === "multishot"
                         ? "rgba(239, 68, 68, 0.8)" // Red for multishot
-                        : powerUp.type === "shield"
-                          ? "rgba(255, 107, 53, 0.8)" // Orange for shield
-                          : "rgba(251, 146, 60, 0.8)", // Light orange for slowmo
+                        : "rgba(251, 146, 60, 0.8)", // Light orange for slowmo
                     boxShadow:
                       powerUp.type === "multishot"
                         ? "0 0 20px rgba(239, 68, 68, 0.8)"
-                        : powerUp.type === "shield"
-                          ? "0 0 20px rgba(255, 107, 53, 0.8)"
-                          : "0 0 20px rgba(251, 146, 60, 0.8)",
+                        : "0 0 20px rgba(251, 146, 60, 0.8)",
                   }}
                 >
                   {powerUp.type === "multishot" && <Zap className="w-5 h-5 text-white" />}
-                  {powerUp.type === "shield" && <div className="text-lg">🛡️</div>}
                   {powerUp.type === "slowmo" && <div className="text-lg">⏰</div>}
                 </div>
               ))}
@@ -1328,7 +1292,7 @@ const MathAsteroidBlaster = () => {
                   {/* Simple enemy indicators */}
                   <div className="absolute w-[25%] h-[25%] rounded-full bg-red-400/40 top-[15%] left-[15%]"></div>
                   <div className="absolute w-[20%] h-[20%] rounded-full bg-orange-300/40 bottom-[25%] right-[20%]"></div>
-                  
+
                   {/* Threat indicator */}
                   <div className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></div>
                 </div>
@@ -1374,18 +1338,9 @@ const MathAsteroidBlaster = () => {
 
               {/* Iron Man Mark 85 Suit */}
               <div
-                className={`absolute bottom-2 transform -translate-x-1/2 transition-all duration-300 ${gameState.shield > 0 ? "shield-active" : ""
-                  } hover:-translate-y-1 hover:scale-105`}
+                className="absolute bottom-2 transform -translate-x-1/2 transition-all duration-300 hover:-translate-y-1 hover:scale-105"
                 style={{ left: `${rocketPosition}%` }}
               >
-                {/* Shield Field */}
-                {gameState.shield > 0 && (
-                  <div className="absolute w-18 h-18 rounded-full bg-gradient-to-br from-orange-400/30 to-red-400/20 border border-orange-300/50 -translate-x-1/3 -translate-y-1/3">
-                    {/* Shield Glow */}
-                    <div className="absolute inset-0 rounded-full bg-orange-400/20 blur-md" />
-                  </div>
-                )}
-
                 {/* Main Suit Body */}
                 <div className="relative w-10 h-14 md:w-11 md:h-15">
                   {/* Thruster Glow */}
@@ -1443,29 +1398,40 @@ const MathAsteroidBlaster = () => {
             </div>
           </div>
           {/* Iron Man Mobile Controls */}
-          <div className="sm:hidden fixed bottom-4 left-1/2 transform -translate-x-1/2 flex items-center justify-center gap-8 z-20 px-4">
-            <div className="touch-none hover:scale-90 active:scale-75 transition-transform">
+          <div
+            className="sm:hidden fixed left-1/2 flex items-center justify-center gap-4 sm:gap-8 z-20 px-4"
+            style={{
+              bottom: 'max(env(safe-area-inset-bottom, 0px) + 12px, 12px)',
+              width: '100vw',
+              transform: 'translateX(-50%)',
+              pointerEvents: 'none', // Prevent accidental overlay block
+            }}
+          >
+            <div className="pointer-events-auto touch-none hover:scale-90 active:scale-75 transition-transform bg-black/70 rounded-full p-2 shadow-lg border border-red-700" style={{ minWidth: 44, minHeight: 44 }}>
+              {/* Left button */}
               <Button
                 onClick={() => setRocketPosition((prev) => Math.max(5, prev - 10))}
-                className="bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 rounded-full w-12 h-12 flex items-center justify-center border-2 border-orange-400 shadow-[0_0_8px_rgba(255,107,53,0.4)]"
+                className="bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 rounded-full w-10 h-10 flex items-center justify-center border-2 border-orange-400 shadow-[0_0_8px_rgba(255,107,53,0.4)] text-sm"
               >
                 ←
               </Button>
             </div>
 
-            <div className="touch-none hover:scale-90 active:scale-75 transition-transform">
+            <div className="pointer-events-auto touch-none hover:scale-90 active:scale-75 transition-transform bg-black/70 rounded-full p-2 shadow-lg border border-red-700" style={{ minWidth: 44, minHeight: 44 }}>
+              {/* Fire button */}
               <Button
                 onClick={shootBullet}
-                className="bg-gradient-to-r from-orange-500 to-orange-400 hover:from-orange-400 hover:to-orange-300 rounded-full w-14 h-14 flex items-center justify-center border-2 border-red-300 shadow-[0_0_10px_rgba(255,107,53,0.5)]"
+                className="bg-gradient-to-r from-orange-500 to-orange-400 hover:from-orange-400 hover:to-orange-300 rounded-full w-12 h-12 flex items-center justify-center border-2 border-red-300 shadow-[0_0_10px_rgba(255,107,53,0.5)]"
               >
-                <Zap className="w-6 h-6" />
+                <Zap className="w-5 h-5" />
               </Button>
             </div>
 
-            <div className="touch-none hover:scale-90 active:scale-75 transition-transform">
+            <div className="pointer-events-auto touch-none hover:scale-90 active:scale-75 transition-transform bg-black/70 rounded-full p-2 shadow-lg border border-red-700" style={{ minWidth: 44, minHeight: 44 }}>
+              {/* Right button */}
               <Button
                 onClick={() => setRocketPosition((prev) => Math.min(95, prev + 10))}
-                className="bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 rounded-full w-12 h-12 flex items-center justify-center border-2 border-orange-400 shadow-[0_0_8px_rgba(255,107,53,0.4)]"
+                className="bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 rounded-full w-10 h-10 flex items-center justify-center border-2 border-orange-400 shadow-[0_0_8px_rgba(255,107,53,0.4)] text-sm"
               >
                 →
               </Button>

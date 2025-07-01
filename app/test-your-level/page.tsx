@@ -1017,7 +1017,7 @@ export default function TestYourLevelPage() {
     
     // Create custom cursor element
     const cursor = document.createElement('div');
-    cursor.className = 'moon-knight-cursor';
+    cursor.className = 'moon-knight-cursor md:visible invisible';
     cursor.style.position = 'fixed';
     cursor.style.pointerEvents = 'none';
     cursor.style.zIndex = '999999';
@@ -1131,7 +1131,7 @@ export default function TestYourLevelPage() {
           <img
             src="https://i.postimg.cc/T2ynnZtM/favpng-306783c776b1736dd8d34378982cda68.png"
             alt="background"
-            className="opacity-100 w-[500px] h-auto mb-80 fixed top-20 right-10 z-10 scale-x-[-1]"
+            className="opacity-100 w-[500px] h-auto mb-80 fixed top-20 right-10 z-10 drop-shadow-[0_0_40px_#ffffff] scale-x-[-1]"
           />
         </div>
 

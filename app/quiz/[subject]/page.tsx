@@ -492,6 +492,7 @@ export default function QuizSubjectPage({ params }: { params: { subject: string 
           transition: batTransition,
         }}
         id="custom-bat-cursor"
+        className="md:visible invisible"
       />
       {/* Background Image with overlay */}
       <div className="absolute inset-0 flex items-center h-full w-full max-w-7xl mx-auto px-4">

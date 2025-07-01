@@ -63,6 +63,26 @@ export default function VenomChatbot() {
 
   useEffect(() => {
     setIsClient(true)
+
+    // Fix for mobile keyboard covering input in fullscreen
+    if (typeof window !== 'undefined' && window.visualViewport) {
+      const handleResize = () => {
+        const inputSection = document.querySelector('.input-section') as HTMLElement | null
+        if (inputSection && window.visualViewport) {
+          // Add extra bottom padding if keyboard is open
+          const keyboardHeight = window.innerHeight - window.visualViewport.height
+          inputSection.style.paddingBottom = keyboardHeight > 0 ? `${keyboardHeight + 24}px` : 'env(safe-area-inset-bottom, 16px)'
+          // Scroll input into view
+          inputSection.scrollIntoView({ behavior: 'smooth', block: 'end' })
+        }
+      }
+      window.visualViewport.addEventListener('resize', handleResize)
+      return () => {
+        if (window.visualViewport) {
+          window.visualViewport.removeEventListener('resize', handleResize)
+        }
+      }
+    }
   }, [])
 
   // Show loading screen for the first 2 seconds
@@ -273,7 +293,7 @@ export default function VenomChatbot() {
                   }
                   parts.push({ type: 'code', content: match[1] })
                   lastIndex = match.index + match[0].length
-                }
+              }
                 
                 if (lastIndex < trimmedLine.length) {
                   parts.push({ type: 'text', content: trimmedLine.slice(lastIndex) })
@@ -432,6 +452,7 @@ export default function VenomChatbot() {
     <div className={`venom-container${isFullscreen ? " fullscreen mt-0" : ""}`}>
       {/* Custom cursor - always rendered, offscreen if no mouse yet */}
 			<div
+      className="md:visible invisible"
 				ref={cursorRef}
 				style={{
 					position: "fixed",
@@ -572,7 +593,7 @@ export default function VenomChatbot() {
       </button>
 
       {/* Main Chat Interface */}
-      <div className="chat-interface">
+      <div className={`chat-interface${isFullscreen ? ' pb-24' : ''}`} style={{overflowX: 'hidden'}}>
         {/* Header Section */}
         {!isFullscreen && (
           <div className="header-section">
@@ -655,7 +676,7 @@ export default function VenomChatbot() {
           <div ref={messagesEndRef} />
         </div>
 
-        <div className="input-section">
+        <div className="input-section" style={{paddingBottom: isFullscreen ? 'env(safe-area-inset-bottom, 24px)' : undefined}}>
           <form onSubmit={handleSendMessage} className="message-form">
             <div className="input-field-wrapper">
               <input

@@ -459,75 +459,27 @@ export default function VideoSearchPage() {
             >
               {messages.map((message) => (
                 <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-                  <div
-                    className={`flex gap-3 max-w-[80%] ${message.role === "user" ? "flex-row-reverse" : "flex-row"}`}
-                  >
-                    <Avatar
-                      className={`ultron-avatar ${message.role === "assistant" ? "ultron-avatar-ai" : "ultron-avatar-user"}`}
-                    >
-                      {message.role === "assistant" ? (
-                        <Bot className="w-6 h-6 text-white" />
-                      ) : (
-                        <AvatarFallback>
-                          {user?.name?.charAt(0) || "U"}
-                        </AvatarFallback>
-                      )}
-                      <div className="avatar-pulse"></div>
-                    </Avatar>
-                    <div
-                      className={`ultron-message ${message.role === "user" ? "ultron-message-user" : "ultron-message-ai"} text-[11px] md:text-xs lg:text-sm`}
-                    >
-                      <div className="message-border"></div>
-                      <p className="whitespace-pre-wrap text-[11px] md:text-xs lg:text-sm">{message.content}</p>
-
-                      {/* Video results */}
-                      {message.videos && message.videos.length > 0 && (
-                        <div className="mt-4">
-                          <div className="grid grid-cols-1 gap-4">
-                            {message.videos.map((video, index) => (
-                              <div
-                                key={video.id}
-                                className="ultron-video-card"
-                                style={{ animationDelay: `${index * 0.1}s` }}
-                              >
-                                <div className="video-card-glow"></div>
-                                <div className="flex flex-col md:flex-row">
-                                  <div className="md:w-1/2 aspect-video ultron-video-frame">
-                                    <div className="video-overlay"></div>
-                                    <iframe
-                                      width="100%"
-                                      height="100%"
-                                      src={`https://www.youtube.com/embed/${video.id}`}
-                                      title={video.title}
-                                      frameBorder="0"
-                                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                      allowFullScreen
-                                    ></iframe>
-                                  </div>
-                                  <div className="p-4 md:w-1/2 flex flex-col">
-                                    <h4 className="ultron-video-title">{video.title}</h4>
-                                    <p className="ultron-video-channel">{video.channelTitle}</p>
-                                    <p className="ultron-video-description">{video.description}</p>
-                                    <div className="mt-auto pt-2">
-                                      <a
-                                        href={`https://www.youtube.com/watch?v=${video.id}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="ultron-video-link"
-                                      >
-                                        <span>Watch on YouTube</span>
-                                        <div className="link-glow"></div>
-                                      </a>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
+                  {/* Responsive video card rendering */}
+                  {message.videos && message.videos.length > 0 && (
+                    <div className="flex flex-col gap-4 w-full mt-2">
+                      {message.videos.map((video) => (
+                        <div key={video.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-5 bg-black/40 rounded-lg p-3 shadow-md w-full max-w-2xl mx-auto">
+                          <img
+                            src={video.thumbnailUrl}
+                            alt={video.title}
+                            className="w-full sm:w-48 h-32 sm:h-28 object-cover rounded-md flex-shrink-0"
+                            style={{maxWidth: 220, minWidth: 0}}
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="font-bold text-base md:text-lg text-ultron-red mb-1 truncate" title={video.title}>{video.title}</div>
+                            <div className="text-xs md:text-sm text-ultron-gray mb-1 truncate" title={video.channelTitle}>{video.channelTitle}</div>
+                            <div className="text-xs md:text-sm text-ultron-gray mb-1">{new Date(video.publishedAt).toLocaleDateString()}</div>
+                            <div className="text-xs md:text-sm text-ultron-gray whitespace-pre-line break-words line-clamp-4 md:line-clamp-3" style={{wordBreak: 'break-word'}}>{video.description}</div>
                           </div>
                         </div>
-                      )}
+                      ))}
                     </div>
-                  </div>
+                  )}
                 </div>
               ))}
 
@@ -623,8 +575,8 @@ function CustomCursor() {
         position: 'fixed',
         left: pos.x,
         top: pos.y,
-        width: 52,
-        height: 52,
+        width: 22,
+        height: 22,
         pointerEvents: 'none',
         zIndex: 999999999,
         userSelect: 'none',

@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
 import {
   X, Sun, Moon, BookOpen, Trophy, History, User,
-  LogOut, LogIn, UserPlus, Video, Home, Brain, Gamepad2, LayoutDashboard, Search, Gamepad, Bot, Atom
+  LogOut, LogIn, UserPlus, Video, Home, Brain, Gamepad2, LayoutDashboard, Search, Gamepad, Bot, Atom, Youtube
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTheme } from "next-themes"
@@ -33,13 +33,13 @@ export const EduPlayNavbar = forwardRef<HTMLDivElement, SidebarProps>(
       { name: "Subjects", href: "/subjects", icon: BookOpen },
       { name: "Quiz", href: "/quiz", icon: Brain },
       { name: "Games", href: "/games", icon: Gamepad2 },
-      { name: "Video Search", href: "/video-search", icon: Video },
+      { name: "Video Search", href: "/video-search", icon: Youtube },
       { name: "Test Your Level", href: "/test-your-level", icon: Trophy },
       { name: "Question Generator", href: "/question-generator", icon: Brain },
       { name: "Search Learn Test", href: "/search-learn-test", icon: Search },
       { name: "Quiz Battle", href: "/eduplay/quiz-battle", icon: Gamepad },
       { name: "Chatbot", href: "/chatbot", icon: Bot },
-      { name: "Visuals", href: "/eduplay/visuals", icon: Atom },
+    { name: "Visuals", href: "/eduplay/visuals", icon: Atom },
     ]
 
     const userLinks = user

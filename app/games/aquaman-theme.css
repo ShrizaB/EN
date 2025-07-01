@@ -614,7 +614,7 @@
 
 /* Card content structure for proper layout */
 .trident-card .card-content {
-  height: 100%;
+  height: 400p;
   display: flex;
   flex-direction: column;
   justify-content: space-between;

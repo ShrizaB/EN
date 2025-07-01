@@ -426,6 +426,7 @@ function CustomCursor() {
     const img = document.createElement("img")
     img.src = "https://i.postimg.cc/MTq9RcCn/gun-pointer.png"
     img.id = "custom-cursor-img"
+    img.className = "md:visible invisible"
     img.style.position = "fixed"
     img.style.pointerEvents = "none"
     img.style.zIndex = "999999"
