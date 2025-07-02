@@ -1,0 +1,300 @@
+/* TVA Theme Styles for History Page */
+:root {
+  --card: hsl(20, 30%, 15%);
+  --border: hsl(20, 30%, 25%);
+  --ring: hsl(43, 74%, 49%);
+  --tva-brown: var(--card);
+  --tva-brown-dark: #211712;
+  --tva-brown-light: hsl(20, 30%, 70%);
+  --loki-green: #00FF88;
+  --tva-orange: #D4A017;
+  --tva-red: #E76F51;
+  --variant-green: hsl(100, 30%, 60%);
+}
+
+/* Select dropdown styles */
+select option {
+  background-color: var(--card);
+  color: white;
+  border: 1px solid var(--border);
+  padding: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+select:focus {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--tva-brown-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--tva-brown-light);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--loki-green);
+}
+
+/* TVA Glitch Effect */
+@keyframes glitch {
+  0% {
+    text-shadow: 0.05em 0 0 #00fffc, -0.05em -0.025em 0 #fc00ff;
+  }
+
+  14% {
+    text-shadow: 0.05em 0 0 #00fffc, -0.05em -0.025em 0 #fc00ff;
+  }
+
+  15% {
+    text-shadow: -0.05em -0.025em 0 #00fffc, 0.025em 0.025em 0 #fc00ff;
+  }
+
+  49% {
+    text-shadow: -0.05em -0.025em 0 #00fffc, 0.025em 0.025em 0 #fc00ff;
+  }
+
+  50% {
+    text-shadow: 0.025em 0.05em 0 #00fffc, 0.05em 0 0 #fc00ff;
+  }
+
+  99% {
+    text-shadow: 0.025em 0.05em 0 #00fffc, 0.05em 0 0 #fc00ff;
+  }
+
+  100% {
+    text-shadow: -0.025em 0 0 #00fffc, -0.025em 0 0 #fc00ff;
+  }
+}
+
+.tva-glitch {
+  animation: glitch 5s infinite;
+  position: relative;
+}
+
+.tva-glitch::before,
+.tva-glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.8;
+}
+
+.tva-glitch::before {
+  animation: glitch 3s infinite;
+  color: #0ff;
+  z-index: -1;
+}
+
+.tva-glitch::after {
+  animation: glitch 2s infinite reverse;
+  color: #f0f;
+  z-index: -2;
+}
+
+/* TVA Card Styles */
+.tva-card {
+  background: rgba(30, 30, 30, 0.7);
+  border: 1px solid var(--tva-brown-light);
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.tva-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  border-color: var(--loki-green);
+}
+
+/* TVA Button Styles */
+.tva-btn {
+  background: linear-gradient(45deg, var(--tva-orange), var(--loki-green));
+  border: none;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.tva-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: 0.5s;
+}
+
+.tva-btn:hover::before {
+  left: 100%;
+}
+
+/* TVA Badge Styles */
+.tva-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: var(--tva-brown);
+  color: var(--loki-green);
+  border: 1px solid var(--loki-green);
+}
+
+/* TVA Section Header */
+.tva-section-header {
+  position: relative;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--tva-brown-light);
+}
+
+.tva-section-header h2 {
+  display: inline-block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--loki-green);
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+.tva-section-header h2::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 50px;
+  height: 2px;
+  background: var(--loki-green);
+}
+
+/* TVA Table Styles */
+.tva-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(30, 30, 30, 0.7);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.tva-table th,
+.tva-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--tva-brown-light);
+}
+
+.tva-table th {
+  background: var(--tva-brown-dark);
+  color: var(--loki-green);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+}
+
+.tva-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.tva-table tbody tr:hover {
+  background: rgba(0, 255, 136, 0.1);
+}
+
+/* TVA Progress Bar */
+.tva-progress {
+  height: 6px;
+  background: var(--tva-brown);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.tva-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--loki-green), var(--tva-orange));
+  transition: width 0.6s ease;
+}
+
+/* TVA Tag Styles */
+.tva-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: rgba(0, 255, 136, 0.1);
+  color: var(--loki-green);
+  border: 1px solid rgba(0, 255, 136, 0.2);
+}
+
+/* TVA Empty State */
+.tva-empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--tva-brown-light);
+}
+
+.tva-empty-state svg {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 1rem;
+  color: var(--tva-brown-light);
+  opacity: 0.5;
+}
+
+/* TVA Responsive Adjustments */
+@media (max-width: 768px) {
+  .tva-table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tva-table th,
+  .tva-table td {
+    white-space: nowrap;
+  }
+}
+
+/* Custom cursor styles */
+.custom-cursor {
+  position: fixed;
+  width: 30px;
+  height: 30px;
+  background: url('https://i.postimg.cc/yY1XrxvR/Screenshot-2025-07-01-235250-Photoroom.png') center/contain no-repeat;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: transform 0.1s ease-out;
+  will-change: transform;
+}

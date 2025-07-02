@@ -1,0 +1,167 @@
+/* Superman-inspired dark theme */
+.superman-dark-container {
+    background-color: #0a0b0f; /* Deep Kryptonian night */
+    color: #e5e7eb;
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  /* Superman logo overlay with subtle opacity */
+  .superman-logo-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 600px;
+    height: 600px;
+    background: url('https://upload.wikimedia.org/wikipedia/commons/3/38/Superman_S_symbol.svg') no-repeat center;
+    background-size: contain;
+    opacity: 0.05;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    animation: logo-pulse 15s ease-in-out infinite;
+  }
+  
+  /* Animated starry background */
+  .stars-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  
+  .star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: #ffffff;
+    border-radius: 50%;
+    opacity: 0.3;
+  }
+  
+  .text-superman-red {
+    color: #dc2626; /* Vibrant Superman red */
+  }
+  
+  .text-superman-blue {
+    color: #1e40af; /* Deep Kryptonian blue */
+  }
+  
+  .text-superman-yellow {
+    color: #facc15; /* Bright Superman yellow */
+  }
+  
+  /* Card styling with Kryptonian crystal effect */
+  .superman-card {
+    background: transparent;
+    border: 1px solid rgba(55, 65, 81, 0.5);
+    border-radius: 1.25rem;
+    backdrop-filter: blur(8px);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .superman-card.hovered {
+    transform: translateY(-4px);
+    border-color: #1e40af;
+    box-shadow: 0 0 20px rgba(30, 64, 175, 0.5), 0 0 40px rgba(30, 64, 175, 0.3);
+  }
+  
+  /* Card glow effect */
+  .card-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 30% 30%, rgba(30, 64, 175, 0.3), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  
+  .superman-card.hovered .card-glow {
+    opacity: 1;
+  }
+  
+  /* Icon wrapper with crystal-like effect */
+  .icon-wrapper {
+    background: transparent;
+    padding: 1rem;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(30, 64, 175, 0.3);
+  }
+  
+  /* Custom Kryptonian-inspired font */
+  @font-face {
+    font-family: 'Krypton';
+    src: url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+  }
+  
+  .font-krypton {
+    font-family: 'Orbitron', sans-serif;
+  }
+  
+  /* Asteroid styles */
+  .asteroid {
+    position: absolute;
+    opacity: 0.7;
+    z-index: 1;
+    pointer-events: none;
+  }
+  
+  /* Asteroid animations */
+  @keyframes float-1 {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(10px, 15px) rotate(5deg); }
+    50% { transform: translate(0, 30px) rotate(0deg); }
+    75% { transform: translate(-10px, 15px) rotate(-5deg); }
+  }
+  
+  @keyframes float-2 {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(-15px, 10px) rotate(-3deg); }
+    50% { transform: translate(0, 20px) rotate(0deg); }
+    75% { transform: translate(15px, 10px) rotate(3deg); }
+  }
+  
+  @keyframes float-3 {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(5px, 20px) rotate(2deg); }
+    50% { transform: translate(10px, 10px) rotate(0deg); }
+    75% { transform: translate(5px, 0) rotate(-2deg); }
+  }
+  
+  /* Animations */
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.8; }
+  }
+  
+  @keyframes logo-pulse {
+    0%, 100% { opacity: 0.05; transform: translate(-50%, -50%) scale(1); }
+    50% { opacity: 0.1; transform: translate(-50%, -50%) scale(1.05); }
+  }
+  
+  @keyframes pulse-shadow {
+    0%, 100% { text-shadow: 0 0 8px rgba(220, 38, 38, 0.5); }
+    50% { text-shadow: 0 0 16px rgba(220, 38, 38, 0.8); }
+  }
+  
+  .animate-pulse-shadow {
+    animation: pulse-shadow 3s ease-in-out infinite;
+  }
+  
+  .animate-spin-slow {
+    animation: spin 10s linear infinite;
+  }
+  
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }

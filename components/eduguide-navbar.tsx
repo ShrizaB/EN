@@ -6,8 +6,6 @@ import { usePathname, useRouter } from "next/navigation"
 import {
   Menu,
   X,
-  Sun,
-  Moon,
   Trophy,
   History,
   User,
@@ -17,7 +15,6 @@ import {
   Brain,
   Briefcase,
   Cpu,
-  Shield,
   MapPin,
   Users,
   GraduationCap,
@@ -27,7 +24,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { useTheme } from "next-themes"
 import { useAuth } from "@/contexts/auth-context"
-import { motion } from "framer-motion"
+
 
 export function EduGuideNavbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -163,31 +160,15 @@ export function EduGuideNavbar() {
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-2">
           <Link href="/eduguide" className="flex items-center gap-2" onClick={closeMenu}>
-            <motion.div
-              className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-teal-500"
-              whileHover={{ rotate: 360 }}
-              transition={{ duration: 0.5 }}
+            <div
+              className="nav-icon-rotate flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-teal-500"
             >
               <Cpu className="h-5 w-5 text-black" />
-            </motion.div>
+            </div>
             <div className="flex items-center">
-              <motion.span
-                className="font-bold text-2xl bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-teal-400"
-                whileHover={{ scale: 1.05 }}
-                transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              >
+              <span className="font-bold text-2xl bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-teal-400 hover:scale-105 transition duration-300">
                 EduGuide
-              </motion.span>
-              <motion.div
-                className="ml-1"
-                animate={{
-                  rotate: [0, 360],
-                  scale: [1, 1.2, 1],
-                }}
-                transition={{ duration: 3, repeat: Number.POSITIVE_INFINITY }}
-              >
-                <Shield className="h-5 w-5 text-green-400" />
-              </motion.div>
+              </span>
             </div>
           </Link>
 
@@ -202,9 +183,9 @@ export function EduGuideNavbar() {
                     : "text-gray-400 hover:bg-gray-800"
                 }`}
               >
-                <motion.div whileHover={{ rotate: 360 }} transition={{ duration: 0.5 }}>
+                <div className="nav-icon-rotate">
                   {link.icon && <link.icon className={`h-4 w-4 ${link.active ? link.color : ""}`} />}
-                </motion.div>
+                </div>
                 {link.name}
               </Link>
             ))}
@@ -212,16 +193,6 @@ export function EduGuideNavbar() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="rounded-md mr-2 text-gray-400 hover:text-gray-300 hover:bg-gray-800"
-            onClick={toggleTheme}
-            aria-label="Toggle theme"
-          >
-            {mounted && theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-          </Button>
-
           <div className="hidden md:flex items-center gap-4">
             {user ? (
               <>
@@ -231,13 +202,11 @@ export function EduGuideNavbar() {
                   onClick={handleProfileClick}
                   className="flex items-center gap-2 rounded-md text-gray-400 hover:text-gray-300 hover:bg-gray-800"
                 >
-                  <motion.div
-                    className="w-8 h-8 rounded-md bg-gradient-to-br from-green-400 to-teal-500 flex items-center justify-center"
-                    whileHover={{ scale: 1.1 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                  <div
+                    className="profile-avatar-hover w-8 h-8 rounded-md bg-gradient-to-br from-green-400 to-teal-500 flex items-center justify-center"
                   >
                     <span className="text-sm font-medium text-black">{user.name?.charAt(0) || "U"}</span>
-                  </motion.div>
+                  </div>
                   <div className="text-sm font-medium">{user.name || "User"}</div>
                 </Button>
                 <Button
@@ -282,14 +251,15 @@ export function EduGuideNavbar() {
       </div>
 
       {/* Mobile menu */}
-      {isMenuOpen && (
-        <div className="fixed inset-0 z-50 bg-black md:hidden">
+      <div className={`fixed inset-0 z-50 bg-black md:hidden mobile-menu ${isMenuOpen ? 'open' : ''}`}>
           <div className="container flex h-16 items-center justify-between">
             <Link href="/eduguide" className="flex items-center gap-2" onClick={closeMenu}>
               <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-teal-500">
                 <Cpu className="h-5 w-5 text-black" />
               </div>
-              <span className="font-bold text-2xl bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-teal-400">
+              <span
+                className="logo-text-hover font-bold text-2xl bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-teal-400"
+              >
                 EduGuide
               </span>
             </Link>
@@ -307,11 +277,8 @@ export function EduGuideNavbar() {
           <nav className="container grid gap-4 pb-20 pt-6 overflow-y-auto max-h-[calc(100vh-4rem)]">
             {/* User profile section at the top for mobile */}
             {user && (
-              <motion.div
-                className="flex items-center gap-4 p-4 bg-gray-900 border border-green-900/30 rounded-md mb-4"
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
+              <div
+                className="mobile-menu-item flex items-center gap-4 p-4 bg-gray-900 border border-green-900/30 rounded-md mb-4"
               >
                 <div className="w-16 h-16 rounded-md bg-gradient-to-br from-green-400 to-teal-500 flex items-center justify-center">
                   <span className="text-2xl font-bold text-black">{user.name?.charAt(0) || "U"}</span>
@@ -322,16 +289,15 @@ export function EduGuideNavbar() {
                     View Profile
                   </Button>
                 </div>
-              </motion.div>
+              </div>
             )}
 
             <div className="grid grid-cols-1 gap-2">
               {navLinks.map((link, index) => (
-                <motion.div
+                <div
                   key={link.href}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.05 }}
+                  className="mobile-menu-item"
+                  style={{ animationDelay: `${index * 0.05}s` }}
                 >
                   <Link
                     href={link.href}
@@ -347,7 +313,7 @@ export function EduGuideNavbar() {
                     </div>
                     <span className="font-medium">{link.name}</span>
                   </Link>
-                </motion.div>
+                </div>
               ))}
             </div>
 
@@ -356,11 +322,10 @@ export function EduGuideNavbar() {
                 {user ? (
                   <>
                     {userLinks.map((link, index) => (
-                      <motion.div
+                      <div
                         key={link.href}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.3, delay: (navLinks.length + index) * 0.05 }}
+                        className="mobile-menu-item"
+                        style={{ animationDelay: `${(navLinks.length + index) * 0.05}s` }}
                       >
                         <Link
                           href={link.href}
@@ -376,12 +341,11 @@ export function EduGuideNavbar() {
                           </div>
                           <span className="font-medium">{link.name}</span>
                         </Link>
-                      </motion.div>
+                      </div>
                     ))}
-                    <motion.div
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: (navLinks.length + userLinks.length) * 0.05 }}
+                    <div
+                      className="mobile-menu-item"
+                      style={{ animationDelay: `${(navLinks.length + userLinks.length) * 0.05}s` }}
                     >
                       <button
                         className="flex items-center gap-3 p-3 rounded-md text-red-500 hover:bg-red-900/20 w-full text-left"
@@ -395,16 +359,15 @@ export function EduGuideNavbar() {
                         </div>
                         <span className="font-medium">Logout</span>
                       </button>
-                    </motion.div>
+                    </div>
                   </>
                 ) : (
                   <>
                     {userLinks.map((link, index) => (
-                      <motion.div
+                      <div
                         key={link.href}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.3, delay: (navLinks.length + index) * 0.05 }}
+                        className="mobile-menu-item"
+                        style={{ animationDelay: `${(navLinks.length + index) * 0.05}s` }}
                       >
                         <Link
                           href={link.href}
@@ -420,41 +383,17 @@ export function EduGuideNavbar() {
                           </div>
                           <span className="font-medium">{link.name}</span>
                         </Link>
-                      </motion.div>
+                      </div>
                     ))}
                   </>
                 )}
               </div>
             </div>
 
-            {/* Theme toggle in mobile menu */}
-            <motion.div
-              className="border-t border-gray-800 pt-4 mt-4"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: (navLinks.length + userLinks.length + 1) * 0.05 }}
-            >
-              <button
-                className="flex items-center gap-3 p-3 rounded-md text-gray-400 hover:bg-gray-800 w-full text-left"
-                onClick={toggleTheme}
-              >
-                <div className="w-10 h-10 rounded-md bg-gray-800 flex items-center justify-center">
-                  {mounted && theme === "dark" ? (
-                    <Sun className="h-5 w-5 text-yellow-400" />
-                  ) : (
-                    <Moon className="h-5 w-5 text-blue-400" />
-                  )}
-                </div>
-                <span className="font-medium">{mounted && theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
-              </button>
-            </motion.div>
-
             {/* Additional features section */}
-            <motion.div
-              className="border-t border-gray-800 pt-4 mt-4"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: (navLinks.length + userLinks.length + 2) * 0.05 }}
+            <div
+              className="mobile-menu-item border-t border-gray-800 pt-4 mt-4"
+              style={{ animationDelay: `${(navLinks.length + userLinks.length + 2) * 0.05}s` }}
             >
               <h3 className="text-sm font-medium text-gray-500 mb-2 px-3">Professional Tools</h3>
               <div className="grid grid-cols-2 gap-2">
@@ -464,14 +403,10 @@ export function EduGuideNavbar() {
                   { name: "Market Trends", icon: LineChart, color: "text-teal-500", bg: "bg-teal-900/20" },
                   { name: "Job Search", icon: Briefcase, color: "text-amber-500", bg: "bg-amber-900/20" },
                 ].map((tool, index) => (
-                  <motion.div
+                  <div
                     key={index}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{
-                      duration: 0.3,
-                      delay: (navLinks.length + userLinks.length + 2) * 0.05 + index * 0.05,
-                    }}
+                    className="mobile-menu-item-inner"
+                    style={{ animationDelay: `${(navLinks.length + userLinks.length + 2 + index) * 0.05}s` }}
                   >
                     <button
                       className={`flex flex-col items-center justify-center gap-2 p-3 rounded-md ${tool.bg} w-full h-24`}
@@ -479,13 +414,12 @@ export function EduGuideNavbar() {
                       <tool.icon className={`h-8 w-8 ${tool.color}`} />
                       <span className="text-xs font-medium text-gray-300">{tool.name}</span>
                     </button>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
-            </motion.div>
+            </div>
           </nav>
         </div>
-      )}
     </header>
   )
 }

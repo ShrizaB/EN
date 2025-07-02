@@ -27,9 +27,23 @@
   --variant-green: hsl(100, 30%, 60%);
 }
 
-/* Base styles */
-* {
-  border-color: hsl(20, 30%, 25%);
+/* Hide default cursor for the container and its children */
+.tva-container,
+.tva-container * {
+  cursor: none !important;
+}
+
+/* Custom cursor styles */
+.custom-cursor {
+  position: fixed;
+  width: 30px;
+  height: 30px;
+  background: url('https://i.postimg.cc/yY1XrxvR/Screenshot-2025-07-01-235250-Photoroom.png') center/contain no-repeat;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: transform 0.1s ease-out;
+  will-change: transform;
 }
 
 body {

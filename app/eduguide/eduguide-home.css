@@ -1,0 +1,646 @@
+html,
+body {
+    overflow-x: hidden;
+}
+
+/* Circuit path animation */
+@keyframes circuitPath {
+    0% {
+        stroke-dashoffset: 100;
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        stroke-dashoffset: 0;
+        opacity: 1;
+    }
+}
+
+.animate-circuit-path {
+    animation: circuitPath 2.5s ease-in-out forwards;
+    stroke-dashoffset: 100;
+    opacity: 0;
+}
+
+/* Floating animation */
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+@keyframes floatReverse {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(8px);
+    }
+}
+
+.animate-float {
+    animation: float 4s ease-in-out infinite;
+}
+
+.animate-float-reverse {
+    animation: floatReverse 4s ease-in-out infinite;
+}
+
+/* Card hover effect */
+.group-hover\/card .icon-scan-effect::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(to bottom right,
+            transparent 45%,
+            rgba(16, 185, 129, 0.3) 50%,
+            transparent 55%);
+    transform: rotate(45deg);
+    animation: scan 3s linear infinite;
+}
+
+@keyframes scan {
+    0% {
+        transform: translateY(-100%) rotate(45deg);
+    }
+
+    100% {
+        transform: translateY(100%) rotate(45deg);
+    }
+}
+
+/* Hexagon grid movement */
+@keyframes hex-move {
+    0% {
+        transform: translateY(0) translateX(0);
+    }
+
+    50% {
+        transform: translateY(20px) translateX(10px);
+    }
+
+    100% {
+        transform: translateY(0) translateX(0);
+    }
+}
+
+.animate-hex-move {
+    animation: hex-move 30s ease-in-out infinite;
+}
+
+/* Binary rain effect */
+@keyframes binaryRain {
+    0% {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 0.3;
+    }
+
+    90% {
+        opacity: 0.3;
+    }
+
+    100% {
+        transform: translateY(100vh);
+        opacity: 0;
+    }
+}
+
+/* Gradient shift animation */
+@keyframes gradient-shift {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.animate-gradient-shift {
+    animation: gradient-shift 8s ease infinite;
+    background-size: 200% 200%;
+}
+
+/* Scanning laser effect */
+@keyframes scan {
+    0% {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+
+    2% {
+        opacity: 0.5;
+    }
+
+    50% {
+        opacity: 0.2;
+    }
+
+    98% {
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+}
+
+.animate-scan {
+    animation: scan 5s linear infinite;
+}
+
+/* Quantum Dot Pulse Animation */
+@keyframes pulse {
+    0% {
+        opacity: 0.1;
+        transform: scale(0.8);
+    }
+
+    100% {
+        opacity: 0.3;
+        transform: scale(1.2);
+    }
+}
+
+/* DNA Strand Floating Animation */
+@keyframes dna-float {
+    0% {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 0.5;
+    }
+
+    90% {
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+}
+
+.animate-dna-float {
+    animation: dna-float 15s linear infinite;
+}
+
+/* Matrix Rain Animation */
+@keyframes matrixRain {
+    0% {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 0.3;
+    }
+
+    90% {
+        opacity: 0.3;
+    }
+
+    100% {
+        transform: translateY(100vh);
+        opacity: 0;
+    }
+}
+
+/* Card Hover Effects */
+.group-hover\/card .icon-hologram::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(to bottom right,
+            transparent 45%,
+            rgba(16, 185, 129, 0.3) 50%,
+            transparent 55%);
+    transform: rotate(45deg);
+    animation: scan 3s linear infinite;
+}
+
+@keyframes scan {
+    0% {
+        transform: translateY(-100%) rotate(45deg);
+    }
+
+    100% {
+        transform: translateY(100%) rotate(45deg);
+    }
+}
+
+/* Hexagon grid movement */
+@keyframes hex-move {
+    0% {
+        transform: translateY(0) translateX(0);
+    }
+
+    50% {
+        transform: translateY(20px) translateX(10px);
+    }
+
+    100% {
+        transform: translateY(0) translateX(0);
+    }
+}
+
+.animate-hex-move {
+    animation: hex-move 30s ease-in-out infinite;
+}
+
+/* Security particle pulse */
+@keyframes security-pulse {
+    0% {
+        transform: scale(0.8);
+        opacity: 0.1;
+    }
+
+    100% {
+        transform: scale(1.2);
+        opacity: 0.3;
+    }
+}
+
+/* Scanning laser effect */
+@keyframes scan {
+    0% {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+
+    2% {
+        opacity: 0.5;
+    }
+
+    50% {
+        opacity: 0.2;
+    }
+
+    98% {
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+}
+
+.animate-scan {
+    animation: scan 5s linear infinite;
+}
+
+/* Wave Path Animation */
+@keyframes wave-path {
+    0% {
+        stroke-dashoffset: 100;
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+
+    100% {
+        stroke-dashoffset: 0;
+        opacity: 0.3;
+    }
+}
+
+.animate-wave-path {
+    animation: wave-path 8s linear infinite;
+    stroke-dasharray: 20;
+    stroke-dashoffset: 100;
+    opacity: 0;
+}
+
+/* Quantum Float Animation */
+@keyframes quantum-float {
+
+    0%,
+    100% {
+        transform: translateY(0) translateX(0);
+    }
+
+    25% {
+        transform: translateY(-20px) translateX(10px);
+    }
+
+    50% {
+        transform: translateY(0) translateX(20px);
+    }
+
+    75% {
+        transform: translateY(20px) translateX(10px);
+    }
+}
+
+/* Slow Pulse Animation */
+@keyframes pulse-slow {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.1;
+    }
+
+    50% {
+        transform: scale(1.1);
+        opacity: 0.2;
+    }
+}
+
+.animate-pulse-slow {
+    animation: pulse-slow 6s ease-in-out infinite;
+}
+
+/* Border Pulse Animation */
+@keyframes border-pulse {
+
+    0%,
+    100% {
+        border-color: transparent;
+        opacity: 0;
+    }
+
+    50% {
+        border-color: rgba(16, 185, 129, 0.5);
+        opacity: 1;
+    }
+}
+
+.animate-border-pulse {
+    animation: border-pulse 4s ease-in-out infinite;
+}
+
+/* Binary Rain Animation */
+@keyframes binaryRain {
+    0% {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 0.3;
+    }
+
+    90% {
+        opacity: 0.3;
+    }
+
+    100% {
+        transform: translateY(100vh);
+        opacity: 0;
+    }
+}
+
+/* Terminal styles */
+.terminal-container {
+    position: relative;
+    background: #0a0f14;
+    /* Solid dark background */
+    border-radius: 12px;
+    padding: 16px;
+    overflow: hidden;
+    color: #00FF88;
+    /* Terminal green */
+    font-family: 'Fira Code', 'Courier New', Courier, monospace;
+    font-size: 14px;
+    /* Reduced font size */
+    border: 1px solid #002b16;
+    box-shadow: 0 4px 15px rgba(0, 42, 22, 0.2);
+    max-width: 600px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+.terminal-container * {
+    overflow: hidden;
+}
+
+/* Terminal header decoration */
+.terminal-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 24px;
+    background: transparent;
+    border-radius: 12px 12px 0 0;
+}
+
+/* Terminal control buttons (traffic lights) */
+.terminal-container::after {
+    content: '● ● ●';
+    position: absolute;
+    top: 8px;
+    left: 12px;
+    font-size: 10px;
+    color: #0a0f14;
+    letter-spacing: 4px;
+}
+
+.terminal-content {
+    position: relative;
+    z-index: 2;
+    height: 300px;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-top: 24px;
+    /* Space for header */
+}
+
+.terminal-content::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+}
+
+.terminal-line {
+    white-space: pre-wrap;
+    word-break: break-all;
+    margin-bottom: 8px;
+}
+
+.terminal-current-line {
+    display: flex;
+    align-items: center;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.terminal-cursor {
+    background-color: #00FF88;
+    width: 8px;
+    height: 1.2em;
+    display: inline-block;
+    animation: blink 1s step-end infinite;
+    box-shadow: 0 0 5px #00FF88;
+    border-radius: 1px;
+}
+
+@keyframes blink {
+
+    from,
+    to {
+        background-color: transparent;
+    }
+
+    50% {
+        background-color: #00FF88;
+    }
+}
+
+.terminal-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.shape {
+    position: absolute;
+    bottom: -50px;
+    background-color: rgba(0, 255, 136, 0.1);
+    animation: move 20s linear infinite;
+    list-style: none;
+    border-radius: 0;
+    /* Square shapes */
+}
+
+.shape:nth-child(1) {
+    left: 10%;
+    width: 60px;
+    height: 60px;
+    animation-duration: 18s;
+}
+
+.shape:nth-child(2) {
+    left: 20%;
+    width: 25px;
+    height: 25px;
+    animation-duration: 12s;
+    animation-delay: 1.5s;
+}
+
+.shape:nth-child(3) {
+    left: 25%;
+    width: 40px;
+    height: 40px;
+    animation-duration: 25s;
+}
+
+.shape:nth-child(4) {
+    left: 40%;
+    width: 50px;
+    height: 50px;
+    animation-duration: 22s;
+}
+
+.shape:nth-child(5) {
+    left: 65%;
+    width: 20px;
+    height: 20px;
+    animation-duration: 15s;
+}
+
+.shape:nth-child(6) {
+    left: 75%;
+    width: 80px;
+    height: 80px;
+    animation-duration: 18s;
+}
+
+.shape:nth-child(7) {
+    left: 85%;
+    width: 30px;
+    height: 30px;
+    animation-duration: 20s;
+    animation-delay: 1s;
+}
+
+@keyframes move {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(-1000px) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+@keyframes line-slide {
+    0% {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+}
+
+.animate-line-slide {
+    animation: line-slide 6s linear infinite;
+}
+
+@keyframes gradient-slow {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.animate-gradient-slow {
+    background-size: 200% 200%;
+    animation: gradient-slow 20s ease infinite;
+}

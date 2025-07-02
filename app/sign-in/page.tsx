@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -53,22 +52,63 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="container flex items-center justify-center min-h-screen py-8">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl text-center">Welcome to EduPlay</CardTitle>
-          <CardDescription className="text-center">Sign in to your account or create a new one</CardDescription>
+    <div className="container flex items-center justify-center min-h-screen py-8 bg-gradient-to-tl from-[#0a0717] via-black to-[#150303] [&_input]:focus:ring-0 [&_input]:focus:ring-offset-0 [&_input]:focus:outline-none [&_input]:focus:border-gray-600 [&_input]:focus:shadow-none">
+
+      {/* Background Image with overlay */}
+      <div className="absolute inset-0 flex items-center h-full w-full max-w-7xl mx-auto px-4">
+        <div className="flex gap-4">
+          <div className="relative">
+            <img
+              src="https://i.postimg.cc/c6yZDPN1/Ironman-PNG-Photoroom.png"
+              alt="Ironman"
+              className="opacity-90 w-[300px] fixed top-16 left-10 h-auto scale-x-[-1] drop-shadow-[0_0_40px_#eb403460] animate-glow"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="absolute inset-0 flex items-center h-full w-full max-w-7xl mx-auto px-4">
+        <div className="flex gap-4">
+          <div className="relative">
+            <img
+              src="https://i.postimg.cc/WpSMBjDJ/Superman-Flying-HD-PNG-Image-Transparent-photo-4-Free-Download-Photoroom.png"
+              alt="Superman"
+              className="opacity-90 w-[300px] fixed top-16 right-10 h-auto scale-x-[-1] drop-shadow-[0_0_40px_#001a4d] animate-glow"
+            />
+          </div>
+        </div>
+      </div>
+
+      <Card className="w-full max-w-md bg-gray-900 backdrop-blur-sm border border-gray-700 shadow-lg transition-shadow duration-300">
+        <CardHeader className="relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-gray-800/50 to-gray-900/50" />
+          <CardTitle className="text-3xl font-bold text-center text-white drop-shadow-[0_2px_2px_rgba(255,0,0,0.8)]">
+            Welcome to EduNova
+          </CardTitle>
+          <CardDescription className="text-center text-gray-300">
+            Join the league or assemble your team
+          </CardDescription>
         </CardHeader>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="signin">Sign In</TabsTrigger>
-            <TabsTrigger value="signup">Sign Up</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 bg-gray-800 border-b border-gray-700">
+            <TabsTrigger 
+              value="signin" 
+              className="text-gray-300 data-[state=active]:bg-gray-700 data-[state=active]:text-white hover:bg-gray-700 transition-all duration-200"
+            >
+              Sign In
+            </TabsTrigger>
+            <TabsTrigger 
+              value="signup" 
+              className="text-gray-300 data-[state=active]:bg-gray-700 data-[state=active]:text-white hover:bg-gray-700 transition-all duration-200"
+            >
+              Sign Up
+            </TabsTrigger>
           </TabsList>
 
           <CardContent className="pt-6">
             {error && (
-              <Alert variant="destructive" className="mb-4">
+              <Alert variant="destructive" className="mb-4 bg-red-900/30 border-red-700 text-white animate-shake">
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>Error</AlertTitle>
                 <AlertDescription>{error}</AlertDescription>
@@ -78,88 +118,98 @@ export default function SignInPage() {
             <form onSubmit={handleSignIn}>
               <TabsContent value="signin" className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email" className="text-white font-semibold">Email</Label>
                   <Input
                     id="email"
                     type="email"
-                    placeholder="your.email@example.com"
+                    placeholder="hero.email@gmail.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    className="bg-gray-800 border-gray-700 text-white placeholder-gray-500 transition-all duration-200"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password" className="text-white font-semibold">Password</Label>
                   <Input
                     id="password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    className="bg-gray-800 border-gray-700 text-white placeholder-gray-500 transition-all duration-200"
                   />
                 </div>
               </TabsContent>
 
               <TabsContent value="signup" className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Full Name</Label>
+                  <Label htmlFor="name" className="text-white font-semibold">Hero Name</Label>
                   <Input
                     id="name"
-                    placeholder="John Doe"
+                    placeholder="Bruce Wayne"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
+                    className="bg-gray-800 border-gray-700 text-white placeholder-gray-500 transition-all duration-200"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email-signup">Email</Label>
+                  <Label htmlFor="email-signup" className="text-white font-semibold">Email</Label>
                   <Input
                     id="email-signup"
                     type="email"
-                    placeholder="your.email@example.com"
+                    placeholder="hero.email@marveldc.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    className="bg-gray-800 border-gray-700 text-white placeholder-gray-500 transition-all duration-200"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password-signup">Password</Label>
+                  <Label htmlFor="password-signup" className="text-white font-semibold">Password</Label>
                   <Input
                     id="password-signup"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    className="bg-gray-800 border-gray-700 text-white placeholder-gray-500 transition-all duration-200"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="age">Age</Label>
+                  <Label htmlFor="age" className="text-white font-semibold">Age</Label>
                   <Input
                     id="age"
                     type="number"
-                    placeholder="25"
+                    placeholder="18"
                     value={age}
                     onChange={(e) => setAge(e.target.value)}
                     required
+                    className="bg-gray-800 border-gray-700 text-white placeholder-gray-500 transition-all duration-200"
                   />
                 </div>
               </TabsContent>
 
               <CardFooter className="flex justify-center pt-6 px-0">
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                <Button 
+                  type="submit" 
+                  className="w-full bg-gray-800 hover:bg-gray-700 text-white font-bold transition-all duration-300 transform hover:scale-105 border border-gray-700"
+                  disabled={isLoading}
+                >
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Please wait
+                      Activating Hero Mode
                     </>
                   ) : activeTab === "signin" ? (
-                    "Sign In"
+                    "Join the Mission"
                   ) : (
-                    "Sign Up"
+                    "Become a Hero"
                   )}
                 </Button>
               </CardFooter>
@@ -167,6 +217,25 @@ export default function SignInPage() {
           </CardContent>
         </Tabs>
       </Card>
+      <style jsx>{`
+        @keyframes gradient {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+          20%, 40%, 60%, 80% { transform: translateX(2px); }
+        }
+        .animate-gradient {
+          background-size: 200% 200%;
+          animation: gradient 15s ease infinite;
+        }
+        .animate-shake {
+          animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+      `}</style>
     </div>
   )
 }

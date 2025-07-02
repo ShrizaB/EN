@@ -1,0 +1,398 @@
+/* Thanos Theme Styles */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Orbitron:wght@400;700&display=swap');
+
+:root {
+    --thanos-purple: #6b21a8;
+    --thanos-gold: #facc15;
+    --thanos-blue: #3b82f6;
+    --thanos-red: #ef4444;
+    --thanos-green: #10b981;
+    --thanos-orange: #f97316;
+    --thanos-bg: #0f0f1a;
+    --thanos-card-bg: rgba(23, 23, 36, 0.9);
+    --thanos-text: #f3f4f6;
+    --thanos-text-muted: #9ca3af;
+    --card-border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body {
+    background: var(--thanos-bg);
+    color: var(--thanos-text);
+    font-family: 'Orbitron', sans-serif;
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+.font-thanos-one {
+    font-family: 'Orbitron', sans-serif;
+}
+
+.font-thanos-two {
+    font-family: 'Cinzel Decorative', serif;
+}
+
+.text-thanos-one {
+    font-family: 'Cinzel Decorative', serif;
+    background: linear-gradient(90deg, #f3f4f6, #d4a017);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 10px rgba(212, 160, 23, 0.3);
+    position: relative;
+    display: inline-block;
+    letter-spacing: 2px;
+}
+
+/* Cosmic Background */
+.cosmic-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background:
+        radial-gradient(circle at 10% 20%, rgba(107, 33, 168, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(30, 58, 138, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 50% 50%, rgba(20, 20, 30, 0.8) 0%, #0a0a10 100%);
+    overflow: hidden;
+}
+
+/* Particle Animation */
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0) rotate(0deg);
+    }
+
+    50% {
+        transform: translateY(-20px) rotate(5deg);
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 0.8;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+}
+
+@keyframes glow {
+
+    0%,
+    100% {
+        box-shadow: 0 0 10px rgba(212, 160, 23, 0.3);
+    }
+
+    50% {
+        box-shadow: 0 0 25px rgba(212, 160, 23, 0.6);
+    }
+}
+
+/* Infinity Stone Orb Animation */
+@keyframes stoneGlow {
+
+    0%,
+    100% {
+        box-shadow:
+            0 0 10px currentColor,
+            0 0 20px currentColor,
+            inset 0 0 10px rgba(255, 255, 255, 0.1);
+        transform: scale(1);
+    }
+
+    50% {
+        box-shadow:
+            0 0 20px currentColor,
+            0 0 40px currentColor,
+            inset 0 0 20px rgba(255, 255, 255, 0.2);
+        transform: scale(1.1);
+    }
+}
+
+/* Stone Orb Hover Effect */
+.thanos-card:hover .stone-orb {
+    transform: scale(1.1) rotate(5deg);
+    border: rgb(92, 92, 92);
+}
+
+/* Card Styles */
+.thanos-card {
+    background: var(--thanos-card-bg);
+    backdrop-filter: blur(10px);
+    border: var(--card-border);
+    border-radius: 0.75rem;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.thanos-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #6b21a8, #3b82f6, #10b981, #facc15, #f97316, #ef4444, transparent);
+    background-size: 200% 100%;
+    transform: translateX(-100%);
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
+}
+
+.thanos-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #ef4444, #f97316, #facc15, #10b981, #3b82f6, #6b21a8, transparent);
+    background-size: 200% 100%;
+    transform: translateX(100%);
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.2s;
+    z-index: 1;
+}
+
+.thanos-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.thanos-card:hover::before {
+    transform: translateX(100%);
+}
+
+.thanos-card:hover::after {
+    transform: translateX(-100%);
+}
+
+/* Title Styles */
+.thanos-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 4rem;
+    background: linear-gradient(90deg, #f3f4f6, #d4a017);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 10px rgba(212, 160, 23, 0.3);
+    position: relative;
+    display: inline-block;
+    letter-spacing: 2px;
+}
+
+.thanos-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--thanos-gold), transparent);
+    opacity: 0.7;
+}
+
+/* Button Styles */
+.thanos-button {
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    transition: all 0.5s ease;
+    background: transparent;
+    color: #f3f4f6;
+    border: none;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(4px);
+    border: #2e280c 1px solid;
+}
+
+.thanos-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: transparent;
+    background-size: 400% 400%;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.5s ease, background-position 8s ease;
+    border: #0c0d2e 1px solid;
+
+}
+
+.thanos-button::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: inherit;
+    border-radius: inherit;
+    z-index: -2;
+}
+
+.thanos-button:hover {
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.thanos-button:hover::before {
+    opacity: 1;
+    animation: gradientBG 8s ease infinite;
+}
+
+@keyframes gradientBG {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.thanos-button .button-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+}
+
+.thanos-button .arrow-icon {
+    margin-left: 8px;
+    transition: transform 0.3s ease;
+}
+
+.thanos-button:hover .arrow-icon {
+    transform: translateX(4px);
+}
+
+/* Stone Orb Styles */
+.stone-orb {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    position: relative;
+    animation: float 6s ease-in-out infinite;
+}
+
+.stone-orb::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), transparent 70%);
+    opacity: 0.3;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .thanos-title {
+        font-size: 2.5rem;
+    }
+
+    .stone-orb {
+        width: 50px;
+        height: 50px;
+    }
+}
+
+.infinity-orbit-container {
+    position: fixed;
+    width: 200px;
+    height: 200px;
+    margin: auto;
+    border-radius: 50%;
+    right: 80px;
+    top: 170px;
+}
+
+.stone {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    animation: orbit 20s linear infinite;
+    transform-origin: 100px center; /* Half of container width */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stone-wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.stone img {
+    width: 120%;
+    height: 120%;
+    object-fit: contain;
+    transition: all 0.3s ease;
+}
+
+/* Position each stone at different angles */
+.stone-1 { transform: rotate(0deg) translateX(100px) rotate(0deg); }
+.stone-2 { transform: rotate(60deg) translateX(100px) rotate(-60deg); }
+.stone-3 { transform: rotate(120deg) translateX(100px) rotate(-120deg); }
+.stone-4 { transform: rotate(180deg) translateX(100px) rotate(-180deg); }
+.stone-5 { transform: rotate(240deg) translateX(100px) rotate(-240deg); }
+.stone-6 { transform: rotate(300deg) translateX(100px) rotate(-300deg); }
+
+/* Orbit animation */
+@keyframes orbit {
+    from {
+        transform: rotate(0deg) translateX(100px) rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg) translateX(100px) rotate(-360deg);
+    }
+}
+
+/* Hover effects */
+.stone:hover .stone-wrapper {
+    transform: scale(1.3);
+}
+
+.stone:hover img {
+    filter: brightness(1.2);
+}
+
+/* Individual stone animations for slight variation */
+.stone-1 { animation: orbit 15s linear infinite; }
+.stone-2 { animation: orbit 18s linear infinite reverse; }
+.stone-3 { animation: orbit 20s linear infinite; }
+.stone-4 { animation: orbit 22s linear infinite reverse; }
+.stone-5 { animation: orbit 16s linear infinite; }
+.stone-6 { animation: orbit 19s linear infinite reverse; }

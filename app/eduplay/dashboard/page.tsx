@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useEffect, useState, useCallback, Suspense } from "react"
+import { useEffect, useState, useCallback, Suspense, useRef } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import {
@@ -540,7 +540,7 @@ function DashboardContent() {
         <div className="absolute bottom-1/5 left-1/3 w-8 h-8 bg-loki-green/20 rounded-full animate-float-fast shadow-lg shadow-loki-green/20"></div>
         <div className="absolute top-1/4 right-1/3 w-5 h-5 bg-tva-orange/30 rounded-full animate-float-slow shadow-lg shadow-tva-orange/20"></div>
         {/* Aurora/mist overlay */}
-        <div className="absolute inset-0 z-0 pointer-events-none" style={{background: 'radial-gradient(ellipse at 60% 40%, rgba(80,255,180,0.10) 0%, rgba(120,0,255,0.08) 60%, transparent 100%)', mixBlendMode: 'screen', animation: 'aurora-move 12s ease-in-out infinite alternate'}}></div>
+        <div className="absolute inset-0 z-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 60% 40%, rgba(80,255,180,0.10) 0%, rgba(120,0,255,0.08) 60%, transparent 100%)', mixBlendMode: 'screen', animation: 'aurora-move 12s ease-in-out infinite alternate' }}></div>
         {/* Animated runes/Norse pattern overlay */}
         <div className="absolute inset-0 z-0 pointer-events-none norse-runes-bg opacity-10 animate-runes-fade"></div>
       </div>
@@ -836,13 +836,32 @@ function DashboardContent() {
 export default function Dashboard() {
   const { user } = useAuth()
   const [isLoading, setIsLoading] = useState(true)
+  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 })
+  const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false)
-    }, 1500)
-    return () => clearTimeout(timer)
-  }, [])
+    }, 2000)
+
+    const handleMouseMove = (e: MouseEvent) => {
+      setCursorPos({ x: e.clientX, y: e.clientY })
+      if (!isVisible) setIsVisible(true)
+    }
+
+    const handleMouseLeave = () => {
+      setIsVisible(false)
+    }
+
+    window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('mouseleave', handleMouseLeave)
+
+    return () => {
+      clearTimeout(timer)
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('mouseleave', handleMouseLeave)
+    }
+  }, [isVisible])
 
   if (isLoading) {
     return (
@@ -857,7 +876,17 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-dark-gray via-tva-brown to-dark-gray relative overflow-hidden pt-8">
+    <div className="min-h-screen bg-gradient-to-br from-dark-gray via-tva-brown to-dark-gray relative overflow-hidden pt-8 tva-container">
+
+      {/* Custom cursor */}
+      <div 
+        className={`custom-cursor ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+        style={{
+          left: `${cursorPos.x}px`,
+          top: `${cursorPos.y}px`,
+        }}
+      />
+
       {/* Main Character - Fixed Position */}
       <div className="fixed inset-0 w-screen h-screen overflow-hidden pointer-events-none z-0">
         <img
@@ -922,7 +951,7 @@ export default function Dashboard() {
               {/* Speech bubble pointer */}
               <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-dark-gray/90 border-b-2 border-r-2 border-loki-green/50 transform rotate-45"></div>
             </div>
-            
+
             {/* Miss Minutes image */}
             <div className="w-[200px] h-[200px] pointer-events-none mt-2">
               <img

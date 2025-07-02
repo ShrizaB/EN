@@ -9,7 +9,7 @@ export const metadata = {
 
 export default function BiologyVisualsPage() {
   return (
-    <div className="container mx-auto py-8">
+    <div className="container mx-auto py-8 mt-10 ">
       <h1 className="text-3xl font-bold mb-6">Biology Visualizations</h1>
       <p className="text-lg mb-8">
         Explore biology concepts through interactive 3D visualizations. Click on any topic below to get started.

@@ -1,239 +1,236 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import { motion } from "framer-motion"
 import { Card } from "@/components/ui/card"
-import { Atom, Beaker, FlaskRoundIcon as Flask, ArrowRight, Sparkles, Zap } from "lucide-react"
+import { Atom, Zap, FlaskRoundIcon as Flask, ArrowRight } from "lucide-react"
+import "./superman-theme.css"
+import React from "react"
 
 export default function ChemistryVisualsPage() {
   const [hoveredCard, setHoveredCard] = useState<string | null>(null)
+
+  useEffect(() => {
+    // Initialize subtle background animations
+    const stars = document.querySelectorAll<HTMLElement>('.star')
+    stars.forEach(star => {
+      const duration = Math.random() * 3 + 2
+      star.style.animation = `twinkle ${duration}s infinite`
+    })
+  }, [])
 
   const topics = [
     {
       id: "atom-structure",
       title: "Atom Structure",
-      description: "Explore the Bohr Model and 3D Orbitals of atoms",
+      description: "Explore the Bohr Model and atomic orbitals in a cosmic dance.",
       icon: Atom,
-      color: "text-purple-500",
-      bgColor: "bg-purple-100 dark:bg-purple-900/30",
-      borderColor: "border-purple-300 dark:border-purple-700",
-      hoverColor: "group-hover:text-purple-600 dark:group-hover:text-purple-400",
-      shadowColor: "shadow-purple-500/20",
-      gradient: "from-purple-400 to-pink-500",
     },
     {
       id: "molecular-bonds",
       title: "Molecular Bonds",
-      description: "Visualize how atoms bond together to form molecules",
+      description: "Witness atomic bonds form with Superman-speed energy.",
       icon: Zap,
-      color: "text-blue-500",
-      bgColor: "bg-blue-100 dark:bg-blue-900/30",
-      borderColor: "border-blue-300 dark:border-blue-700",
-      hoverColor: "group-hover:text-blue-600 dark:group-hover:text-blue-400",
-      shadowColor: "shadow-blue-500/20",
-      gradient: "from-blue-400 to-cyan-500",
     },
     {
       id: "chemical-reactions",
       title: "Chemical Reactions",
-      description: "Watch chemical reactions happen in 3D space",
+      description: "Dive into 3D reaction simulations with Kryptonian flair.",
       icon: Flask,
-      color: "text-green-500",
-      bgColor: "bg-green-100 dark:bg-green-900/30",
-      borderColor: "border-green-300 dark:border-green-700",
-      hoverColor: "group-hover:text-green-600 dark:group-hover:text-green-400",
-      shadowColor: "shadow-green-500/20",
-      gradient: "from-green-400 to-emerald-500",
     },
   ]
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
+  // Add asteroid data
+  const asteroids = [
+    {
+      id: 1,
+      src: 'https://i.postimg.cc/pXPwk6kq/f2aa08ac-bfe1-4133-b008-9e364404e7a4-Photoroom.png',
+      className: 'w-16 h-16 top-1/3 left-1/6',
+      animation: 'float-1 8s ease-in-out infinite'
     },
-  }
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { duration: 0.5 },
+    {
+      id: 2,
+      src: 'https://i.postimg.cc/pXPwk6kq/f2aa08ac-bfe1-4133-b008-9e364404e7a4-Photoroom.png',
+      className: 'w-24 h-24 top-10 right-1/5',
+      animation: 'float-2 10s ease-in-out infinite 2s'
     },
-  }
-
-  // Floating bubbles animation
-  const bubbles = Array.from({ length: 20 }).map((_, i) => ({
-    id: i,
-    size: Math.random() * 40 + 20,
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-    duration: Math.random() * 8 + 4,
-    delay: Math.random() * 5,
-    color: [
-      "rgba(139, 92, 246, 0.2)", // Purple
-      "rgba(59, 130, 246, 0.2)", // Blue
-      "rgba(236, 72, 153, 0.2)", // Pink
-    ][Math.floor(Math.random() * 3)],
-  }))
+    {
+      id: 3,
+      src: 'https://i.postimg.cc/pXPwk6kq/f2aa08ac-bfe1-4133-b008-9e364404e7a4-Photoroom.png',
+      className: 'w-20 h-20 bottom-1/4 right-1/4',
+      animation: 'float-3 12s ease-in-out infinite 1s'
+    },
+    {
+      id: 4,
+      src: 'https://i.postimg.cc/pXPwk6kq/f2aa08ac-bfe1-4133-b008-9e364404e7a4-Photoroom.png',
+      className: 'w-16 h-16 bottom-1/3 left-1/4',
+      animation: 'float-1 9s ease-in-out infinite 0.5s'
+    },
+    {
+      id: 5,
+      src: 'https://i.postimg.cc/pXPwk6kq/f2aa08ac-bfe1-4133-b008-9e364404e7a4-Photoroom.png',
+      className: 'w-16 h-16 bottom-1/2 right-1/4',
+      animation: 'float-1 9s ease-in-out infinite 0.5s'
+    },
+    {
+      id: 6,
+      src: 'https://i.postimg.cc/pXPwk6kq/f2aa08ac-bfe1-4133-b008-9e364404e7a4-Photoroom.png',
+      className: 'w-16 h-16 top-1/3 right-1/3',
+      animation: 'float-1 9s ease-in-out infinite 0.5s'
+    },
+    {
+      id: 7,
+      src: 'https://i.postimg.cc/pXPwk6kq/f2aa08ac-bfe1-4133-b008-9e364404e7a4-Photoroom.png',
+      className: 'w-16 h-16 bottom-1/4 left-1/2',
+      animation: 'float-1 9s ease-in-out infinite 0.5s'
+    },
+  ];
 
   return (
-    <div className="container px-4 py-12 mx-auto relative">
-      {/* Animated background bubbles */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {bubbles.map((bubble) => (
-          <motion.div
-            key={`bubble-${bubble.id}`}
-            className="absolute rounded-full"
-            style={{
-              width: `${bubble.size}px`,
-              height: `${bubble.size}px`,
-              left: `${bubble.x}%`,
-              top: `${bubble.y}%`,
-              background: `radial-gradient(circle at 30% 30%, white, ${bubble.color})`,
-              boxShadow: `0 0 10px ${bubble.color.replace("0.2", "0.5")}`,
-            }}
-            initial={{ scale: 0 }}
-            animate={{
-              y: [0, -50, -100],
-              x: [0, Math.random() * 30 - 15, Math.random() * 60 - 30],
-              scale: [0, 1, 0],
-              opacity: [0, 0.7, 0],
-            }}
-            transition={{
-              duration: bubble.duration,
-              repeat: Number.POSITIVE_INFINITY,
-              delay: bubble.delay,
-              ease: "easeInOut",
-            }}
-          />
-        ))}
+    <div className="superman-dark-container relative overflow-hidden">
+      {/* Floating Asteroids */}
+      {asteroids.map((asteroid) => (
+        <img
+          key={asteroid.id}
+          src={asteroid.src}
+          alt="Asteroid"
+          className={`asteroid ${asteroid.className}`}
+          style={{
+            animation: asteroid.animation,
+          }}
+        />
+      ))}
+
+      {/* Background Image with overlay */}
+      <div className="absolute inset-0 flex items-center h-full w-full max-w-7xl mx-auto px-4">
+        <div className="flex gap-4">
+          <div className="relative">
+            <img
+              src="https://i.postimg.cc/WpSMBjDJ/Superman-Flying-HD-PNG-Image-Transparent-photo-4-Free-Download-Photoroom.png"
+              alt="Superman"
+              className="opacity-90 w-[300px] fixed top-16 right-10 h-auto scale-x-[-1] drop-shadow-[0_0_40px_#001a4d] animate-glow"
+            />
+          </div>
+        </div>
+      </div>
+      {/* Background Image with overlay */}
+      <div className="absolute inset-0 flex items-center h-full w-full max-w-7xl mx-auto px-4">
+        <div className="flex gap-4">
+          <div className="relative">
+            <img
+              src="https://i.postimg.cc/VL2xqkrP/pngimg-com-superman-logo-PNG8.png"
+              alt="Superman"
+              className="opacity-40 w-[300px] fixed top-16 left-10 h-auto scale-x-[-1] drop-shadow-[0_0_40px_#dc2626] animate-float"
+            />
+          </div>
+        </div>
       </div>
 
-      <div className="relative">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-12"
-        >
-          <div className="inline-block relative">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-800 dark:text-white mb-4">
-              Chemistry Visualizations
-            </h1>
-            <motion.div
-              className="absolute -top-6 -right-6 text-purple-500"
-              animate={{
-                rotate: 360,
-                scale: [1, 1.2, 1],
-              }}
-              transition={{ duration: 5, repeat: Number.POSITIVE_INFINITY }}
-            >
-              <Beaker className="h-8 w-8" />
-            </motion.div>
-            <motion.div
-              className="absolute -bottom-6 -left-6 text-pink-500"
-              animate={{
-                rotate: -360,
-                scale: [1, 1.2, 1],
-              }}
-              transition={{ duration: 5, repeat: Number.POSITIVE_INFINITY, delay: 0.5 }}
-            >
-              <Sparkles className="h-8 w-8" />
-            </motion.div>
-          </div>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            Explore the fascinating world of chemistry through interactive 3D models and visualizations!
+      {/* Hide default cursor and render a custom cursor image that follows the mouse */}
+      <style>{`
+        html, body, #__next, .thanos-container, * {
+          cursor: none !important;
+        }
+      `}</style>
+      {/* Custom cursor image */}
+      <CustomCursor />
+
+      <div className="stars-background">
+        {[...Array(50)].map((_, i) => (
+          <div key={i} className="star" style={{
+            top: `${Math.random() * 100}%`,
+            left: `${Math.random() * 100}%`,
+            animationDelay: `${Math.random() * 2}s`
+          }} />
+        ))}
+      </div>
+      <div className="superman-logo-overlay" />
+      <div className="container px-4 py-16 mx-auto relative z-10">
+        <div className="text-center mb-16">
+          <h1 className="text-5xl md:text-7xl font-bold text-superman-yellow mb-4 tracking-tight animate-pulse-shadow font-krypton">
+            Chemistry Visuals
+          </h1>
+          <p className="text-lg text-gray-300 max-w-2xl mx-auto font-krypton">
+            Unleash the power of chemistry with Superman-inspired visualizations.
           </p>
-        </motion.div>
+        </div>
 
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="grid grid-cols-1 md:grid-cols-3 gap-8"
-        >
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mt-24">
           {topics.map((topic) => (
-            <motion.div
-              key={topic.id}
-              variants={itemVariants}
-              onHoverStart={() => setHoveredCard(topic.id)}
-              onHoverEnd={() => setHoveredCard(null)}
-              className="relative"
-            >
-              <Link href={`/eduplay/visuals/chemistry/${topic.id}`}>
-                <Card
-                  className={`h-full overflow-hidden border-2 ${topic.borderColor} ${topic.shadowColor} hover:shadow-xl transition-all duration-300 group`}
-                >
-                  <div className="p-6">
-                    <div className="flex items-center mb-4">
-                      <motion.div
-                        className={`w-16 h-16 rounded-full ${topic.bgColor} flex items-center justify-center mr-4`}
-                        whileHover={{ rotate: 360 }}
-                        transition={{ duration: 0.5 }}
-                      >
-                        <topic.icon className={`h-8 w-8 ${topic.color}`} />
-                      </motion.div>
-                      <h2 className={`text-2xl font-bold ${topic.color}`}>{topic.title}</h2>
+            <Link key={topic.id} href={`/eduplay/visuals/chemistry/${topic.id}`}>
+              <Card
+                onMouseEnter={() => setHoveredCard(topic.id)}
+                onMouseLeave={() => setHoveredCard(null)}
+                className={`superman-card relative overflow-hidden transition-all duration-500 ${hoveredCard === topic.id ? "hovered" : ""
+                  }`}
+              >
+                <div className="card-glow" />
+                <div className="p-6 relative z-10">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="icon-wrapper animate-spin-slow">
+                      <topic.icon className="h-8 w-8 text-superman-blue" />
                     </div>
-
-                    <p className="text-gray-600 dark:text-gray-300 mb-6">{topic.description}</p>
-
-                    <motion.div
-                      className={`mt-4 flex items-center text-sm font-medium ${topic.color}`}
-                      animate={hoveredCard === topic.id ? { x: [0, 5, 0] } : {}}
-                      transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY }}
-                    >
-                      <span>Explore {topic.title}</span>
-                      <ArrowRight className="ml-1 h-4 w-4" />
-                    </motion.div>
+                    <h2 className="text-2xl font-semibold text-white font-krypton">
+                      {topic.title}
+                    </h2>
                   </div>
-
-                  {/* Gradient overlay on hover */}
-                  <div
-                    className={`absolute inset-0 opacity-0 group-hover:opacity-10 bg-gradient-to-r ${topic.gradient} transition-opacity duration-300 pointer-events-none`}
-                  ></div>
-
-                  {/* Animated background particles */}
-                  {hoveredCard === topic.id && (
-                    <div className="absolute inset-0 pointer-events-none">
-                      {Array.from({ length: 10 }).map((_, i) => (
-                        <motion.div
-                          key={i}
-                          className={`absolute rounded-full ${topic.bgColor}`}
-                          style={{
-                            width: `${Math.random() * 30 + 10}px`,
-                            height: `${Math.random() * 30 + 10}px`,
-                            left: `${Math.random() * 100}%`,
-                            top: `${Math.random() * 100}%`,
-                          }}
-                          initial={{ scale: 0, opacity: 0 }}
-                          animate={{
-                            scale: [0, 1, 0],
-                            opacity: [0, 0.5, 0],
-                            x: [0, Math.random() * 40 - 20],
-                            y: [0, Math.random() * 40 - 20],
-                          }}
-                          transition={{
-                            duration: Math.random() * 2 + 1,
-                            repeat: Number.POSITIVE_INFINITY,
-                            delay: Math.random() * 0.5,
-                          }}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </Card>
-              </Link>
-            </motion.div>
+                  <p className="text-gray-300 text-sm">{topic.description}</p>
+                  <div className="mt-6 flex items-center text-red-100 text-sm group">
+                    Explore {topic.title}
+                    <ArrowRight className="ml-1 h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+              </Card>
+            </Link>
           ))}
-        </motion.div>
+        </div>
       </div>
     </div>
   )
+}
+
+// Custom cursor component
+function CustomCursor() {
+  const [pos, setPos] = React.useState({ x: 0, y: 0 });
+  const lastPos = React.useRef({ x: 0, y: 0 });
+  React.useEffect(() => {
+    // Lower sensitivity: only update if mouse moved > 8px
+    const move = (e: MouseEvent) => {
+      const dx = Math.abs(e.clientX - lastPos.current.x);
+      const dy = Math.abs(e.clientY - lastPos.current.y);
+      if (dx > 9 || dy > 9) {
+        setPos({ x: e.clientX, y: e.clientY });
+        lastPos.current = { x: e.clientX, y: e.clientY };
+      }
+    };
+    window.addEventListener('mousemove', move);
+    return () => window.removeEventListener('mousemove', move);
+  }, []);
+  return (
+    <div
+      className="fixed pointer-events-none z-[9999]"
+      style={{
+        left: pos.x,
+        top: pos.y,
+        transform: 'translate(-50%, -50%) scaleX(-1) rotate(15deg)',
+        width: '32px',
+        height: '32px',
+      }}
+    >
+      <img
+        src="https://i.postimg.cc/G3DPx9nd/Screenshot-2025-07-02-213834-Photoroom.png"
+        alt="Superman Cursor"
+        className="w-full h-full object-contain"
+        style={{
+          filter: 'drop-shadow(0 0 8px rgba(0,0,0,0.5))',
+          pointerEvents: 'none',
+          userSelect: 'none',
+          WebkitUserSelect: 'none',
+          MozUserSelect: 'none',
+          msUserSelect: 'none',
+        }}
+        draggable={false}
+      />
+    </div>
+  );
 }

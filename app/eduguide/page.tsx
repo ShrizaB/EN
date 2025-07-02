@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
-import { motion, useAnimation, useInView } from "framer-motion"
+import './eduguide-home.css'
+
 import { Button } from "@/components/ui/button"
 import {
   BookOpen,
@@ -15,36 +16,27 @@ import {
   Layers,
   Cpu,
   Code,
-  Network,
   Lock,
   Shield,
   Zap,
   LineChart,
   Briefcase,
   GraduationCap,
-  Database,
   Eye,
   Key,
   AlertTriangle,
+  Network,
+
 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function EduGuidePage() {
   const [animationComplete, setAnimationComplete] = useState(false)
-  const [activeCard, setActiveCard] = useState<number | null>(null)
   const [terminalText, setTerminalText] = useState("")
   const [cursorVisible, setCursorVisible] = useState(true)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const headerRef = useRef(null)
-  const isHeaderInView = useInView(headerRef, { once: true })
-  const controls = useAnimation()
   const gridRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (isHeaderInView) {
-      controls.start("visible")
-    }
-  }, [isHeaderInView, controls])
 
   // Terminal text typing effect
   useEffect(() => {
@@ -175,46 +167,14 @@ export default function EduGuidePage() {
     return () => clearTimeout(timer)
   }, [])
 
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  }
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { duration: 0.5 },
-    },
-  }
-
-  const glitchVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5,
-        ease: "easeInOut",
-      },
-    },
-  }
-
   const services = [
     {
-      title: "Learn & Give Aptitude Test",
+      title: "Aptitude Test",
       description: "Master aptitude topics and test your knowledge with competitive exam-style mock tests",
       icon: BookOpen,
       color: "text-blue-400",
       bgColor: "bg-blue-900/30",
-      borderColor: "border-blue-500/20 hover:border-blue-500/50",
+      borderColor: "border-blue-500/20",
       gradientFrom: "from-blue-900/40",
       gradientTo: "to-purple-900/40",
       buttonGradientFrom: "from-blue-600",
@@ -228,14 +188,15 @@ export default function EduGuidePage() {
         "Current affairs mock tests",
         "Competitive exam preparation",
       ],
+      shadowColor: 'hover:shadow-[0_0_25px_5px_rgba(59,130,246,0.2)]',
     },
     {
       title: "Career Roadmap",
-      description: "Explore career paths and get step-by-step guidance to achieve your professional goals",
+      description: "Explore career paths with step-by-step guidance to build skills, make smart choices, and reach your professional goals",
       icon: MapPin,
       color: "text-green-400",
       bgColor: "bg-green-900/30",
-      borderColor: "border-green-500/20 hover:border-green-500/50",
+      borderColor: "border-green-500/20",
       gradientFrom: "from-green-900/40",
       gradientTo: "to-teal-900/40",
       buttonGradientFrom: "from-green-600",
@@ -249,14 +210,15 @@ export default function EduGuidePage() {
         "Skill development resources",
         "Job market insights",
       ],
+      shadowColor: 'hover:shadow-[0_0_25px_5px_rgba(74,222,128,0.2)]'
     },
     {
       title: "Give Interview",
-      description: "Practice with simulated interviews and get feedback to improve your interview skills",
+      description: "Practice with mock interviews and get feedback to sharpen your interview skills and boost confidence.",
       icon: Users,
       color: "text-amber-400",
       bgColor: "bg-amber-900/30",
-      borderColor: "border-amber-500/20 hover:border-amber-500/50",
+      borderColor: "border-amber-500/20",
       gradientFrom: "from-amber-900/40",
       gradientTo: "to-orange-900/40",
       buttonGradientFrom: "from-amber-600",
@@ -270,6 +232,7 @@ export default function EduGuidePage() {
         "Personalized feedback",
         "Industry-specific preparation",
       ],
+      shadowColor: 'hover:shadow-[0_0_25px_5px_rgba(251,191,36,0.2)]'
     },
   ]
 
@@ -336,51 +299,32 @@ export default function EduGuidePage() {
       {/* Binary particles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {binaryParticles.map((particle) => (
-          <motion.div
+          <div
             key={particle.id}
-            className="absolute font-mono text-green-500/30"
+            className="binary-particle absolute font-mono text-green-500/30"
             style={{
               fontSize: `${particle.size}px`,
               top: `${particle.y}%`,
               left: `${particle.x}%`,
-            }}
-            initial={{ opacity: 0 }}
-            animate={{
-              opacity: [0, 0.3, 0],
-              y: [0, 20],
-            }}
-            transition={{
-              duration: particle.animationDuration,
-              repeat: Number.POSITIVE_INFINITY,
-              delay: particle.delay,
+              animationDuration: `${particle.animationDuration}s`,
+              animationDelay: `${particle.delay}s`,
             }}
           >
             {particle.value}
-          </motion.div>
+          </div>
         ))}
       </div>
 
       {/* Data streams */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {Array.from({ length: 15 }).map((_, i) => (
-          <motion.div
+          <div
             key={`stream-${i}`}
-            className="absolute h-px bg-gradient-to-r from-transparent via-green-500 to-transparent"
+            className="data-stream absolute h-px bg-gradient-to-r from-transparent via-green-500 to-transparent"
             style={{
               top: `${Math.random() * 100}%`,
-              left: 0,
-              right: 0,
-              opacity: 0.3,
-            }}
-            animate={{
-              scaleX: [0, 1, 0],
-              opacity: [0, 0.5, 0],
-            }}
-            transition={{
-              duration: Math.random() * 3 + 2,
-              repeat: Number.POSITIVE_INFINITY,
-              delay: Math.random() * 5,
-              ease: "linear",
+              animationDuration: `${Math.random() * 3 + 2}s`,
+              animationDelay: `${Math.random() * 5}s`,
             }}
           />
         ))}
@@ -389,441 +333,254 @@ export default function EduGuidePage() {
       {/* Main content */}
       <div className="relative z-10">
         {/* Hero Section */}
-        <section ref={headerRef} className="py-20">
-          <div className="container px-4 md:px-6">
-            <motion.div
-              initial="hidden"
-              animate={controls}
-              variants={containerVariants}
-              className="flex flex-col items-center text-center mb-12"
-            >
-              <motion.div
-                variants={itemVariants}
-                whileHover={{
-                  rotate: [0, 5, 0, -5, 0],
-                  scale: 1.05,
-                  transition: { duration: 0.5 },
+        <section className="relative py-28 overflow-hidden bg-gradient-to-b from-gray-950 to-gray-900">
+          {/* Binary Rain Background */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+            {[...Array(30)].map((_, i) => (
+              <div
+                key={`binary-${i}`}
+                className="absolute text-green-400/10 font-mono text-xs"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `-${Math.random() * 100}px`,
+                  animation: `binaryRain ${10 + Math.random() * 20}s linear infinite`,
+                  animationDelay: `${Math.random() * 5}s`,
+                  writingMode: 'vertical-rl',
+                  textOrientation: 'mixed'
                 }}
-                className="mb-6 relative"
               >
-                <div className="w-28 h-28 rounded-full bg-gradient-to-br from-green-400 to-teal-500 flex items-center justify-center shadow-lg shadow-green-500/20 cyber-scan">
-                  <Cpu className="h-14 w-14 text-black" />
-                </div>
-                <motion.div
-                  className="absolute -top-4 -right-4 text-green-400"
-                  animate={{
-                    rotate: [0, 360],
-                    scale: [1, 1.2, 1],
-                  }}
-                  transition={{ duration: 3, repeat: Number.POSITIVE_INFINITY }}
-                >
-                  <Zap className="h-10 w-10" />
-                </motion.div>
-                <motion.div
-                  className="absolute -bottom-2 -left-2 text-teal-400"
-                  animate={{
-                    rotate: [0, -360],
-                    scale: [1, 1.2, 1],
-                  }}
-                  transition={{ duration: 3, repeat: Number.POSITIVE_INFINITY, delay: 1.5 }}
-                >
-                  <Shield className="h-8 w-8" />
-                </motion.div>
-              </motion.div>
+                {Array.from({ length: 20 }, () => Math.random() > 0.5 ? '1' : '0').join(' ')}
+              </div>
+            ))}
+          </div>
 
-              <motion.div variants={glitchVariants} className="mb-4 overflow-hidden relative">
-                <h1 className="text-5xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-teal-400 cyber-glitch">
+          <div className="container px-4 md:px-6">
+            <div className="flex flex-col lg:flex-row items-center gap-12">
+              {/* Main Hero Content */}
+              <div className="flex-1 text-center lg:text-left">
+                <div className="relative inline-block mb-6">
+                  <div className="absolute rounded-lg blur opacity-75 animate-pulse"></div>
+                  <div className="relative px-4 py-2 bg-black rounded-[6px] leading-none flex items-center border border-green-400/20">
+                    <span className="text-green-400 mr-2">
+                      <Zap size={16} />
+                    </span>
+                    <span className="text-gray-300">Powered by EduNova</span>
+                  </div>
+                </div>
+
+                <h1 className="text-5xl md:text-6xl font-bold tracking-tighter mb-6 text-transparent bg-clip-text bg-[linear-gradient(90deg,#86efac,#5eead4,#22d3ee)]">
                   EduGuide Professional
                 </h1>
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-green-500/20 to-transparent"
-                  animate={{
-                    x: ["-100%", "200%"],
-                  }}
-                  transition={{
-                    duration: 1.5,
-                    repeat: Number.POSITIVE_INFINITY,
-                    repeatType: "loop",
-                    ease: "linear",
-                  }}
-                />
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent to-teal-500/20"
-                  animate={{
-                    x: ["200%", "-100%"],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Number.POSITIVE_INFINITY,
-                    repeatType: "loop",
-                    ease: "linear",
-                    delay: 0.5,
-                  }}
-                />
-              </motion.div>
 
-              <motion.p variants={itemVariants} className="text-xl text-gray-400 max-w-2xl">
-                Advanced learning paths for career development, aptitude testing, and professional growth. Navigate your
-                future with precision.
-              </motion.p>
-
-              {/* Terminal text display */}
-              <motion.div
-                variants={itemVariants}
-                className="mt-6 mb-8 w-full max-w-2xl bg-black border border-green-500/50 rounded-lg p-4 font-mono text-sm text-green-400 overflow-hidden"
-              >
-                <div className="flex items-center mb-2 border-b border-green-500/30 pb-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
-                  <div className="w-3 h-3 rounded-full bg-yellow-500 mr-2"></div>
-                  <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
-                  <span className="text-xs text-green-300">system_terminal</span>
-                </div>
-                <div className="whitespace-pre-line">
-                  {terminalText}
-                  {cursorVisible && <span className="inline-block w-2 h-4 bg-green-400 ml-1 animate-pulse"></span>}
-                </div>
-              </motion.div>
-
-              <motion.div variants={itemVariants} className="flex flex-wrap justify-center gap-4 mt-4">
-                <Button
-                  asChild
-                  size="lg"
-                  className="bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-black shadow-lg shadow-green-500/20 hover:shadow-green-500/40 transition-all duration-300 cyber-button"
-                >
-                  <Link href="/eduguide/career-roadmap">
-                    <motion.span
-                      className="flex items-center"
-                      whileHover={{ scale: 1.05 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                    >
-                      Explore Career Paths
-                      <ChevronRight className="ml-2 h-4 w-4" />
-                    </motion.span>
-                  </Link>
-                </Button>
-                <Button
-                  asChild
-                  size="lg"
-                  variant="outline"
-                  className="border-green-500 text-green-500 hover:bg-green-950 shadow-lg shadow-green-500/10 hover:shadow-green-500/20 transition-all duration-300 cyber-button"
-                >
-                  <Link href="/eduguide/aptitude-test">
-                    <motion.span
-                      className="flex items-center"
-                      whileHover={{ scale: 1.05 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                    >
-                      Take Aptitude Test
-                      <Brain className="ml-2 h-4 w-4" />
-                    </motion.span>
-                  </Link>
-                </Button>
-              </motion.div>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* Features Section */}
-        <section className="py-16 bg-gray-950 border-t border-b border-green-900/50 relative overflow-hidden">
-          {/* Animated circuit lines */}
-          <div className="absolute inset-0 pointer-events-none">
-            <svg width="100%" height="100%" className="absolute inset-0 opacity-10">
-              <motion.path
-                d="M0,100 L200,100 C250,100 250,50 300,50 L1000,50"
-                stroke="rgba(16,185,129,0.6)"
-                strokeWidth="2"
-                fill="none"
-                initial={{ pathLength: 0, opacity: 0 }}
-                animate={{ pathLength: 1, opacity: 1 }}
-                transition={{ duration: 3, ease: "easeInOut" }}
-              />
-              <motion.path
-                d="M0,200 L150,200 C200,200 200,250 250,250 L1000,250"
-                stroke="rgba(16,185,129,0.6)"
-                strokeWidth="2"
-                fill="none"
-                initial={{ pathLength: 0, opacity: 0 }}
-                animate={{ pathLength: 1, opacity: 1 }}
-                transition={{ duration: 3, ease: "easeInOut", delay: 0.5 }}
-              />
-              <motion.path
-                d="M1000,150 L800,150 C750,150 750,200 700,200 L0,200"
-                stroke="rgba(16,185,129,0.6)"
-                strokeWidth="2"
-                fill="none"
-                initial={{ pathLength: 0, opacity: 0 }}
-                animate={{ pathLength: 1, opacity: 1 }}
-                transition={{ duration: 3, ease: "easeInOut", delay: 1 }}
-              />
-              <motion.path
-                d="M1000,300 L700,300 C650,300 650,350 600,350 L0,350"
-                stroke="rgba(16,185,129,0.6)"
-                strokeWidth="2"
-                fill="none"
-                initial={{ pathLength: 0, opacity: 0 }}
-                animate={{ pathLength: 1, opacity: 1 }}
-                transition={{ duration: 3, ease: "easeInOut", delay: 1.5 }}
-              />
-              {/* Connection nodes */}
-              {[
-                { cx: 200, cy: 100 },
-                { cx: 300, cy: 50 },
-                { cx: 150, cy: 200 },
-                { cx: 250, cy: 250 },
-                { cx: 800, cy: 150 },
-                { cx: 700, cy: 200 },
-                { cx: 700, cy: 300 },
-                { cx: 600, cy: 350 },
-              ].map((node, i) => (
-                <motion.circle
-                  key={i}
-                  cx={node.cx}
-                  cy={node.cy}
-                  r="4"
-                  fill="rgba(16,185,129,0.8)"
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{ scale: [0, 1.5, 1], opacity: [0, 1, 0.8] }}
-                  transition={{
-                    duration: 2,
-                    repeat: Number.POSITIVE_INFINITY,
-                    repeatType: "loop",
-                    repeatDelay: 5,
-                    delay: i * 0.2 + 2,
-                  }}
-                />
-              ))}
-            </svg>
-          </div>
-
-          <div className="container px-4 md:px-6 relative z-10">
-            <div className="text-center mb-12">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
-                className="relative inline-block"
-              >
-                <h2 className="text-3xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-teal-400 cyber-glitch">
-                  Professional Development Tools
-                </h2>
-                <motion.div
-                  className="absolute -top-6 -right-6 text-green-500/50"
-                  animate={{
-                    rotate: 360,
-                    scale: [1, 1.2, 1],
-                  }}
-                  transition={{ duration: 10, repeat: Number.POSITIVE_INFINITY }}
-                >
-                  <Network className="h-8 w-8" />
-                </motion.div>
-                <motion.div
-                  className="absolute -bottom-6 -left-6 text-teal-500/50"
-                  animate={{
-                    rotate: -360,
-                    scale: [1, 1.2, 1],
-                  }}
-                  transition={{ duration: 10, repeat: Number.POSITIVE_INFINITY, delay: 5 }}
-                >
-                  <Database className="h-8 w-8" />
-                </motion.div>
-                <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-                  Advanced resources designed to accelerate your career growth and professional development.
+                <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto lg:mx-0">
+                  Your AI-powered guide to career excellence. Master aptitude tests, explore career roadmaps, and ace interviews with our comprehensive platform.
                 </p>
-              </motion.div>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {features.map((feature, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.2 }}
-                  whileHover={{
-                    y: -10,
-                    boxShadow: "0 10px 30px -10px rgba(16, 185, 129, 0.3)",
-                  }}
-                  className="bg-gray-900 border border-green-900/50 rounded-xl p-6 shadow-lg transition-all duration-300 neon-border"
-                >
-                  <motion.div
-                    className={`w-16 h-16 rounded-full ${feature.bgColor} flex items-center justify-center mb-4 cyber-scan`}
-                    whileHover={{
-                      rotate: 360,
-                      boxShadow: "0 0 20px rgba(16, 185, 129, 0.5)",
-                    }}
-                    transition={{ duration: 0.5 }}
+                <div className="flex flex-wrap justify-center lg:justify-start gap-4">
+                  <Button
+                    asChild
+                    size="lg"
+                    className="bg-transparent hover:bg-green-500/20 border-green-400/20 border hover:scale-[1.02] rounded-[6px] hover:translate-y-[2px] duration-300 group"
                   >
-                    <feature.icon className={`h-8 w-8 ${feature.color}`} />
-                  </motion.div>
-                  <h3 className="text-xl font-bold mb-2 text-green-400">{feature.title}</h3>
-                  <p className="text-gray-400">{feature.description}</p>
+                    <Link href="#services">
+                      Get Started
+                      <ChevronRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-all duration-300" />
+                    </Link>
+                  </Button>
+                  <Button
+                    asChild
+                    size="lg"
+                    className="bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-black shadow-lg shadow-green-500/20 hover:shadow-green-500/40 transition-all duration-300 hover:scale-[1.02] hover:translate-y-[2px] group rounded-[6px]"
+                  >
+                    <Link href="/eduguide/career-roadmap">
+                      <span className="flex items-center">
+                        Explore Career Paths
+                        <ChevronRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-all duration-300" />
+                      </span>
+                    </Link>
+                  </Button>
+                </div>
+              </div>
 
-                  {/* Animated circuit lines */}
-                  <div className="mt-4 h-1 w-full overflow-hidden">
-                    <motion.div
-                      className="h-full bg-gradient-to-r from-green-500/50 to-teal-500/50"
-                      initial={{ x: "-100%" }}
-                      whileInView={{ x: "100%" }}
-                      viewport={{ once: false }}
-                      transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, repeatType: "loop", repeatDelay: 1 }}
-                    />
+              {/* Interactive Terminal */}
+              <div className="flex-1 max-w-2xl w-full">
+                <div className="terminal-container bg-gray-900 rounded-xl overflow-hidden shadow-2xl shadow-green-500/10 ">
+                  {/* Terminal Header */}
+                  <div className="flex items-center px-4 py-3 bg-transparent rounded-t-xl">
+                    <div className="flex space-x-2 mr-4">
+                      <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                      <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                    </div>
+                    <div className="text-sm text-gray-400">terminal — zsh</div>
                   </div>
-                </motion.div>
-              ))}
+
+                  {/* Terminal Content */}
+                  <div className="p-4 font-mono text-green-400 h-64 overflow-auto">
+                    <TerminalTypingEffect />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Main Services Section */}
-        <section className="py-16 relative overflow-hidden">
-          {/* Hexagon grid background */}
-          <div className="absolute inset-0 pointer-events-none opacity-10">
-            <svg width="100%" height="100%" className="absolute inset-0">
-              <pattern
-                id="hexagons"
-                width="50"
-                height="43.4"
-                patternUnits="userSpaceOnUse"
-                patternTransform="scale(2) rotate(0)"
-              >
-                <path d="M25 0L50 25L25 50L0 25L25 0z" fill="none" stroke="rgba(16,185,129,0.5)" strokeWidth="1" />
-              </pattern>
-              <rect width="100%" height="100%" fill="url(#hexagons)" />
-            </svg>
+        <section className="py-24 relative overflow-hidden isolate bg-[#0e0e0e]">
+          {/* Subtle animated gradient background */}
+          <div className="absolute inset-0 z-0 bg-gradient-to-br from-[#0f0f0f] via-[#121212] to-[#080808] animate-gradient-slow" />
+
+          {/* Subtle grid/hex pattern */}
+          <div className="absolute inset-0 z-0 opacity-5 bg-[url('/grid.svg')] bg-[length:120px_120px] bg-center pointer-events-none" />
+
+          {/* Animated vertical lines */}
+          <div className="absolute inset-0 z-0 pointer-events-none">
+            {[...Array(12)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute top-0 w-px h-full bg-white/5 animate-line-slide"
+                style={{ left: `${(i + 1) * 8}%`, animationDelay: `${i * 0.8}s` }}
+              />
+            ))}
           </div>
 
-          {/* Scanning effect */}
-          <motion.div
-            className="absolute inset-0 bg-gradient-to-b from-transparent via-green-500/10 to-transparent pointer-events-none"
-            animate={{ y: ["-100%", "100%"] }}
-            transition={{ duration: 5, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-          />
-
           <div className="container px-4 md:px-6 relative z-10">
-            <div className="text-center mb-12">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
-              >
-                <h2 className="text-3xl font-bold mb-4 text-white text-glitch">Professional Services</h2>
-                <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-                  Comprehensive tools to help you prepare for aptitude tests, plan your career path, and ace your
-                  interviews.
-                </p>
-              </motion.div>
+            <div className="text-center mb-20">
+              <h2 className="text-4xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-green-300 via-teal-400 to-cyan-400">
+                Professional Services
+              </h2>
+              <p className="mt-4 text-lg text-gray-400 max-w-xl mx-auto">
+                Tools to help you excel in aptitude tests, plan your career, and master interviews.
+              </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-6xl mx-auto">
               {services.map((service, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.2 }}
-                  whileHover={{ scale: 1.03 }}
-                  onHoverStart={() => setActiveCard(index)}
-                  onHoverEnd={() => setActiveCard(null)}
-                >
-                  <Card
-                    className={`overflow-hidden border-2 ${service.borderColor} transition-colors bg-gray-900 text-white h-full cyber-scan`}
-                  >
-                    <CardHeader className={`bg-gradient-to-r ${service.gradientFrom} ${service.gradientTo} pb-8`}>
-                      <motion.div
-                        className={`w-12 h-12 rounded-full ${service.bgColor} flex items-center justify-center mb-4`}
-                        whileHover={{ rotate: 360 }}
-                        transition={{ duration: 0.5 }}
-                      >
-                        <service.icon className={`h-6 w-6 ${service.color}`} />
-                      </motion.div>
-                      <CardTitle className={service.color}>{service.title}</CardTitle>
-                      <CardDescription className="text-gray-400">{service.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="pt-6">
+                <div key={index} className="group relative transition-transform duration-300 hover:-translate-y-1.5">
+                  <Card className="relative overflow-hidden border border-white/10 bg-[#080808] backdrop-blur-md rounded-xl shadow-[0_4px_30px_rgba(0,0,0,0.4)] transition-all duration-500 group-hover:shadow-[0_6px_40px_rgba(34,197,94,0.2)]"> 
+                    <CardContent className="p-6 space-y-4">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-12 h-12 flex items-center justify-center rounded-lg bg-transparent shadow-inner border ${service.borderColor}`}>
+                          <service.icon className={`w-6 h-6  ${service.color}`} />
+                        </div>
+                        <CardTitle className={`text-xl font-bold ${service.color}`}>
+                          {service.title}
+                        </CardTitle>
+                      </div>
+                      <CardDescription className="text-gray-400 text-sm">
+                        {service.description}
+                      </CardDescription>
                       <ul className="space-y-2">
                         {service.features.map((feature, i) => (
-                          <motion.li
-                            key={i}
-                            className="flex items-center gap-2 text-sm text-gray-300"
-                            animate={activeCard === index ? { x: [0, 5, 0] } : {}}
-                            transition={{ duration: 0.5, delay: i * 0.1 }}
-                          >
-                            <div className={`w-2 h-2 rounded-full ${service.color.replace("text-", "bg-")}`}></div>
-                            <span>{feature}</span>
-                          </motion.li>
+                          <li key={i} className="flex items-start gap-3">
+                            <div className={`w-2 h-2 rounded-full mt-1.5 ${service.color.replace('text-', 'bg-')} animate-pulse`} />
+                            <span className="text-sm text-gray-300">{feature}</span>
+                          </li>
                         ))}
                       </ul>
                     </CardContent>
-                    <CardFooter>
+
+                    <CardFooter className="px-6 pb-6 pt-4">
                       <Button
                         asChild
-                        className={`w-full bg-gradient-to-r ${service.buttonGradientFrom} ${service.buttonGradientTo} ${service.buttonHoverFrom} ${service.buttonHoverTo} cyber-button`}
+                        className={`w-full transition-all duration-300 bg-transparent border border-green-400/20 hover:border-green-400/40 text-white hover:text-white/90 hover:scale-[1.02] hover:translate-y-[2px] hover:bg-transparent`}
                       >
                         <Link href={service.link}>
-                          <motion.span
-                            className="flex items-center justify-center w-full"
-                            whileHover={{ scale: 1.05 }}
-                            transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                          >
-                            Get Started
-                          </motion.span>
+                          Get Started
                         </Link>
                       </Button>
                     </CardFooter>
                   </Card>
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>
         </section>
 
         {/* Advanced Features Section */}
-        <section className="py-16 bg-gray-950 border-t border-green-900/50 relative overflow-hidden">
-          {/* Digital noise effect */}
-          <div className="absolute inset-0 pointer-events-none">
-            {Array.from({ length: 100 }).map((_, i) => (
-              <motion.div
-                key={`noise-${i}`}
-                className="absolute bg-green-500"
-                style={{
-                  width: `${Math.random() * 3 + 1}px`,
-                  height: `${Math.random() * 3 + 1}px`,
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
-                  opacity: Math.random() * 0.3,
-                }}
-                animate={{
-                  opacity: [0, 1, 0],
-                  scale: [0, 1, 0],
-                }}
-                transition={{
-                  duration: Math.random() * 2 + 0.5,
-                  repeat: Number.POSITIVE_INFINITY,
-                  delay: Math.random() * 5,
-                }}
-              />
-            ))}
+        <section className="py-24 bg-gray-950 border-t border-green-900/30 relative overflow-hidden isolate group/features">
+          {/* Holographic Grid Background */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+            {/* Quantum Dot Effect */}
+            <div className="absolute inset-0">
+              {[...Array(80)].map((_, i) => (
+                <div
+                  key={`quantum-${i}`}
+                  className="absolute rounded-full bg-green-500/10"
+                  style={{
+                    width: `${Math.random() * 8 + 2}px`,
+                    height: `${Math.random() * 8 + 2}px`,
+                    left: `${Math.random() * 100}%`,
+                    top: `${Math.random() * 100}%`,
+                    boxShadow: `0 0 ${Math.random() * 10 + 5}px rgba(16, 185, 129, 0.5)`,
+                    animation: `pulse ${Math.random() * 6 + 4}s infinite alternate`,
+                    animationDelay: `${Math.random() * 5}s`
+                  }}
+                />
+              ))}
+            </div>
+
+            {/* DNA Strand Animation */}
+            <div className="absolute inset-0 opacity-10">
+              <svg width="100%" height="100%" className="absolute inset-0">
+                <path
+                  d="M50,0 Q75,50 50,100 Q25,150 50,200 Q75,250 50,300 Q25,350 50,400"
+                  stroke="url(#dnaGradient)"
+                  strokeWidth="1.5"
+                  fill="none"
+                  strokeDasharray="5 3"
+                  className="animate-dna-float"
+                />
+                <path
+                  d="M70,0 Q45,50 70,100 Q95,150 70,200 Q45,250 70,300 Q95,350 70,400"
+                  stroke="url(#dnaGradient)"
+                  strokeWidth="1.5"
+                  fill="none"
+                  strokeDasharray="5 3"
+                  className="animate-dna-float"
+                  style={{ animationDelay: '0.5s' }}
+                />
+                <defs>
+                  <linearGradient id="dnaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor="rgba(16,185,129,0)" />
+                    <stop offset="50%" stopColor="rgba(16,185,129,0.6)" />
+                    <stop offset="100%" stopColor="rgba(16,185,129,0)" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+
+            {/* Binary Matrix Rain */}
+            <div className="absolute inset-0 opacity-5">
+              {[...Array(30)].map((_, i) => (
+                <div
+                  key={`binary-${i}`}
+                  className="absolute text-green-400/20 font-mono text-xs"
+                  style={{
+                    left: `${Math.random() * 100}%`,
+                    top: `-${Math.random() * 100}px`,
+                    animation: `matrixRain ${10 + Math.random() * 20}s linear infinite`,
+                    animationDelay: `${Math.random() * 5}s`,
+                    writingMode: 'vertical-rl',
+                    textOrientation: 'mixed'
+                  }}
+                >
+                  {Array.from({ length: 20 }, () => Math.random() > 0.5 ? '1' : '0').join(' ')}
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="container px-4 md:px-6 relative z-10">
-            <div className="text-center mb-12">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
-              >
-                <h2 className="text-3xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-teal-400 cyber-glitch">
+            <div className="text-center mb-16">
+              <div className="relative inline-block">
+                <h2 className="text-4xl font-bold mb-4 text-transparent bg-clip-text bg-[linear-gradient(90deg,#86efac,#5eead4,#22d3ee)] tracking-tight">
                   Advanced Career Tools
                 </h2>
-                <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+                <div className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-gradient-to-r from-green-400 to-teal-400 rounded-full opacity-0 group-hover/features:opacity-100 transition-opacity duration-500"></div>
+                <p className="text-lg text-gray-400/90 max-w-2xl mx-auto mt-6 leading-relaxed">
                   Cutting-edge resources to give you the competitive edge in today's job market.
                 </p>
-              </motion.div>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -861,306 +618,270 @@ export default function EduGuidePage() {
                 },
                 { icon: Brain, title: "AI Integration", description: "Learn how to leverage AI in your profession" },
               ].map((item, index) => (
-                <motion.div
+                <div
                   key={index}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.3, delay: index * 0.05 }}
-                  whileHover={{
-                    y: -5,
-                    boxShadow: "0 10px 30px -10px rgba(16, 185, 129, 0.3)",
-                  }}
-                  className="bg-gray-900 border border-green-900/30 rounded-lg p-5 hover:border-green-500/30 transition-all duration-300 cyber-scan"
+                  className="relative bg-gradient-to-b from-gray-900/80 to-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-xl p-6 transition-all duration-500 hover:border-green-400/40 hover:shadow-lg hover:shadow-green-500/10 group/card"
                 >
-                  <div className="flex items-start">
-                    <motion.div
-                      className="w-10 h-10 rounded-full bg-green-900/20 flex items-center justify-center mr-4 mt-1"
-                      whileHover={{ rotate: 360 }}
-                      transition={{ duration: 0.5 }}
-                    >
-                      <item.icon className="h-5 w-5 text-green-500" />
-                    </motion.div>
-                    <div>
-                      <h3 className="text-lg font-medium text-green-400 mb-1">{item.title}</h3>
-                      <p className="text-sm text-gray-400">{item.description}</p>
-                    </div>
+                  {/* Card Hover Effect */}
+                  <div className="absolute inset-0 rounded-xl overflow-hidden">
+                    <div className="absolute inset-0 bg-green-900/10 opacity-0 group-hover/card:opacity-100 transition-opacity duration-500"></div>
+                    <div className="absolute inset-0 border border-green-900/20 rounded-xl pointer-events-none"></div>
                   </div>
-                </motion.div>
+
+                  {/* Icon with Holographic Effect */}
+                  <div className="relative w-12 h-12 rounded-lg bg-green-900/20 flex items-center justify-center mb-5 overflow-hidden">
+                    <div className="absolute inset-0 bg-white/5"></div>
+                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-green-400/70 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-500"></div>
+                    <item.icon className="relative h-6 w-6 text-green-400 z-10 transition-transform duration-300 group-hover/card:scale-110" />
+                  </div>
+
+                  <h3 className="text-lg font-semibold mb-2 text-green-300/90 group-hover/card:text-green-200 transition-colors duration-300">
+                    {item.title}
+                  </h3>
+                  <p className="text-sm text-gray-400/90 leading-relaxed group-hover/card:text-gray-300 transition-colors duration-300">
+                    {item.description}
+                  </p>
+
+                  {/* Animated Divider */}
+                  <div className="mt-4 h-px w-full overflow-hidden relative">
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-500/50 to-transparent group-hover/card:via-green-400 transition-all duration-500 w-0 group-hover/card:w-full"></div>
+                  </div>
+                </div>
               ))}
             </div>
           </div>
         </section>
 
         {/* Security Section */}
-        <section className="py-12 relative overflow-hidden">
-          <div className="absolute inset-0 bg-black opacity-70 z-0"></div>
-          <div className="absolute inset-0 z-0">
-            {Array.from({ length: 20 }).map((_, i) => (
-              <motion.div
-                key={`security-${i}`}
-                className="absolute text-green-500/30"
-                style={{
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
-                  fontSize: `${Math.random() * 20 + 10}px`,
-                }}
-                animate={{
-                  opacity: [0, 0.3, 0],
-                  scale: [0.5, 1, 0.5],
-                  rotate: [0, 360],
-                }}
-                transition={{
-                  duration: Math.random() * 5 + 5,
-                  repeat: Number.POSITIVE_INFINITY,
-                  delay: Math.random() * 5,
-                }}
-              >
-                {
-                  [
-                    <Lock key="lock" />,
-                    <Shield key="shield" />,
-                    <Eye key="eye" />,
-                    <Key key="key" />,
-                    <AlertTriangle key="alert" />,
-                  ][Math.floor(Math.random() * 5)]
-                }
-              </motion.div>
-            ))}
+        <section className="py-20 relative overflow-hidden isolate bg-gradient-to-br from-gray-950/60 via-black to-black border-t border-b border-green-900/20">
+          {/* Holographic Security Grid Background */}
+          <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+            {/* Animated Hexagonal Security Pattern */}
+            <div className="absolute inset-0 opacity-10">
+              <svg width="100%" height="100%" className="absolute inset-0">
+                <pattern
+                  id="hexagons"
+                  width="80"
+                  height="80"
+                  patternUnits="userSpaceOnUse"
+                  patternTransform="scale(1.5) rotate(0)"
+                >
+                  <path
+                    d="M40 0L80 23.094L80 69.282L40 92.376L0 69.282L0 23.094z"
+                    fill="none"
+                    stroke="rgba(16,185,129,0.2)"
+                    strokeWidth="1"
+                    className="group-hover/security:stroke-green-400/30 transition-colors duration-1000"
+                  />
+                </pattern>
+                <rect width="100%" height="100%" fill="url(#hexagons)" className="animate-hex-move" />
+              </svg>
+            </div>
+
+            {/* Floating Security Particles */}
+            <div className="absolute inset-0">
+              {[...Array(30)].map((_, i) => (
+                <div
+                  key={`particle-${i}`}
+                  className="absolute rounded-full bg-green-500/10"
+                  style={{
+                    width: `${Math.random() * 6 + 2}px`,
+                    height: `${Math.random() * 6 + 2}px`,
+                    left: `${Math.random() * 100}%`,
+                    top: `${Math.random() * 100}%`,
+                    boxShadow: `0 0 ${Math.random() * 8 + 4}px rgba(16, 185, 129, 0.3)`,
+                    animation: `security-pulse ${Math.random() * 8 + 4}s infinite alternate`,
+                    animationDelay: `${Math.random() * 5}s`
+                  }}
+                />
+              ))}
+            </div>
+
+            {/* Scanning Laser Effect */}
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_65%,rgba(16,185,129,0.03)_95%,transparent_100%)] animate-scan opacity-0 group-hover/security:opacity-100 transition-opacity duration-1000"></div>
           </div>
 
           <div className="container px-4 md:px-6 relative z-10">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="max-w-3xl mx-auto text-center"
-            >
-              <h2 className="text-2xl font-bold mb-4 text-green-400">Secure Career Development Environment</h2>
-              <p className="text-gray-400 mb-6">
+            <div className="max-w-3xl mx-auto text-center group/security">
+              <div className="relative inline-block mb-8">
+                <h2 className="text-3xl font-bold mb-4 text-transparent bg-clip-text bg-[linear-gradient(90deg,#86efac,#5eead4)] tracking-tight">
+                  Secure Career Development Environment
+                </h2>
+                <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-32 h-0.5 bg-gradient-to-r from-green-400 to-teal-400 rounded-full opacity-0 group-hover/security:opacity-100 transition-opacity duration-500"></div>
+              </div>
+
+              <p className="text-lg text-gray-400/90 mb-10 leading-relaxed max-w-2xl mx-auto">
                 Our platform employs advanced encryption and security protocols to ensure your career data and personal
                 information remain protected at all times.
               </p>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 {[
-                  { icon: Shield, text: "Data Encryption" },
-                  { icon: Lock, text: "Secure Access" },
-                  { icon: Key, text: "Privacy Controls" },
-                  { icon: Eye, text: "Transparent Policies" },
+                  {
+                    icon: Shield,
+                    text: "Data Encryption",
+                    description: "End-to-end AES-256 encryption"
+                  },
+                  {
+                    icon: Lock,
+                    text: "Secure Access",
+                    description: "Multi-factor authentication"
+                  },
+                  {
+                    icon: Key,
+                    text: "Privacy Controls",
+                    description: "Granular permission settings"
+                  },
+                  {
+                    icon: Eye,
+                    text: "Transparent Policies",
+                    description: "Regular security audits"
+                  },
                 ].map((item, i) => (
-                  <motion.div
+                  <div
                     key={i}
-                    initial={{ opacity: 0, y: 10 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.3, delay: i * 0.1 }}
-                    className="bg-gray-900/50 border border-green-900/30 rounded-lg p-3 text-center"
+                    className="relative bg-gradient-to-b from-gray-900/50 to-gray-900/20 backdrop-blur-sm border border-gray-800 rounded-xl p-5 transition-all duration-500 hover:border-green-400/40 hover:shadow-lg hover:shadow-green-500/10 group/card"
                   >
-                    <item.icon className="h-6 w-6 text-green-500 mx-auto mb-2" />
-                    <p className="text-sm text-gray-300">{item.text}</p>
-                  </motion.div>
+                    {/* Card Hover Effect */}
+                    <div className="absolute inset-0 rounded-xl overflow-hidden">
+                      <div className="absolute inset-0 bg-green-900/10 opacity-0 group-hover/card:opacity-100 transition-opacity duration-500"></div>
+                      <div className="absolute inset-0 border border-green-900/20 rounded-xl pointer-events-none"></div>
+                    </div>
+
+                    {/* Icon Container */}
+                    <div className="relative w-12 h-12 rounded-lg bg-green-900/20 flex items-center justify-center mx-auto mb-4 overflow-hidden">
+                      <div className="absolute inset-0 bg-white/5"></div>
+                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-green-400/70 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-500"></div>
+                      <item.icon className="relative h-6 w-6 text-green-400 z-10 transition-transform duration-300 group-hover/card:scale-110" />
+                    </div>
+
+                    <h3 className="text-lg font-semibold mb-1 text-green-300/90 group-hover/card:text-green-200 transition-colors duration-300">
+                      {item.text}
+                    </h3>
+                    <p className="text-sm text-gray-400/80 group-hover/card:text-gray-300 transition-colors duration-300">
+                      {item.description}
+                    </p>
+                  </div>
                 ))}
               </div>
-            </motion.div>
+            </div>
           </div>
         </section>
 
         {/* CTA Section */}
-        <section className="py-16">
+        <section className="py-24 relative overflow-hidden">
+          {/* Quantum Wave Background */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+            {/* Animated Wave Grid */}
+            <div className="absolute inset-0 opacity-10">
+              <svg width="100%" height="100%" className="absolute inset-0">
+                <pattern
+                  id="waveGrid"
+                  width="120"
+                  height="120"
+                  patternUnits="userSpaceOnUse"
+                  patternTransform="rotate(15)"
+                >
+                  <path
+                    d="M0,60 Q30,30 60,60 T120,60"
+                    stroke="rgba(16,185,129,0.3)"
+                    strokeWidth="1"
+                    fill="none"
+                    className="animate-wave-path"
+                  />
+                  <path
+                    d="M0,0 Q30,30 60,0 T120,0"
+                    stroke="rgba(16,185,129,0.3)"
+                    strokeWidth="1"
+                    fill="none"
+                    className="animate-wave-path"
+                    style={{ animationDelay: '0.5s' }}
+                  />
+                  <path
+                    d="M0,120 Q30,90 60,120 T120,120"
+                    stroke="rgba(16,185,129,0.3)"
+                    strokeWidth="1"
+                    fill="none"
+                    className="animate-wave-path"
+                    style={{ animationDelay: '1s' }}
+                  />
+                </pattern>
+                <rect width="100%" height="100%" fill="url(#waveGrid)" />
+              </svg>
+            </div>
+
+            {/* Floating Quantum Particles */}
+            <div className="absolute inset-0">
+              {[...Array(40)].map((_, i) => (
+                <div
+                  key={`particle-${i}`}
+                  className="absolute rounded-full bg-green-500/10"
+                  style={{
+                    width: `${Math.random() * 8 + 4}px`,
+                    height: `${Math.random() * 8 + 4}px`,
+                    left: `${Math.random() * 100}%`,
+                    top: `${Math.random() * 100}%`,
+                    boxShadow: `0 0 ${Math.random() * 12 + 6}px rgba(16, 185, 129, 0.4)`,
+                    animation: `quantum-float ${Math.random() * 15 + 10}s linear infinite`,
+                    animationDelay: `${Math.random() * 5}s`,
+                    filter: 'blur(1px)'
+                  }}
+                />
+              ))}
+            </div>
+
+            {/* Pulsing Core Effect */}
+            <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full bg-green-900/10 opacity-0 group-hover/cta:opacity-100 transition-opacity duration-1000 animate-pulse-slow"></div>
+          </div>
+
           <div className="container px-4 md:px-6">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="bg-gradient-to-r from-green-900/50 to-teal-900/50 border border-green-500/30 rounded-2xl p-8 md:p-12 text-white text-center relative overflow-hidden"
-            >
-              <div className="absolute inset-0 overflow-hidden">
-                {/* Circuit board pattern */}
-                <svg width="100%" height="100%" className="absolute inset-0 opacity-20">
-                  <pattern id="circuit" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
-                    <motion.path
-                      d="M10,10 L40,10 L40,40 L70,40 L70,70 L40,70 L40,100"
-                      stroke="rgba(16,185,129,0.6)"
-                      strokeWidth="2"
-                      fill="none"
-                      initial={{ pathLength: 0, opacity: 0 }}
-                      animate={{ pathLength: 1, opacity: 1 }}
-                      transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, repeatType: "loop", repeatDelay: 1 }}
-                    />
-                    <motion.path
-                      d="M30,10 L30,30 L10,30"
-                      stroke="rgba(16,185,129,0.6)"
-                      strokeWidth="2"
-                      fill="none"
-                      initial={{ pathLength: 0, opacity: 0 }}
-                      animate={{ pathLength: 1, opacity: 1 }}
-                      transition={{
-                        duration: 1.5,
-                        repeat: Number.POSITIVE_INFINITY,
-                        repeatType: "loop",
-                        repeatDelay: 1,
-                        delay: 0.5,
-                      }}
-                    />
-                    <motion.path
-                      d="M70,10 L70,30 L90,30 L90,70 L70,70"
-                      stroke="rgba(16,185,129,0.6)"
-                      strokeWidth="2"
-                      fill="none"
-                      initial={{ pathLength: 0, opacity: 0 }}
-                      animate={{ pathLength: 1, opacity: 1 }}
-                      transition={{
-                        duration: 2.5,
-                        repeat: Number.POSITIVE_INFINITY,
-                        repeatType: "loop",
-                        repeatDelay: 1,
-                        delay: 1,
-                      }}
-                    />
-                    <motion.path
-                      d="M10,50 L30,50 L30,90 L50,90 L50,70"
-                      stroke="rgba(16,185,129,0.6)"
-                      strokeWidth="2"
-                      fill="none"
-                      initial={{ pathLength: 0, opacity: 0 }}
-                      animate={{ pathLength: 1, opacity: 1 }}
-                      transition={{
-                        duration: 2,
-                        repeat: Number.POSITIVE_INFINITY,
-                        repeatType: "loop",
-                        repeatDelay: 1,
-                        delay: 1.5,
-                      }}
-                    />
-                    <motion.circle
-                      cx="10"
-                      cy="10"
-                      r="3"
-                      fill="rgba(16,185,129,0.8)"
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: [0, 1.5, 1], opacity: [0, 1, 0.8] }}
-                      transition={{
-                        duration: 2,
-                        repeat: Number.POSITIVE_INFINITY,
-                        repeatType: "loop",
-                        repeatDelay: 1,
-                        delay: 2,
-                      }}
-                    />
-                    <motion.circle
-                      cx="70"
-                      cy="10"
-                      r="3"
-                      fill="rgba(16,185,129,0.8)"
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: [0, 1.5, 1], opacity: [0, 1, 0.8] }}
-                      transition={{
-                        duration: 2,
-                        repeat: Number.POSITIVE_INFINITY,
-                        repeatType: "loop",
-                        repeatDelay: 1,
-                        delay: 2.2,
-                      }}
-                    />
-                    <motion.circle
-                      cx="10"
-                      cy="50"
-                      r="3"
-                      fill="rgba(16,185,129,0.8)"
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: [0, 1.5, 1], opacity: [0, 1, 0.8] }}
-                      transition={{
-                        duration: 2,
-                        repeat: Number.POSITIVE_INFINITY,
-                        repeatType: "loop",
-                        repeatDelay: 1,
-                        delay: 2.4,
-                      }}
-                    />
-                    <motion.circle
-                      cx="50"
-                      cy="90"
-                      r="3"
-                      fill="rgba(16,185,129,0.8)"
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: [0, 1.5, 1], opacity: [0, 1, 0.8] }}
-                      transition={{
-                        duration: 2,
-                        repeat: Number.POSITIVE_INFINITY,
-                        repeatType: "loop",
-                        repeatDelay: 1,
-                        delay: 2.6,
-                      }}
-                    />
-                  </pattern>
-                  <rect x="0" y="0" width="100%" height="100%" fill="url(#circuit)" />
-                </svg>
+            <div className="relative bg-gradient-to-br from-gray-900/80 to-gray-900/30 backdrop-blur-sm border border-gray-700 rounded-2xl p-10 md:p-16 text-center overflow-hidden group/cta">
+              {/* Animated Border */}
+              <div className="absolute inset-0 rounded-2xl overflow-hidden">
+                <div className="absolute inset-0 border border-green-500/20 rounded-2xl pointer-events-none"></div>
+                <div className="absolute inset-0 border-2 border-transparent rounded-2xl pointer-events-none animate-border-pulse"></div>
               </div>
 
               <div className="relative z-10">
-                <motion.h2
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5 }}
-                  className="text-3xl md:text-4xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-teal-400 cyber-glitch"
-                >
+                <h1 className="text-4xl md:text-5xl font-bold mb-6 text-transparent bg-clip-text bg-[linear-gradient(90deg,#86efac,#5eead4,#22d3ee)] tracking-tight">
                   Accelerate Your Professional Growth
-                </motion.h2>
-                <motion.p
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: 0.2 }}
-                  className="text-xl mb-8 max-w-2xl mx-auto text-gray-300"
-                >
+                </h1>
+                <p className="text-xl md:text-2xl mb-10 max-w-3xl mx-auto text-gray-300/90 leading-relaxed">
                   Take the next step in your career journey with our advanced tools and resources.
-                </motion.p>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: 0.4 }}
-                  className="flex flex-col sm:flex-row gap-4 justify-center"
-                >
+                </p>
+
+                <div className="flex flex-col sm:flex-row gap-6 justify-center">
                   <Button
                     asChild
                     size="lg"
-                    className="bg-green-500 text-black hover:bg-green-600 shadow-lg shadow-green-500/20 hover:shadow-green-500/40 transition-all duration-300 cyber-button"
+                    className="relative overflow-hidden bg-gradient-to-r from-green-500 to-teal-500 text-black hover:from-green-600 hover:to-teal-600 shadow-lg shadow-green-500/30 hover:shadow-green-500/50 transition-all duration-500 group/button"
                   >
                     <Link href="/eduguide/career-roadmap">
-                      <motion.span
-                        className="flex items-center"
-                        whileHover={{ scale: 1.05 }}
-                        transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                      >
+                      <span className="relative z-10 flex items-center">
                         Explore Career Paths
-                        <Rocket className="ml-2 h-4 w-4" />
-                      </motion.span>
+                        <Rocket className="ml-3 h-5 w-5 transition-transform duration-300 group-hover/button:translate-x-1" />
+                      </span>
+                      <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover/button:opacity-100 transition-opacity duration-300"></div>
                     </Link>
                   </Button>
+
                   <Button
                     asChild
                     size="lg"
                     variant="outline"
-                    className="border-green-500 text-green-400 hover:bg-green-950 shadow-lg shadow-green-500/10 hover:shadow-green-500/20 transition-all duration-300 cyber-button"
+                    className="relative overflow-hidden border-green-400 text-green-400 hover:bg-gray-900/50 hover:text-green-300 shadow-lg shadow-green-500/10 hover:shadow-green-500/20 transition-all duration-500 group/button2"
                   >
                     <Link href="/interview">
-                      <motion.span
-                        className="flex items-center"
-                        whileHover={{ scale: 1.05 }}
-                        transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                      >
+                      <span className="relative z-10 flex items-center">
                         Practice Interviews
-                        <Users className="ml-2 h-4 w-4" />
-                      </motion.span>
+                        <Users className="ml-3 h-5 w-5 transition-transform duration-300 group-hover/button2:translate-x-1" />
+                      </span>
+                      <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 to-transparent opacity-0 group-hover/button2:opacity-100 transition-opacity duration-300"></div>
                     </Link>
                   </Button>
-                </motion.div>
+                </div>
               </div>
-            </motion.div>
+            </div>
           </div>
         </section>
       </div>
@@ -1168,4 +889,85 @@ export default function EduGuidePage() {
   )
 }
 
-// https://codepen.io/hk2002/pen/poqvMvj <-- button
+export const TerminalTypingEffect = () => {
+  const [displayedLines, setDisplayedLines] = useState<string[]>([]);
+  const [currentLineIndex, setCurrentLineIndex] = useState(0);
+  const [currentText, setCurrentText] = useState('');
+  const [showCursor, setShowCursor] = useState(true);
+
+  const terminalLines = [
+    "> Initializing EduGuide...",
+    "> Loading modules...",
+    "> Analyzing trends...",
+    "> System Activated",
+    "> EduGuide is ready to help you with your career growth!",
+  ];
+
+  useEffect(() => {
+    const cursorInterval = setInterval(() => {
+      setShowCursor(prev => !prev);
+    }, 500);
+    return () => clearInterval(cursorInterval);
+  }, []);
+
+  useEffect(() => {
+    if (currentLineIndex >= terminalLines.length) return;
+
+    const line = terminalLines[currentLineIndex];
+    let charIndex = 0;
+    let startTime: number | null = null;
+    const typingSpeed = Math.random() * 50 + 30;
+    let animationFrameId: number;
+
+    const type = (currentTime: number) => {
+      if (startTime === null) {
+        startTime = currentTime;
+      }
+      const elapsedTime = currentTime - startTime;
+
+      if (elapsedTime > typingSpeed) {
+        if (charIndex <= line.length) {
+          setCurrentText(line.substring(0, charIndex));
+          charIndex++;
+          startTime = currentTime;
+        } else {
+          setDisplayedLines(prev => [...prev, line]);
+          setCurrentText('');
+          setCurrentLineIndex(prev => prev + 1);
+          return;
+        }
+      }
+
+      animationFrameId = requestAnimationFrame(type);
+    };
+
+    animationFrameId = requestAnimationFrame(type);
+
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [currentLineIndex]);
+
+  return (
+    <div className="terminal-container">
+      <ul className="terminal-background">
+        <li className="shape"></li>
+        <li className="shape"></li>
+        <li className="shape"></li>
+        <li className="shape"></li>
+        <li className="shape"></li>
+        <li className="shape"></li>
+        <li className="shape"></li>
+      </ul>
+      <div className="terminal-content">
+        {displayedLines.map((line, index) => (
+          <div key={index} className="terminal-line">
+            {line}
+          </div>
+        ))}
+        <div className="terminal-current-line ">
+          {currentText}
+          {showCursor && <span className="terminal-cursor" />}
+        </div>
+      </div>
+    </div>
+  );
+};
