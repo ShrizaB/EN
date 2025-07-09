@@ -1,0 +1,272 @@
+/* Base dark theme */
+form {
+    color: #c3f9ff;
+    background: transparent;
+}
+
+h2 {
+    color: #7de8ff;
+    text-shadow: 0 0 5px #0ff, 0 0 15px #0ff;
+}
+
+/* Remove default focus outline and add custom focus style */
+.career-particles input:focus,
+.career-particles textarea:focus,
+.career-particles select:focus,
+.career-particles [role="combobox"]:focus,
+.career-particles [role="combobox"]:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.5) !important;
+  border-color: rgba(34, 211, 238, 0.8) !important;
+}
+
+/* Radio button container */
+.flex.items-center.space-x-2 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Ensure proper spacing between radio groups */
+.space-y-3 > * + * {
+  margin-top: 0.75rem;
+}
+
+/* Base radio button styles */
+[role="radio"] {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+  width: 1.2em;
+  height: 1.2em;
+  border: 2px solid #3b82f6;
+  border-radius: 50%;
+  background: #0b1120;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  padding: 0;
+  vertical-align: middle;
+  transition: all 0.2s ease;
+}
+
+/* Hide default Radix indicator */
+[role="radio"] > span {
+  display: none !important;
+}
+
+/* Custom indicator (inner circle) */
+[role="radio"]::after {
+  content: '';
+  width: 0.6em;
+  height: 0.6em;
+  border-radius: 50%;
+  background: #3b82f6;
+  opacity: 0;
+  transform: scale(0);
+  transition: all 0.2s ease;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: -0.3em 0 0 -0.3em;
+}
+
+/* Hover state */
+[role="radio"]:hover {
+  border-color: #60a5fa;
+}
+
+/* Checked state */
+[role="radio"][data-state="checked"] {
+  border-color: #3b82f6;
+  background: #0b1120;
+}
+
+[role="radio"][data-state="checked"]::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Focus state */
+[role="radio"]:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
+}
+
+/* Radio group item container */
+[data-radix-collection-item] {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+/* Label styling */
+label[data-radix-collection-item] {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-right: 1rem;
+}
+
+/* Hide Radix's internal indicator */
+[data-radio-indicator] {
+  display: none !important;
+}
+
+/* Remove purple outline on buttons */
+.career-particles button:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.5) !important;
+}
+
+.text-muted-foreground {
+    color: #7f9ca9;
+}
+
+/* Glowing input field */
+input[type="text"] {
+    background-color: #0b111b;
+    border: 1px solid #1e3a8a;
+    color: #7de8ff;
+    padding: 0.75rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 5px #0ff2, 0 0 20px #0ff2 inset;
+}
+
+input[type="text"]:focus {
+    outline: none;
+    border-color: #38bdf8;
+    box-shadow: 0 0 10px #38bdf8, 0 0 30px #38bdf8 inset;
+}
+
+/* Glowing button */
+button[type="submit"] {
+    border-radius: 8px;
+    font-weight: bold;
+    box-shadow: 0 0 10px #0ff, 0 0 20px #0ff;
+    transition: all 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 15px #22d3ee, 0 0 40px #22d3ee;
+}
+
+/* Hover state */
+[role="radio"]:hover {
+  border-color: #60a5fa;
+}
+
+/* Checked state */
+[role="radio"][data-state="checked"] {
+  border-color: #3b82f6;
+  background: #0b1120;
+}
+
+[role="radio"][data-state="checked"]::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Focus state */
+[role="radio"]:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
+}
+
+/* Radio group item container */
+[data-radix-collection-item] {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+/* Label styling */
+label[data-radix-collection-item] {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-right: 1rem;
+}
+
+/* Label styles */
+label.font-normal {
+    color: #bfdbfe;
+    transition: color 0.2s ease;
+    cursor: pointer;
+    margin-left: 0.5rem;
+}
+
+label.font-normal:hover {
+    color: #93c5fd;
+}
+
+/* Background Animation */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(0, 229, 255, 0.05), transparent 80%);
+    animation: pulse-bg 10s infinite alternate;
+    z-index: -1;
+}
+
+@keyframes pulse-bg {
+    0% {
+        background-position: 50% 50%;
+        opacity: 0.5;
+    }
+
+    100% {
+        background-position: 70% 30%;
+        opacity: 0.8;
+    }
+}
+
+/* Container border neon glow */
+.card.border-2 {
+    background-color: rgba(8, 17, 32, 0.9);
+    box-shadow: 0 0 10px #0ff3, 0 0 40px #0ff1;
+    transition: box-shadow 0.3s;
+}
+
+.card.border-2:hover {
+    box-shadow: 0 0 20px #22d3ee, 0 0 60px #22d3ee;
+}
+
+/* Floating particles */
+@keyframes float-particles {
+    0% {
+        transform: translateY(0) translateX(0);
+    }
+
+    100% {
+        transform: translateY(-100vh) translateX(20px);
+    }
+}
+
+.career-particles::before {
+    content: "";
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: #22d3ee;
+    box-shadow: 0 0 10px #22d3ee;
+    top: 100%;
+    left: 50%;
+    animation: float-particles 20s linear infinite;
+}
+
+form {
+    font-family: var(--font-orbitron);
+}

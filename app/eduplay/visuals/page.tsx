@@ -255,7 +255,7 @@ function CustomCursor() {
       <img
         src="https://i.postimg.cc/661zZ4kY/Screenshot-2025-07-02-193914-Photoroom.png"
         alt="Thanos Cursor"
-        className="w-full h-full object-contain"
+        className="w-full h-full object-contain md:visible invisible"
         style={{
           filter: 'drop-shadow(0 0 8px rgba(0,0,0,0.5))',
           pointerEvents: 'none',

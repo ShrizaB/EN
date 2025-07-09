@@ -1,7 +1,7 @@
 "use client"  // needed for useState/useEffect
 
 import React, { useEffect, useState, useRef } from "react"
-import { Inter } from "next/font/google"
+import { Inter, JetBrains_Mono, Orbitron, Poppins } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { AuthProvider } from "@/contexts/auth-context"
@@ -10,7 +10,33 @@ import { EduPlayNavbar } from "@/components/eduplay-navbar"
 import { TopNavBar } from "@/components/TopNavBar"
 import { usePathname } from "next/navigation"
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-inter",
+})
+
+const orbitron = Orbitron({
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["400", "500", "600", "700", "800", "900"],
+  variable: "--font-orbitron",
+})
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-jetbrains-mono",
+})
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-poppins",
+})
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
@@ -42,12 +68,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+                  <body
+        className={`${inter.variable} ${orbitron.variable} ${jetbrainsMono.variable} ${poppins.variable}`}>
+
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AuthProvider>
             <div className="flex min-h-screen flex-col">
               {/* Only show TopNavBar and EduPlayNavbar if not on / or /eduguide */}
-              {pathname !== "/" && pathname !== "/eduguide" && (
+              {pathname !== "/" && !pathname.startsWith("/eduguide") && (
                 <>
                   <TopNavBar onMenuClick={() => setIsSidebarOpen(true)} />
                   <EduPlayNavbar

@@ -1,130 +1,188 @@
-import Link from "next/link"
-import type { Metadata } from "next"
-import { Calculator, Brain, Newspaper } from "lucide-react"
+"use client"
 
-export const metadata: Metadata = {
-  title: "Aptitude Test - EduPlay",
-  description: "Prepare for competitive exams with our comprehensive aptitude test preparation resources",
+import Link from "next/link"
+import { Calculator, Brain, Newspaper } from "lucide-react"
+import { useEffect, useState } from "react"
+import './aptitude-test.css'
+
+const CyberGridBackground = () => {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const [scrollPosition, setScrollPosition] = useState(0)
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({ x: e.clientX, y: e.clientY })
+    }
+
+    const handleScroll = () => {
+      setScrollPosition(window.scrollY)
+    }
+
+    window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('scroll', handleScroll)
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [])
+
+  return (
+    <div className="cyber-bg" style={{
+      '--mouse-x': `${mousePosition.x}px`,
+      '--mouse-y': `${mousePosition.y}px`,
+      '--scroll-y': `${scrollPosition}px`
+    } as React.CSSProperties}>
+      <div className="cyber-grid"></div>
+      <div className="cyber-glow"></div>
+      <div className="cyber-scanlines"></div>
+      <div className="cyber-particles"></div>
+      <div className="cyber-circuit"></div>
+      <div className="cyber-matrix"></div>
+      <div className="cyber-corner-lines"></div>
+    </div>
+  )
+}
+
+const CyberCard = ({ href, icon: Icon, title, description, stats, accentColor }: {
+  href: string
+  icon: React.ComponentType<{ className?: string }>
+  title: string
+  description: string
+  stats: string
+  accentColor: string
+}) => {
+  return (
+    <Link href={href} className="cyber-card-wrapper">
+      <div className="cyber-card" style={{ '--accent-color': accentColor } as React.CSSProperties}>
+        <div className="card-border"></div>
+        <div className="card-content">
+          <div className="card-icon">
+            <Icon className="icon" />
+            <div className="icon-hover-glow"></div>
+          </div>
+          <h3 className="glitch-text" data-text={title}>
+            <span>{title}</span>
+          </h3>
+          <p>{description}</p>
+          <div className="card-footer">
+            <span>{stats}</span>
+          </div>
+        </div>
+        <div className="card-hover-effect"></div>
+        <div className="card-corner card-corner-tl"></div>
+        <div className="card-corner card-corner-tr"></div>
+        <div className="card-corner card-corner-bl"></div>
+        <div className="card-corner card-corner-br"></div>
+      </div>
+    </Link>
+  )
+}
+
+const FeatureItem = ({ index, title, description }: { index: number, title: string, description: string }) => {
+  return (
+    <div className="cyber-feature">
+      <div className="feature-index">{index}</div>
+      <div className="feature-content">
+        <h4 className="glitch-text font-mono" data-text={title}>
+          <span>{title}</span>
+        </h4>
+        <p className="font-sans">{description}</p>
+      </div>
+      <div className="feature-line"></div>
+      <div className="feature-corner feature-corner-tl"></div>
+      <div className="feature-corner feature-corner-tr"></div>
+    </div>
+  )
 }
 
 export default function AptitudeTestPage() {
+  const [loaded, setLoaded] = useState(false)
+
+  useEffect(() => {
+    setLoaded(true)
+    document.documentElement.classList.add('cyber-theme')
+    return () => document.documentElement.classList.remove('cyber-theme')
+  }, [])
+
   return (
-    <main className="flex-1 py-12">
-      <div className="container">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold mb-6">Aptitude Test Preparation</h1>
-          <p className="text-xl text-muted-foreground mb-12">
-            Master aptitude concepts with interactive lessons and practice with mock tests designed like competitive
-            exams.
+    <div className="aptitude-test-page">
+      <CyberGridBackground />
+      
+      <main className="cyber-container">
+        <div className={`cyber-header ${loaded ? 'loaded' : ''}`}>
+          <h1 className="cyber-title glitch-text" data-text="Aptitude Test Preparation">
+            <span>Aptitude Test Preparation</span>
+          </h1>
+          <p className="cyber-subtitle">
+            Master aptitude concepts with interactive lessons and practice with mock tests designed like competitive exams.
           </p>
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-            <Link href="/eduguide/aptitude-test/maths" className="group">
-              <div className="bg-card p-8 rounded-xl shadow-sm border border-border transition-all duration-300 hover:shadow-md hover:border-primary/50 h-full flex flex-col">
-                <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mb-6 group-hover:bg-blue-200 transition-colors">
-                  <Calculator className="h-8 w-8 text-blue-600" />
-                </div>
-                <h3 className="text-xl font-bold mb-3 group-hover:text-primary transition-colors">Mathematics</h3>
-                <p className="text-muted-foreground mb-4">
-                  Master mathematical concepts essential for competitive exams including time and distance, percentage,
-                  profit and loss, and more.
-                </p>
-                <div className="mt-auto pt-4 border-t border-border">
-                  <div className="text-sm text-muted-foreground">
-                    <span className="font-medium">18 topics</span> · Includes formulas and examples
-                  </div>
-                </div>
-              </div>
-            </Link>
+        <div className={`cyber-cards ${loaded ? 'loaded' : ''}`}>
+          <CyberCard
+            href="/eduguide/aptitude-test/maths"
+            icon={Calculator}
+            title="Mathematics"
+            description="Master mathematical concepts essential for competitive exams including time and distance, percentage, profit and loss, and more."
+            stats="18 topics · Includes formulas and examples"
+            accentColor="#00cc66"
+          />
+          
+          <CyberCard
+            href="/eduguide/aptitude-test/reasoning"
+            icon={Brain}
+            title="Reasoning"
+            description="Develop logical reasoning skills with topics like clock problems, blood relations, coding-decoding, and more."
+            stats="21 topics · Includes strategies and examples"
+            accentColor="#00aa44"
+          />
+          
+          <CyberCard
+            href="/eduguide/aptitude-test/current-affairs"
+            icon={Newspaper}
+            title="Current Affairs"
+            description="Test your knowledge of recent events and developments with our regularly updated current affairs mock tests."
+            stats="Direct mock tests · Updated regularly"
+            accentColor="#00ff88"
+          />
+        </div>
 
-            <Link href="/eduguide/aptitude-test/reasoning" className="group">
-              <div className="bg-card p-8 rounded-xl shadow-sm border border-border transition-all duration-300 hover:shadow-md hover:border-primary/50 h-full flex flex-col">
-                <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mb-6 group-hover:bg-green-200 transition-colors">
-                  <Brain className="h-8 w-8 text-green-600" />
-                </div>
-                <h3 className="text-xl font-bold mb-3 group-hover:text-primary transition-colors">Reasoning</h3>
-                <p className="text-muted-foreground mb-4">
-                  Develop logical reasoning skills with topics like clock problems, blood relations, coding-decoding,
-                  and more.
-                </p>
-                <div className="mt-auto pt-4 border-t border-border">
-                  <div className="text-sm text-muted-foreground">
-                    <span className="font-medium">21 topics</span> · Includes strategies and examples
-                  </div>
-                </div>
-              </div>
-            </Link>
-
-            <Link href="/eduguide/aptitude-test/current-affairs" className="group">
-              <div className="bg-card p-8 rounded-xl shadow-sm border border-border transition-all duration-300 hover:shadow-md hover:border-primary/50 h-full flex flex-col">
-                <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mb-6 group-hover:bg-amber-200 transition-colors">
-                  <Newspaper className="h-8 w-8 text-amber-600" />
-                </div>
-                <h3 className="text-xl font-bold mb-3 group-hover:text-primary transition-colors">Current Affairs</h3>
-                <p className="text-muted-foreground mb-4">
-                  Test your knowledge of recent events and developments with our regularly updated current affairs mock
-                  tests.
-                </p>
-                <div className="mt-auto pt-4 border-t border-border">
-                  <div className="text-sm text-muted-foreground">
-                    <span className="font-medium">Direct mock tests</span> · Updated regularly
-                  </div>
-                </div>
-              </div>
-            </Link>
-          </div>
-
-          <div className="bg-secondary/20 rounded-xl p-8 mb-12">
-            <h2 className="text-2xl font-bold mb-4">Why Prepare with EduGuide?</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="flex gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex-shrink-0 flex items-center justify-center">
-                  <span className="font-bold text-primary">1</span>
-                </div>
-                <div>
-                  <h3 className="font-medium mb-1">Comprehensive Content</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Detailed explanations, formulas, and examples for each topic
-                  </p>
-                </div>
-              </div>
-              <div className="flex gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex-shrink-0 flex items-center justify-center">
-                  <span className="font-bold text-primary">2</span>
-                </div>
-                <div>
-                  <h3 className="font-medium mb-1">Video Tutorials</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Curated YouTube videos to help you understand concepts better
-                  </p>
-                </div>
-              </div>
-              <div className="flex gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex-shrink-0 flex items-center justify-center">
-                  <span className="font-bold text-primary">3</span>
-                </div>
-                <div>
-                  <h3 className="font-medium mb-1">Exam-like Mock Tests</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Practice with 20-question tests designed like competitive exams
-                  </p>
-                </div>
-              </div>
-              <div className="flex gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex-shrink-0 flex items-center justify-center">
-                  <span className="font-bold text-primary">4</span>
-                </div>
-                <div>
-                  <h3 className="font-medium mb-1">Performance Tracking</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Monitor your progress and identify areas for improvement
-                  </p>
-                </div>
-              </div>
-            </div>
+        <div className={`cyber-features ${loaded ? 'loaded' : ''}`}>
+          <h2 className="cyber-section-title glitch-text" data-text="Why Prepare with EduGuide?">
+            <span>Why Prepare with EduGuide?</span>
+          </h2>
+          <div className="features-grid">
+            <FeatureItem
+              index={1}
+              title="Comprehensive Content"
+              description="Detailed explanations, formulas, and examples for each topic"
+            />
+            <FeatureItem
+              index={2}
+              title="Video Tutorials"
+              description="Curated YouTube videos to help you understand concepts better"
+            />
+            <FeatureItem
+              index={3}
+              title="Exam-like Mock Tests"
+              description="Practice with 20-question tests designed like competitive exams"
+            />
+            <FeatureItem
+              index={4}
+              title="Performance Tracking"
+              description="Monitor your progress and identify areas for improvement"
+            />
           </div>
         </div>
-      </div>
-    </main>
+
+        <div className={`cyber-cta ${loaded ? 'loaded' : ''}`}>
+          <Link href="/eduguide/aptitude-test/start" className="cyber-button">
+            <span>Start Learning Now</span>
+            <div className="button-border"></div>
+            <div className="button-glow"></div>
+          </Link>
+        </div>
+      </main>
+    </div>
   )
 }

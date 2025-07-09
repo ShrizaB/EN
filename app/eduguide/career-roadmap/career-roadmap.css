@@ -1,0 +1,131 @@
+/* Darker theme with deep navy */
+.cyber-bg {
+    background: radial-gradient(circle at top left, #081528 0%, #050a14 50%, #000 100%);
+  }
+  
+  /* Glowing animated grid overlay */
+  .cyber-grid::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(to right, rgba(0, 255, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    z-index: 1;
+    pointer-events: none;
+    animation: grid-glow 14s linear infinite;
+    opacity: 0.3;
+  }
+  
+  /* Fractured glass shards with darker theme */
+  .fractured-glass {
+    position: absolute;
+    inset: 0;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" preserveAspectRatio="none"><polygon points="10,10 90,10 50,90" fill="rgba(5, 15, 30, 0.2)" stroke="rgba(0, 150, 200, 0.1)" stroke-width="1"/><polygon points="20,20 80,20 60,80" fill="rgba(5, 15, 30, 0.15)" stroke="rgba(0, 150, 200, 0.15)" stroke-width="1"/><line x1="30" y1="30" x2="70" y2="70" stroke="rgba(0, 150, 200, 0.2)" stroke-width="1.5" class="arc"/></svg>') repeat;
+    background-size: 200px 200px;
+    z-index: 0;
+    pointer-events: none;
+    animation: shard-glitch 8s ease-in-out infinite, opacity-flicker 5s ease-in-out infinite;
+    opacity: 0.5;
+  }
+  
+  /* Neon arc animation */
+  @keyframes arc-pulse {
+    0%, 100% {
+      stroke-opacity: 0.4;
+      stroke-width: 2;
+    }
+    50% {
+      stroke-opacity: 0.8;
+      stroke-width: 3;
+    }
+  }
+  
+  .fractured-glass .arc {
+    animation: arc-pulse 3s ease-in-out infinite;
+  }
+  
+  /* Glitch effect for shards */
+  @keyframes shard-glitch {
+    0%, 100% {
+      transform: translate(0, 0);
+      opacity: 0.7;
+    }
+    10% {
+      transform: translate(2px, -2px);
+      opacity: 0.5;
+    }
+    20% {
+      transform: translate(-2px, 2px);
+      opacity: 0.9;
+    }
+    30% {
+      transform: translate(1px, 1px);
+      opacity: 0.6;
+    }
+  }
+  
+  /* Holographic opacity flicker */
+  @keyframes opacity-flicker {
+    0%, 100% {
+      opacity: 0.7;
+    }
+    50% {
+      opacity: 0.4;
+    }
+  }
+  
+  /* Subtle title glow */
+  @keyframes title-glow {
+    0%, 100% {
+      text-shadow: 0 0 4px rgba(0, 230, 230, 0.5), 0 0 10px rgba(0, 255, 255, 0.3);
+    }
+    50% {
+      text-shadow: 0 0 8px rgba(0, 230, 230, 0.6), 0 0 16px rgba(0, 255, 255, 0.2);
+    }
+  }
+  .animate-title-glow {
+    animation: title-glow 4s ease-in-out infinite;
+    text-shadow: 0 0 4px rgba(0, 230, 230, 0.3);
+    color: #5eead4; /* Slightly softer cyan */
+  }
+  
+  /* Fade animation */
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-fade-in {
+    animation: fade-in 1.2s ease-out forwards;
+  }
+  .animate-fade-in-up {
+    animation: fade-in 1.4s ease-out forwards;
+  }
+  
+  /* Pulsing border-glow around the screen */
+  @keyframes border-glow {
+    0%, 100% {
+      box-shadow: 0 0 10px rgba(0, 150, 200, 0.05);
+    }
+    50% {
+      box-shadow: 0 0 20px rgba(0, 150, 200, 0.1);
+    }
+  }
+  .animate-border-glow {
+    animation: border-glow 6s ease-in-out infinite;
+  }
+  
+  /* Glassy form container */
+  .glass-container {
+    background: rgba(5, 15, 30, 0.6);
+    box-shadow: 0 0 20px rgba(0, 230, 230, 0.05);
+    border: 1px solid rgba(0, 230, 230, 0.1);
+    border-radius: 1rem;
+    backdrop-filter: blur(20px);
+  }

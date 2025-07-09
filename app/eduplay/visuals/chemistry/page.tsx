@@ -220,7 +220,7 @@ function CustomCursor() {
       <img
         src="https://i.postimg.cc/G3DPx9nd/Screenshot-2025-07-02-213834-Photoroom.png"
         alt="Superman Cursor"
-        className="w-full h-full object-contain"
+        className="w-full h-full object-contain md:visible invisible"
         style={{
           filter: 'drop-shadow(0 0 8px rgba(0,0,0,0.5))',
           pointerEvents: 'none',

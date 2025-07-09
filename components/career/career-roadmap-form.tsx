@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { CareerRoadmapResults } from "./career-roadmap-results"
+import './career-roadmap-form.css'
+import './career-roadmap-results.css'
 
 export function CareerRoadmapForm() {
   const [isLoading, setIsLoading] = useState(false)
@@ -49,6 +51,7 @@ export function CareerRoadmapForm() {
   }
 
   return (
+    <div className="career-particles relative z-10">
     <Card className="border-2 border-green-500/20">
       <CardContent className="pt-6">
         <form onSubmit={handleSubmit} className="space-y-8">
@@ -105,13 +108,24 @@ export function CareerRoadmapForm() {
 
           <Button
             type="submit"
-            className="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700"
+            className={`w-full relative overflow-hidden bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 transition-all duration-300 ${isLoading ? 'opacity-90' : ''}`}
             disabled={isLoading}
           >
-            {isLoading ? "Analyzing..." : "Generate Career Roadmap"}
+            {isLoading ? (
+              <div className="flex items-center justify-center gap-2">
+                <div className="cyber-loader"></div>
+                <span>Generating Roadmap...</span>
+              </div>
+            ) : (
+              'Generate Career Roadmap'
+            )}
+            {isLoading && (
+              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 animate-pulse"></div>
+            )}
           </Button>
         </form>
       </CardContent>
     </Card>
+    </div>
   )
 }
