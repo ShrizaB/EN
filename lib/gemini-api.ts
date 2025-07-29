@@ -7,7 +7,22 @@ const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
 
 export async function generateContent(prompt: string) {
   try {
-    const result = await model.generateContent(prompt)
+    const enhancedPrompt = `${prompt}
+
+Please format your response using proper Markdown syntax:
+- Use # for main headings, ## for subheadings, ### for smaller headings
+- Use **text** for bold and *text* for italic
+- Use - or * for bullet points
+- Use 1. 2. 3. for numbered lists
+- Use > for blockquotes
+- Use \`code\` for inline code and \`\`\`code\`\`\` for code blocks
+- Use tables with | syntax when needed
+
+IMPORTANT: Do NOT include any diagrams, flowcharts, visual representations, or ASCII art. Focus only on text-based explanations, examples, and step-by-step written solutions.
+
+Make the content well-structured with clear headings, subheadings, and organized information that's easy to read and understand. Use proper markdown formatting throughout.`
+
+    const result = await model.generateContent(enhancedPrompt)
     const response = await result.response
     const text = response.text()
 

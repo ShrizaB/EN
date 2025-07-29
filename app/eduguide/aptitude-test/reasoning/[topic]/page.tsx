@@ -10,6 +10,8 @@ import { generateContent } from "@/lib/gemini-api"
 import { searchYouTubeVideos, type YouTubeVideo } from "@/lib/youtube-api"
 import { generateMockTest, type MockTestQuestion } from "@/lib/mock-test-generator"
 import MockTest from "@/components/aptitude/mock-test"
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import './reasoning-topics.css'
 
 // Enhanced CyberGridBackground with more effects
@@ -358,8 +360,10 @@ export default function ReasoningTopicPage() {
         4. Common patterns and tricks
         5. Tips for solving problems quickly in exams
         
-        Format the content with proper headings, bullet points, and diagrams where needed.
-        Make it educational and easy to understand for students preparing for competitive exams.`
+        Format the content with proper headings, bullet points, and organized sections.
+        Make it educational and easy to understand for students preparing for competitive exams.
+        
+        IMPORTANT: Do NOT include any diagrams, flowcharts, visual representations, ASCII art, or any visual elements. Provide only text-based explanations and written examples.`
 
         const generatedContent = await generateContent(prompt)
         setContent(generatedContent)
@@ -517,10 +521,128 @@ export default function ReasoningTopicPage() {
                     <div className="h-40 bg-gray-800/50 rounded-xl animate-pulse mt-6"></div>
                   </div>
                 ) : (
-                  <div 
-                    className="prose prose-sm max-w-none prose-headings:text-accent-primary prose-a:text-accent-secondary hover:prose-a:text-accent-primary prose-strong:text-accent-secondary prose-code:bg-gray-800 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:text-accent-secondary prose-pre:bg-gray-900/80 prose-pre:border prose-pre:border-gray-700/50 prose-pre:shadow-lg prose-pre:rounded-xl prose-pre:overflow-x-auto prose-pre:p-4 prose-pre:max-h-[500px]"
-                    dangerouslySetInnerHTML={{ __html: content }}
-                  />
+                  <div className="prose prose-lg max-w-none text-gray-100">
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        h1: ({ children }) => (
+                          <h1 className="text-4xl font-bold text-accent-primary mb-6 mt-8 border-b border-accent-primary/30 pb-3 tracking-tight">
+                            {children}
+                          </h1>
+                        ),
+                        h2: ({ children }) => (
+                          <h2 className="text-3xl font-bold text-accent-primary mb-4 mt-6">
+                            {children}
+                          </h2>
+                        ),
+                        h3: ({ children }) => (
+                          <h3 className="text-2xl font-semibold text-accent-secondary mb-3 mt-5">
+                            {children}
+                          </h3>
+                        ),
+                        h4: ({ children }) => (
+                          <h4 className="text-xl font-semibold text-gray-200 mb-2 mt-4">
+                            {children}
+                          </h4>
+                        ),
+                        h5: ({ children }) => (
+                          <h5 className="text-lg font-medium text-gray-300 mb-2 mt-3">
+                            {children}
+                          </h5>
+                        ),
+                        h6: ({ children }) => (
+                          <h6 className="text-base font-medium text-gray-400 mb-2 mt-3">
+                            {children}
+                          </h6>
+                        ),
+                        p: ({ children }) => (
+                          <p className="text-gray-100 leading-relaxed mb-4">
+                            {children}
+                          </p>
+                        ),
+                        strong: ({ children }) => (
+                          <strong className="text-accent-secondary font-semibold">
+                            {children}
+                          </strong>
+                        ),
+                        em: ({ children }) => (
+                          <em className="text-accent-primary italic">
+                            {children}
+                          </em>
+                        ),
+                        ul: ({ children }) => (
+                          <ul className="text-gray-100 space-y-2 mb-4 ml-6 list-none">
+                            {children}
+                          </ul>
+                        ),
+                        ol: ({ children }) => (
+                          <ol className="text-gray-100 space-y-2 mb-4 ml-6 list-none">
+                            {children}
+                          </ol>
+                        ),
+                        li: ({ children }) => (
+                          <li className="text-gray-100 leading-relaxed relative pl-6 before:content-['▪'] before:text-accent-primary before:absolute before:left-0 before:font-bold">
+                            {children}
+                          </li>
+                        ),
+                        blockquote: ({ children }) => (
+                          <blockquote className="border-l-4 border-accent-primary bg-gray-800/30 pl-4 py-2 italic text-gray-200 my-4">
+                            {children}
+                          </blockquote>
+                        ),
+                        code: ({ children, className }) => {
+                          const isInline = !className
+                          if (isInline) {
+                            return (
+                              <code className="bg-gray-800 px-2 py-1 rounded text-accent-secondary text-sm">
+                                {children}
+                              </code>
+                            )
+                          }
+                          return (
+                            <code className="block bg-gray-900/80 border border-gray-700/50 rounded-xl p-4 text-accent-secondary text-sm overflow-x-auto">
+                              {children}
+                            </code>
+                          )
+                        },
+                        pre: ({ children }) => (
+                          <pre className="bg-gray-900/80 border border-gray-700/50 shadow-lg rounded-xl overflow-x-auto p-4 max-h-[500px] mb-4">
+                            {children}
+                          </pre>
+                        ),
+                        a: ({ children, href }) => (
+                          <a 
+                            href={href} 
+                            className="text-accent-secondary no-underline hover:text-accent-primary hover:underline transition-colors"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {children}
+                          </a>
+                        ),
+                        table: ({ children }) => (
+                          <table className="border-collapse border border-gray-600 w-full mb-4">
+                            {children}
+                          </table>
+                        ),
+                        th: ({ children }) => (
+                          <th className="bg-gray-800 text-accent-primary font-semibold p-3 border border-gray-600 text-left">
+                            {children}
+                          </th>
+                        ),
+                        td: ({ children }) => (
+                          <td className="p-3 border border-gray-600 text-gray-100">
+                            {children}
+                          </td>
+                        ),
+                        hr: () => (
+                          <hr className="border-accent-primary/30 my-8" />
+                        )
+                      }}
+                    >
+                      {content}
+                    </ReactMarkdown>
+                  </div>
                 )}
               </div>
             </div>

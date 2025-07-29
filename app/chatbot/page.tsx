@@ -2,10 +2,15 @@
 
 import type React from "react"
 import { useState, useRef, useEffect } from "react"
-import { Send, Bot, User, Maximize, Minimize } from "lucide-react"
+import { Send, Bot, User, Maximize, Minimize, Eye } from "lucide-react"
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import rehypeHighlight from 'rehype-highlight'
+import 'highlight.js/styles/github-dark.css'
 import "./venom-theme.css"
 import "./venom-theme-fullscreen.css"
 import ChatbotLoading from "./loading"
+import VisualizationPanel from "@/components/visualization-panel"
 
 interface Message {
   id: string
@@ -31,6 +36,8 @@ export default function VenomChatbot() {
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [isClient, setIsClient] = useState(false)
   const [cursorPos, setCursorPos] = useState<{ x: number; y: number }>({ x: -9999, y: -9999 })
+  const [isVisualizationOpen, setIsVisualizationOpen] = useState(false)
+  const [currentVisualizationTopic, setCurrentVisualizationTopic] = useState("")
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const cursorRef = useRef<HTMLDivElement>(null)
 
@@ -153,7 +160,7 @@ export default function VenomChatbot() {
 
   // Function to render message content with perfect formatting
   const renderMessageContent = (message: Message) => {
-    if (message.role === "user" || !message.formatted) {
+    if (message.role === "user") {
       return (
         <div className="message-content-wrapper">
           <p className="message-text-content">{message.content}</p>
@@ -161,184 +168,76 @@ export default function VenomChatbot() {
       )
     }
 
-    // For formatted assistant messages - COMPLETELY FIXED
-    const lines = message.content.split('\n').filter(line => line.trim())
-    
+    // For assistant messages - use markdown rendering for proper code formatting
     return (
       <div className="message-content-wrapper">
-        <div className="response-content">
-          {lines.map((line, index) => {
-            const trimmedLine = line.trim()
-            
-            // Skip empty lines, lone asterisks, or malformed content
-            if (!trimmedLine || 
-                trimmedLine === '*' || 
-                /^\*+$/.test(trimmedLine) || 
-                trimmedLine.length < 2) {
-              return null
-            }
-            
-            // Handle **bold text** - COMPLETELY FIXED PARSING
-            if (trimmedLine.includes('**')) {
-              // Advanced bold parsing to handle all edge cases
-              const boldPattern = /\*\*([^*\n]+?)\*\*/g
-              
-              if (boldPattern.test(trimmedLine)) {
-                // Reset regex for actual replacement
-                boldPattern.lastIndex = 0
-                const parts = []
-                let lastIndex = 0
-                let match
-                
-                // Parse the line piece by piece
-                while ((match = boldPattern.exec(trimmedLine)) !== null) {
-                  // Add text before the bold part
-                  if (match.index > lastIndex) {
-                    const beforeText = trimmedLine.slice(lastIndex, match.index)
-                    if (beforeText.trim()) {
-                      parts.push({ type: 'text', content: beforeText })
-                    }
-                  }
-                  
-                  // Add the bold part
-                  const boldText = match[1].trim()
-                  if (boldText) {
-                    parts.push({ type: 'bold', content: boldText })
-                  }
-                  
-                  lastIndex = match.index + match[0].length
-                }
-                
-                // Add any remaining text after the last bold part
-                if (lastIndex < trimmedLine.length) {
-                  const afterText = trimmedLine.slice(lastIndex)
-                  if (afterText.trim()) {
-                    parts.push({ type: 'text', content: afterText })
-                  }
-                }
-                
-                // Render the parsed parts
-                if (parts.length > 0) {
-                  return (
-                    <div key={index} className="text-with-bold">
-                      {parts.map((part, partIndex) => {
-                        if (part.type === 'bold') {
-                          return (
-                            <strong key={partIndex} className="bold-emphasis">
-                              {part.content}
-                            </strong>
-                          )
-                        }
-                        return (
-                          <span key={partIndex}>{part.content}</span>
-                        )
-                      })}
+        <div className="message-text-content markdown-content">
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeHighlight]}
+            components={{
+            // Custom styling for code blocks
+            code: ({ inline, className, children, ...props }: any) => {
+              const match = /language-(\w+)/.exec(className || '')
+              if (!inline && match) {
+                return (
+                  <div className="code-block-wrapper">
+                    <div className="code-block-header">
+                      <span className="code-language">{match[1].toUpperCase()}</span>
+                      <button 
+                        onClick={() => navigator.clipboard?.writeText(String(children))}
+                        className="copy-button"
+                        title="Copy code"
+                      >
+                        📋
+                      </button>
                     </div>
-                  )
-                }
-              }
-            }
-            
-            // Check if it's a numbered list item
-            if (/^\d+\.\s/.test(trimmedLine)) {
-              const match = trimmedLine.match(/^(\d+)\.\s(.+)/)
-              if (match && match[2].trim()) {
-                return (
-                  <div key={index} className="numbered-item">
-                    <span className="item-number">{match[1]}</span>
-                    <span className="item-text">{match[2]}</span>
+                    <pre className="code-block">
+                      <code className={className} {...props}>
+                        {children}
+                      </code>
+                    </pre>
                   </div>
                 )
               }
-              return null
-            }
-            
-            // Check if it's a bullet point
-            if (/^[•\-]\s/.test(trimmedLine)) {
-              const text = trimmedLine.replace(/^[•\-]\s/, '').trim()
-              if (text && text.length > 1) {
-                return (
-                  <div key={index} className="bullet-item">
-                    <span className="bullet-point">•</span>
-                    <span className="item-text">{text}</span>
-                  </div>
-                )
-              }
-              return null
-            }
-            
-            // Check if it's a question
-            if (trimmedLine.includes('?') && trimmedLine.length > 5) {
               return (
-                <div key={index} className="question-item">
-                  <span className="question-icon">❓</span>
-                  <span className="question-text">{trimmedLine}</span>
-                </div>
+                <code className="inline-code" {...props}>
+                  {children}
+                </code>
               )
-            }
-            
-            // Check if it's code (contains backticks)
-            if (trimmedLine.includes('`')) {
-              const codePattern = /`([^`]+)`/g
-              if (codePattern.test(trimmedLine)) {
-                // Reset regex
-                codePattern.lastIndex = 0
-                const parts = []
-                let lastIndex = 0
-                let match
-                
-                while ((match = codePattern.exec(trimmedLine)) !== null) {
-                  if (match.index > lastIndex) {
-                    parts.push({ type: 'text', content: trimmedLine.slice(lastIndex, match.index) })
-                  }
-                  parts.push({ type: 'code', content: match[1] })
-                  lastIndex = match.index + match[0].length
-              }
-                
-                if (lastIndex < trimmedLine.length) {
-                  parts.push({ type: 'text', content: trimmedLine.slice(lastIndex) })
-                }
-                
-                return (
-                  <div key={index} className="text-with-code">
-                    {parts.map((part, partIndex) => {
-                      if (part.type === 'code') {
-                        return (
-                          <code key={partIndex} className="inline-code">
-                            {part.content}
-                          </code>
-                        )
-                      }
-                      return part.content ? <span key={partIndex}>{part.content}</span> : null
-                    })}
-                  </div>
-                )
-              }
-            }
-            
-            // Check if it's a section title (short, important line)
-            if (trimmedLine.length < 60 && trimmedLine.length > 3 &&
-                (trimmedLine.endsWith(':') || 
-                 /^[A-Z][A-Z\s]{2,}$/.test(trimmedLine) ||
-                 /^[A-Z][^.!?]*:?$/.test(trimmedLine))) {
-              return (
-                <h3 key={index} className="section-title">
-                  {trimmedLine.replace(':', '')}
-                </h3>
-              )
-            }
-            
-            // Regular paragraph (only if it has meaningful content)
-            if (trimmedLine.length > 3) {
-              return (
-                <p key={index} className="content-paragraph">
-                  {trimmedLine}
-                </p>
-              )
-            }
-            
-            return null
-          })}
+            },
+            // Custom styling for paragraphs
+            p: ({ children }: any) => (
+              <p className="markdown-paragraph">{children}</p>
+            ),
+            // Custom styling for lists
+            ul: ({ children }: any) => (
+              <ul className="markdown-list">{children}</ul>
+            ),
+            ol: ({ children }: any) => (
+              <ol className="markdown-ordered-list">{children}</ol>
+            ),
+            li: ({ children }: any) => (
+              <li className="markdown-list-item">{children}</li>
+            ),
+            // Custom styling for headers
+            h1: ({ children }: any) => (
+              <h1 className="markdown-h1">{children}</h1>
+            ),
+            h2: ({ children }: any) => (
+              <h2 className="markdown-h2">{children}</h2>
+            ),
+            h3: ({ children }: any) => (
+              <h3 className="markdown-h3">{children}</h3>
+            ),
+            // Custom styling for bold text
+            strong: ({ children }: any) => (
+              <strong className="markdown-bold">{children}</strong>
+            )
+          }}
+        >
+          {message.content}
+        </ReactMarkdown>
         </div>
       </div>
     )
@@ -355,6 +254,9 @@ export default function VenomChatbot() {
       timestamp: new Date(),
     }
 
+    // Check if this message might benefit from visualization
+    const detectedTopic = detectVisualizationTopic(input.trim())
+    
     setMessages((prev) => [...prev, userMessage])
     setInput("")
     setIsLoading(true)
@@ -404,6 +306,16 @@ export default function VenomChatbot() {
         assistantContent = "The symbiote received an unexpected response format..."
       }
 
+      // Check for visualization data or auto-detect
+      if (data.visualization && data.visualization.needsVisualization) {
+        setCurrentVisualizationTopic(data.visualization.searchTerm || input.trim())
+        setIsVisualizationOpen(true)
+      } else if (detectedTopic) {
+        // Auto-open visualization for detected topics
+        setCurrentVisualizationTopic(detectedTopic)
+        setIsVisualizationOpen(true)
+      }
+
       // Format the response for better presentation
       const responseData = formatResponse(assistantContent)
 
@@ -444,6 +356,31 @@ export default function VenomChatbot() {
 
   const toggleFullscreen = () => {
     setIsFullscreen((prev) => !prev)
+  }
+
+  // Function to detect visualization-worthy topics
+  const detectVisualizationTopic = (text: string): string | null => {
+    const visualizationKeywords = [
+      // Objects and creatures
+      'dinosaur', 'animal', 'tiger', 'lion', 'elephant', 'shark', 'whale', 'eagle',
+      'heart', 'brain', 'skeleton', 'lung', 'eye', 'hand', 
+      'car', 'plane', 'ship', 'rocket', 'robot', 'computer',
+      'earth', 'moon', 'mars', 'solar system', 'planet',
+      'house', 'castle', 'bridge', 'tower', 'pyramid',
+      
+      // Processes
+      'photosynthesis', 'water cycle', 'digestion', 'respiration', 'circulation',
+      'how does', 'how do', 'process of', 'cycle of', 'workflow',
+      'algorithm', 'steps to', 'procedure', 'method'
+    ]
+    
+    const lowerText = text.toLowerCase()
+    for (const keyword of visualizationKeywords) {
+      if (lowerText.includes(keyword)) {
+        return keyword
+      }
+    }
+    return null
   }
 
   
@@ -592,6 +529,17 @@ export default function VenomChatbot() {
         {isFullscreen ? <Minimize className="fullscreen-icon" /> : <Maximize className="fullscreen-icon" />}
       </button>
 
+      {/* Visualization Button */}
+      <button 
+        className="fullscreen-button" 
+        onClick={() => setIsVisualizationOpen(!isVisualizationOpen)}
+        style={{ right: '80px' }}
+        title="Toggle Visualization Panel"
+      >
+        <div className=""></div>
+        <Eye className={`fullscreen-icon ${isVisualizationOpen ? 'text-green-400' : ''}`} />
+      </button>
+
       {/* Main Chat Interface */}
       <div className={`chat-interface${isFullscreen ? ' pb-24' : ''}`} style={{overflowX: 'hidden'}}>
         {/* Header Section */}
@@ -703,6 +651,13 @@ export default function VenomChatbot() {
           </form>
         </div>
       </div>
+
+      {/* Visualization Panel */}
+      <VisualizationPanel
+        topic={currentVisualizationTopic}
+        isOpen={isVisualizationOpen}
+        onToggle={() => setIsVisualizationOpen(!isVisualizationOpen)}
+      />
     </div>
   )
 }

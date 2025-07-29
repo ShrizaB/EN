@@ -12,7 +12,7 @@ import "./quiz-topics.css"
 // Initialize the Gemini API
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "AIzaSyDiaCC3dAZS8ZiDU1uF8YfEu9PoWy8YLoA"
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY)
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
+const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" })
 
 // This would typically come from a database or API
 const topicsData = {
@@ -399,7 +399,7 @@ interface Question {
   options: string[]
   correctAnswer: number
   explanation: string
-  id?: string
+  id: string
   difficulty?: string
 }
 
@@ -456,6 +456,11 @@ function CustomCursor() {
 }
 
 export default function QuizTopicPage({ params }: { params: { subject: string; topic: string } }) {
+  const { subject, topic } = params
+  return <QuizTopicPageContent subject={subject} topic={topic} />
+}
+
+function QuizTopicPageContent({ subject, topic }: { subject: string; topic: string }) {
   const [mounted, setMounted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [questions, setQuestions] = useState<Question[]>([])
@@ -471,8 +476,8 @@ export default function QuizTopicPage({ params }: { params: { subject: string; t
   // Check if the subject and topic exist in our data
   if (
     mounted &&
-    (!topicsData[params.subject as keyof typeof topicsData] ||
-      !topicsData[params.subject as keyof typeof topicsData][params.topic as any])
+    (!(topicsData as any)[subject] ||
+      !(topicsData as any)[subject][topic])
   ) {
     notFound()
   }
@@ -541,7 +546,7 @@ export default function QuizTopicPage({ params }: { params: { subject: string; t
     setError(null)
 
     try {
-      const topicData = topicsData[params.subject as keyof typeof topicsData][params.topic as any]
+      const topicData = (topicsData as any)[subject][topic]
       console.log(`Generating ${difficulty} questions for ${topicData.title} (${topicData.subject})`)
 
       // Set time limit based on difficulty
@@ -559,7 +564,7 @@ export default function QuizTopicPage({ params }: { params: { subject: string; t
 
       setTimeLimit(newTimeLimit)
 
-      const generatedQuestions = await fetchQuestionsWithDifficulty(params.subject, params.topic, difficulty)
+      const generatedQuestions = await fetchQuestionsWithDifficulty(subject, topic, difficulty)
 
       if (!generatedQuestions || generatedQuestions.length === 0) {
         throw new Error("No questions were generated. Please try again.")
@@ -585,7 +590,7 @@ export default function QuizTopicPage({ params }: { params: { subject: string; t
 
   useEffect(() => {
     if (!mounted) return
-  }, [mounted, params.subject, params.topic])
+  }, [mounted, subject, topic])
 
   if (!mounted) {
     return (
@@ -596,7 +601,7 @@ export default function QuizTopicPage({ params }: { params: { subject: string; t
     )
   }
 
-  const topicData = topicsData[params.subject as keyof typeof topicsData][params.topic as any]
+  const topicData = (topicsData as any)[subject][topic]
 
   // Helper to check for mobile
   const isMobile = () => {
@@ -626,7 +631,7 @@ export default function QuizTopicPage({ params }: { params: { subject: string; t
         />
 
         <div className="hq-content-wrapper">
-          <Link href={`/quiz/${params.subject}`} className="hq-back-link">
+          <Link href={`/quiz/${subject}`} className="hq-back-link">
             <ArrowLeft className="mr-1 h-4 w-4" />
             Back to {topicData.subject} Quizzes
           </Link>
@@ -729,7 +734,7 @@ export default function QuizTopicPage({ params }: { params: { subject: string; t
               </div>
               <div className="hq-test-level-section">
                 <p className="hq-test-prompt">Not sure which level to choose?</p>
-                <Link href={`/test-your-level?subject=${params.subject}`}>
+                <Link href={`/test-your-level?subject=${subject}`}>
                   <Button variant="outline" className="hq-test-button">
                     Test Your Level
                   </Button>
@@ -781,8 +786,8 @@ export default function QuizTopicPage({ params }: { params: { subject: string; t
               <QuizEngine
                 questions={questions}
                 subjectColor={topicData.subjectColor}
-                subject={params.subject}
-                topic={params.topic}
+                subject={subject}
+                topic={topic}
                 difficulty={selectedDifficulty || undefined}
                 timeLimit={timeLimit}
                 onComplete={(score, total) => {

@@ -25,14 +25,22 @@ export async function GET(req: NextRequest) {
   const sessions = await db
     .collection("chat_sessions")
     .find({ userId })
-    .project({ messages: 0 }) // Don't send messages in the list
-    .sort({ createdAt: -1 })
+    .project({ 
+      title: 1, 
+      createdAt: 1, 
+      updatedAt: 1,
+      messageCount: { $size: { $ifNull: ["$messages", []] } },
+      lastMessage: { $last: "$messages.content" }
+    })
+    .sort({ updatedAt: -1 })
     .toArray();
+  
   // Convert _id to id for frontend
   sessions.forEach((s) => {
     s.id = s._id?.toString();
     if (s._id) delete (s as any)._id;
   });
+  
   return NextResponse.json({ sessions });
 }
 
@@ -48,22 +56,52 @@ export async function POST(req: NextRequest) {
       userId,
       title,
       createdAt: new Date(),
-      messages: [],
+      updatedAt: new Date(),
+      messages: []
     };
     const result = await db.collection("chat_sessions").insertOne(session);
-    return NextResponse.json({ sessionId: result.insertedId.toString() });
+    return NextResponse.json({ 
+      sessionId: result.insertedId.toString(),
+      session: { ...session, id: result.insertedId.toString() }
+    });
   }
 
-  // Update messages for a session
-  if (sessionId && Array.isArray(messages)) {
-    await db.collection("chat_sessions").updateOne(
-      { _id: new ObjectId(sessionId), userId },
-      { $set: { messages } }
+  // Update messages in existing session
+  if (sessionId && messages) {
+    const result = await db.collection("chat_sessions").updateOne(
+      { _id: new ObjectId(sessionId) },
+      { 
+        $set: { 
+          messages: messages,
+          updatedAt: new Date()
+        }
+      }
     );
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: result.modifiedCount > 0 });
   }
 
   return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+}
+
+// PUT: Update session title or other properties
+export async function PUT(req: NextRequest) {
+  const body = await req.json();
+  const { sessionId, title } = body;
+  const { db } = await connectToDatabase();
+
+  if (!sessionId) {
+    return NextResponse.json({ error: "Session ID is required" }, { status: 400 });
+  }
+
+  const updateData: any = { updatedAt: new Date() };
+  if (title) updateData.title = title;
+
+  const result = await db.collection("chat_sessions").updateOne(
+    { _id: new ObjectId(sessionId) },
+    { $set: updateData }
+  );
+
+  return NextResponse.json({ success: result.modifiedCount > 0 });
 }
 
 // DELETE: Delete a session

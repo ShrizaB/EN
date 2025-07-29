@@ -446,7 +446,11 @@ const subjectsData = {
 }
 
 export default function QuizSubjectPage({ params }: { params: { subject: string } }) {
-  const subject = params.subject
+  const { subject } = params
+  return <QuizSubjectPageContent subject={subject} />
+}
+
+function QuizSubjectPageContent({ subject }: { subject: string }) {
 
   // Check if the subject exists in our data
   if (!subjectsData[subject as keyof typeof subjectsData]) {

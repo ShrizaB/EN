@@ -16,14 +16,50 @@ export async function POST(req: NextRequest) {
     // Create a model with the correct model name
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
 
-    // Generate content
-    const result = await model.generateContent(prompt)
-    const response = await result.response
-    const text = response.text()
+    // Add retry logic for overloaded API
+    const maxRetries = 2
+    let lastError
 
-    return NextResponse.json({ content: text })
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`🤖 Gemini API attempt ${attempt}/${maxRetries}`)
+        
+        // Generate content
+        const result = await model.generateContent(prompt)
+        const response = await result.response
+        const text = response.text()
+
+        console.log("✅ Gemini API success!")
+        return NextResponse.json({ content: text })
+        
+      } catch (error) {
+        lastError = error
+        
+        // Check if it's an overload error
+        const isOverloaded = error instanceof Error && error.message.includes('503') && error.message.includes('overloaded')
+        
+        if (isOverloaded && attempt < maxRetries) {
+          console.log(`⏳ API overloaded, retrying in ${attempt * 2} seconds... (attempt ${attempt}/${maxRetries})`)
+          await new Promise(resolve => setTimeout(resolve, attempt * 2000)) // 2s, 4s delay
+          continue
+        }
+        
+        // If it's not retryable or we've exhausted retries, break
+        break
+      }
+    }
+
+    // If we get here, all retries failed
+    throw lastError
   } catch (error) {
     console.error("Error in Gemini API:", error)
+
+    // Check if it's a 503 overload error
+    const isOverloaded = error instanceof Error && error.message.includes('503') && error.message.includes('overloaded')
+    
+    if (isOverloaded) {
+      console.log("🔄 Gemini API is temporarily overloaded. Using fallback content.")
+    }
 
     // Return fallback content instead of an error
     return NextResponse.json({

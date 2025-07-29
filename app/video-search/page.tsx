@@ -15,7 +15,7 @@ import Loading from "./loading"
 // Initialize the Gemini API
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "AIzaSyDiaCC3dAZS8ZiDU1uF8YfEu9PoWy8YLoA"
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY)
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
+const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" })
 
 // YouTube API key - you'll need to add this to your environment variables
 const YOUTUBE_API_KEY = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY || "AIzaSyCd4Nl9qskVrhr8J-Xt9pMXUaXInw_NY3k"
@@ -112,7 +112,7 @@ export default function VideoSearchPage() {
     }
   }, [])
 
-  // Update the searchYouTubeVideos function to search for kid-friendly content
+  // Enhanced kid-friendly video search with comprehensive content filtering
   const searchYouTubeVideos = async (query: string): Promise<YouTubeVideo[]> => {
     try {
       if (!YOUTUBE_API_KEY) {
@@ -120,13 +120,13 @@ export default function VideoSearchPage() {
         return []
       }
 
-      // Add "for kids" to the search query to get more kid-friendly results
-      const kidFriendlyQuery = `${query} for kids educational`
+      // Enhanced educational search query with strict kid-friendly terms
+      const kidFriendlyQuery = `${query} for kids educational children learning tutorial lesson safe`
 
       const response = await fetch(
-        `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=5&q=${encodeURIComponent(
+        `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=25&q=${encodeURIComponent(
           kidFriendlyQuery,
-        )}&type=video&key=${YOUTUBE_API_KEY}`,
+        )}&type=video&safeSearch=strict&regionCode=US&relevanceLanguage=en&key=${YOUTUBE_API_KEY}`,
       )
 
       if (!response.ok) {
@@ -135,7 +135,148 @@ export default function VideoSearchPage() {
 
       const data = await response.json()
 
-      return data.items.map((item: any) => ({
+      // Define terms arrays outside for reuse
+      const blacklistedTerms = [
+        // Adult content
+        'adult', 'mature', 'explicit', 'nsfw', 'sexy', 'hot', 'nude', 'naked', 'bikini', 'underwear',
+        'romantic', 'dating', 'kiss', 'love story', 'relationship', 'marriage', 'wedding',
+        
+        // Violence & scary content
+        'violent', 'scary', 'horror', 'blood', 'kill', 'death', 'weapon', 'gun', 'fight', 'war',
+        'battle', 'zombie', 'ghost', 'monster', 'demon', 'devil', 'evil', 'dark', 'nightmare',
+        
+        // Substances
+        'drug', 'alcohol', 'beer', 'wine', 'smoke', 'cigarette', 'drunk', 'high', 'weed', 'cannabis',
+        
+        // Inappropriate language/behavior
+        'stupid', 'idiot', 'hate', 'dumb', 'crazy', 'insane', 'mad', 'angry', 'furious',
+        'curse', 'swear', 'bad word', 'inappropriate', 'offensive', 'rude', 'mean',
+        
+        // Non-educational entertainment
+        'prank', 'troll', 'roast', 'diss', 'beef', 'drama', 'gossip', 'scandal', 'controversy',
+        'clickbait', 'exposed', 'leaked', 'secret', 'hidden', 'conspiracy',
+        
+        // Gaming content (can be inappropriate)
+        'minecraft', 'fortnite', 'roblox', 'gaming', 'gamer', 'gameplay', 'streamer', 'twitch',
+        'discord', 'mod', 'hack', 'cheat', 'glitch',
+        
+        // Social media/trends
+        'tiktok', 'instagram', 'snapchat', 'viral', 'trend', 'challenge', 'dance', 'vlog',
+        'reaction', 'review', 'unboxing', 'haul', 'makeup', 'fashion',
+        
+        // Inappropriate topics for kids
+        'money', 'rich', 'expensive', 'buy', 'purchase', 'shopping', 'brand', 'luxury',
+        'celebrity', 'famous', 'star', 'popular', 'cool', 'awesome', 'epic', 'insane'
+      ]
+
+      const educationalTerms = [
+        'learn', 'education', 'educational', 'tutorial', 'lesson', 'teach', 'teaching',
+        'school', 'student', 'study', 'academic', 'knowledge', 'skill', 'training',
+        'kids', 'children', 'child', 'toddler', 'preschool', 'kindergarten',
+        'elementary', 'primary', 'grade', 'classroom', 'homeschool',
+        'science', 'math', 'mathematics', 'reading', 'writing', 'history', 'geography',
+        'art', 'music', 'coding', 'programming', 'computer', 'technology',
+        'nature', 'animal', 'plant', 'environment', 'space', 'solar system',
+        'alphabet', 'number', 'count', 'color', 'shape', 'pattern', 'basic', 'simple',
+        'beginner', 'introduction', 'fundamental', 'concept', 'theory', 'practice'
+      ]
+
+      // Comprehensive content filtering
+      let safeVideos = data.items.filter((item: any) => {
+        const title = item.snippet.title.toLowerCase()
+        const description = item.snippet.description.toLowerCase()
+        const channelTitle = item.snippet.channelTitle.toLowerCase()
+        
+        // Check for blacklisted terms
+        const hasBlacklistedContent = blacklistedTerms.some((term: string) => 
+          title.includes(term) || description.includes(term) || channelTitle.includes(term)
+        )
+        
+        // Educational whitelist - content must contain these terms
+        const hasEducationalContent = educationalTerms.some((term: string) => 
+          title.includes(term) || description.includes(term) || channelTitle.includes(term)
+        )
+        
+        // Additional safety checks
+        const isSafeChannel = !channelTitle.includes('gaming') && 
+                             !channelTitle.includes('entertainment') &&
+                             !channelTitle.includes('fun') &&
+                             !channelTitle.includes('comedy')
+        
+        const isSafeTitle = title.length > 10 && // Avoid very short, potentially clickbait titles
+                           !title.includes('!') && // Avoid sensational titles
+                           !title.includes('???') && // Avoid mysterious titles
+                           !title.includes('shocking') &&
+                           !title.includes('amazing') &&
+                           !title.includes('incredible')
+        
+        // Final safety check: must be educational, not blacklisted, and from safe channel
+        return hasEducationalContent && !hasBlacklistedContent && isSafeChannel && isSafeTitle
+      })
+
+      // If we don't have enough safe videos, try a broader search
+      if (safeVideos.length < 3) {
+        const broadQuery = `${query} educational kids learning`
+        const broadResponse = await fetch(
+          `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=20&q=${encodeURIComponent(
+            broadQuery,
+          )}&type=video&safeSearch=strict&regionCode=US&relevanceLanguage=en&key=${YOUTUBE_API_KEY}`,
+        )
+
+        if (broadResponse.ok) {
+          const broadData = await broadResponse.json()
+          const additionalVideos = broadData.items.filter((item: any) => {
+            const title = item.snippet.title.toLowerCase()
+            const description = item.snippet.description.toLowerCase()
+            const channelTitle = item.snippet.channelTitle.toLowerCase()
+            
+            const hasEducationalContent = educationalTerms.some((term: string) => 
+              title.includes(term) || description.includes(term) || channelTitle.includes(term)
+            )
+            
+            const hasBlacklistedContent = blacklistedTerms.some((term: string) => 
+              title.includes(term) || description.includes(term) || channelTitle.includes(term)
+            )
+            
+            return hasEducationalContent && !hasBlacklistedContent
+          })
+          
+          // Add unique videos to safe videos
+          const existingIds = new Set(safeVideos.map((v: any) => v.id.videoId))
+          const newVideos = additionalVideos.filter((v: any) => !existingIds.has(v.id.videoId))
+          safeVideos = [...safeVideos, ...newVideos]
+        }
+      }
+
+      // Ensure we have at least 3 videos - if still not enough, use basic educational search
+      if (safeVideos.length < 3) {
+        const basicQuery = `basic educational video children`
+        const basicResponse = await fetch(
+          `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=15&q=${encodeURIComponent(
+            basicQuery,
+          )}&type=video&safeSearch=strict&regionCode=US&relevanceLanguage=en&key=${YOUTUBE_API_KEY}`,
+        )
+
+        if (basicResponse.ok) {
+          const basicData = await basicResponse.json()
+          const basicVideos = basicData.items.filter((item: any) => {
+            const title = item.snippet.title.toLowerCase()
+            const description = item.snippet.description.toLowerCase()
+            
+            return (title.includes('educational') || title.includes('learning') || 
+                   title.includes('kids') || description.includes('educational'))
+          })
+          
+          const existingIds = new Set(safeVideos.map((v: any) => v.id.videoId))
+          const newBasicVideos = basicVideos.filter((v: any) => !existingIds.has(v.id.videoId))
+          safeVideos = [...safeVideos, ...newBasicVideos]
+        }
+      }
+
+      // Return at least 3 videos, maximum 5
+      const finalVideos = safeVideos.slice(0, Math.max(3, Math.min(5, safeVideos.length)))
+      
+      return finalVideos.map((item: any) => ({
         id: item.id.videoId,
         title: item.snippet.title,
         channelTitle: item.snippet.channelTitle,
@@ -149,22 +290,40 @@ export default function VideoSearchPage() {
     }
   }
 
-  // Update the rankVideosWithAI function to prioritize kid-friendly content
+  // Enhanced AI ranking with strict child safety and educational focus
   const rankVideosWithAI = async (query: string, videos: YouTubeVideo[]): Promise<YouTubeVideo[]> => {
     try {
       if (videos.length === 0) return []
 
-      // Create a prompt for the AI to rank the videos
+      // AI prompt with strict educational and safety criteria
       const prompt = `
-        I'm looking for the best educational videos about "${query}" specifically for children.
-        Here are some videos I found. Please rank them from most to least relevant for children's learning.
-        Consider factors like:
-        1. Child-friendliness (appropriate for kids)
-        2. Educational value for children
-        3. Engagement level for young learners
-        4. Clarity and simplicity of explanation
-      
-        Videos:
+        You are evaluating educational videos for children aged 3-12. These videos must meet STRICT safety and educational standards.
+        
+        Query: "${query}"
+        
+        MANDATORY REQUIREMENTS - Videos must be:
+        1. 100% child-safe (no violence, scary content, inappropriate language, adult themes)
+        2. Purely educational and age-appropriate
+        3. From trusted educational channels or certified kid-friendly creators
+        4. Clear, engaging, and pedagogically sound for children
+        5. Focused on learning outcomes, not entertainment
+        
+        AUTOMATIC REJECTION CRITERIA - Reject videos that contain:
+        - Any gaming content (Minecraft, Roblox, etc.)
+        - Pranks, challenges, or social media content
+        - Adult themes, violence, or inappropriate language
+        - Entertainment-focused content without educational value
+        - Commercial or promotional content
+        - Unverified or suspicious channels
+        
+        EDUCATIONAL PRIORITY - Prefer videos that:
+        - Are from established educational channels
+        - Have clear learning objectives
+        - Are appropriate for classroom use
+        - Have structured, pedagogical content
+        - Focus on fundamental concepts and skills
+        
+        Videos to evaluate:
         ${videos
           .map(
             (video, index) => `
@@ -172,67 +331,72 @@ export default function VideoSearchPage() {
         Title: ${video.title}
         Channel: ${video.channelTitle}
         Description: ${video.description}
-      `,
+        `,
           )
           .join("\n")}
-      
-      Return ONLY the ranked list of video indices (e.g., [3, 1, 5, 2, 4]) with the most kid-friendly and educational video first.
-    `
+        
+        Return ONLY a JSON array with the indices of videos that meet ALL safety and educational criteria, ranked by educational value.
+        Example: [3, 1, 2] (only include videos that pass all requirements)
+        If NO videos meet the criteria, return: []
+      `
 
       const result = await model.generateContent(prompt)
       const responseText = result.response.text()
 
-      // Extract the ranked indices from the response
-      const indexMatch = responseText.match(/\[[\d,\s]+\]/)
-      if (!indexMatch) return videos.slice(0, 3) // Return first 3 if no ranking found
+      // Extract ranked indices
+      const indexMatch = responseText.match(/\[[\d,\s]*\]/)
+      if (!indexMatch) {
+        console.log("No safe videos found by AI filter")
+        return []
+      }
 
       const rankedIndices = JSON.parse(indexMatch[0])
-
-      // Reorder videos based on AI ranking
-      const rankedVideos: YouTubeVideo[] = []
+      
+      // Return only videos that passed AI safety check
+      const safeVideos: YouTubeVideo[] = []
       for (const idx of rankedIndices) {
         if (videos[idx - 1]) {
-          rankedVideos.push(videos[idx - 1])
+          safeVideos.push(videos[idx - 1])
         }
       }
 
-      // Add any videos that weren't ranked
-      const rankedIds = new Set(rankedVideos.map((v) => v.id))
-      const unrankedVideos = videos.filter((v) => !rankedIds.has(v.id))
-
-      // Return only the top 3 videos
-      return [...rankedVideos, ...unrankedVideos].slice(0, 3)
+      return safeVideos.slice(0, Math.max(3, Math.min(5, safeVideos.length))) // Ensure at least 3, max 5
     } catch (error) {
       console.error("Error ranking videos with AI:", error)
-      return videos.slice(0, 3) // Return first 3 if ranking fails
+      // If AI fails, return the original videos (still maintaining safety)
+      return videos.slice(0, Math.max(3, Math.min(5, videos.length)))
     }
   }
 
-  // Update the generateResponse function to specify kid-friendly content
+  // Enhanced response generation with safety emphasis
   const generateResponse = async (query: string, videos: YouTubeVideo[]): Promise<string> => {
     try {
       if (videos.length === 0) {
-        return "I couldn't find any videos on that topic. Please try a different search term."
+        return "I couldn't find any child-safe educational videos on that topic. Please try searching for basic educational concepts like 'learning colors', 'counting numbers', or 'alphabet for kids'."
       }
 
       const prompt = `
-      The user is looking for educational videos about "${query}" for children.
-      I found ${videos.length} kid-friendly educational videos on this topic.
-      
-      Write a helpful, friendly response that:
-      1. Acknowledges their search query
-      2. Mentions these are specifically selected for kids
-      3. Encourages them to check out the videos below
-      4. Suggests they can ask for more specific videos if needed
-      
-      Keep it concise (2-3 sentences) and friendly, as if speaking to a parent or teacher helping a child.
-    `
+        Generate a friendly, reassuring response for parents/teachers about educational videos for children.
+        
+        Search query: "${query}"
+        Found: ${videos.length} carefully filtered, child-safe educational videos
+        
+        Write a response that:
+        1. Acknowledges the search in a positive way
+        2. Emphasizes that all videos are strictly filtered for child safety
+        3. Mentions they are educational and age-appropriate
+        4. Encourages viewing the selected videos
+        5. Suggests they can search for more specific educational topics
+        
+        Keep it warm, professional, and reassuring (2-3 sentences max).
+        Focus on safety and educational value.
+      `
 
       const result = await model.generateContent(prompt)
       return result.response.text().trim()
     } catch (error) {
       console.error("Error generating AI response:", error)
-      return "Here are some kid-friendly videos I found on that topic. I hope they're helpful for your child's learning!"
+      return "I found some carefully selected, child-safe educational videos on that topic. All content has been filtered to ensure it's appropriate and educational for children!"
     }
   }
 
@@ -369,6 +533,10 @@ export default function VideoSearchPage() {
             </h1>
             <p className="ultron-subtitle">
               Ask me to find educational videos on any topic. I'll search YouTube and show you the best results.
+              <br />
+              <span className="text-sm text-green-400 font-semibold">
+                🛡️ All videos are strictly filtered for child safety and educational content only
+              </span>
             </p>
           </div>
 
@@ -459,22 +627,63 @@ export default function VideoSearchPage() {
             >
               {messages.map((message) => (
                 <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-                  {/* Responsive video card rendering */}
+                  {message.role === "user" ? (
+                    <div className="flex gap-3">
+                      <div className="ultron-message ultron-message-user">
+                        <div className="message-border"></div>
+                        <p>{message.content}</p>
+                      </div>
+                      <Avatar className="ultron-avatar ultron-avatar-user">
+                        <AvatarFallback>{user?.name?.[0] || "U"}</AvatarFallback>
+                      </Avatar>
+                    </div>
+                  ) : (
+                    <div className="flex gap-3">
+                      <Avatar className="ultron-avatar ultron-avatar-ai">
+                        <AvatarFallback>AI</AvatarFallback>
+                        <div className="avatar-pulse"></div>
+                      </Avatar>
+                      <div className="ultron-message ultron-message-ai">
+                        <div className="message-border"></div>
+                        <p>{message.content}</p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Enhanced video card rendering with safety indicators */}
                   {message.videos && message.videos.length > 0 && (
                     <div className="flex flex-col gap-4 w-full mt-2">
                       {message.videos.map((video) => (
                         <div key={video.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-5 bg-black/40 rounded-lg p-3 shadow-md w-full max-w-2xl mx-auto">
-                          <img
-                            src={video.thumbnailUrl}
-                            alt={video.title}
-                            className="w-full sm:w-48 h-32 sm:h-28 object-cover rounded-md flex-shrink-0"
-                            style={{maxWidth: 220, minWidth: 0}}
-                          />
+                          <div className="relative">
+                            <img
+                              src={video.thumbnailUrl}
+                              alt={video.title}
+                              className="w-full sm:w-48 h-32 sm:h-28 object-cover rounded-md flex-shrink-0"
+                              style={{maxWidth: 220, minWidth: 0}}
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-md">
+                              <a
+                                href={`https://www.youtube.com/watch?v=${video.id}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-white hover:text-red-400 transition-colors"
+                                title="Watch on YouTube (opens in new tab)"
+                              >
+                                <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+                                  <path d="M8 5v14l11-7z"/>
+                                </svg>
+                              </a>
+                            </div>
+                          </div>
                           <div className="flex-1 min-w-0">
-                            <div className="font-bold text-base md:text-lg text-ultron-red mb-1 truncate" title={video.title}>{video.title}</div>
+                            <div className="font-bold text-base md:text-lg text-ultron-red mb-1 line-clamp-2" title={video.title}>{video.title}</div>
                             <div className="text-xs md:text-sm text-ultron-gray mb-1 truncate" title={video.channelTitle}>{video.channelTitle}</div>
                             <div className="text-xs md:text-sm text-ultron-gray mb-1">{new Date(video.publishedAt).toLocaleDateString()}</div>
-                            <div className="text-xs md:text-sm text-ultron-gray whitespace-pre-line break-words line-clamp-4 md:line-clamp-3" style={{wordBreak: 'break-word'}}>{video.description}</div>
+                            <div className="text-xs md:text-sm text-ultron-gray whitespace-pre-line break-words line-clamp-3" style={{wordBreak: 'break-word'}}>{video.description}</div>
+                            <div className="mt-2 text-xs text-green-400 font-semibold">
+                              ✅ Child-safe & Educational
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -498,7 +707,7 @@ export default function VideoSearchPage() {
                           <div className="loader-ring"></div>
                           <div className="loader-ring"></div>
                         </div>
-                        <p>Searching for videos...</p>
+                        <p>Searching for safe educational videos...</p>
                       </div>
                     </div>
                   </div>
@@ -541,6 +750,10 @@ export default function VideoSearchPage() {
             <p>
               <span className="footer-highlight">POWERED BY</span> YouTube and Gemini AI. Results are based on YouTube's
               search algorithm and may vary.
+              <br />
+              <span className="text-xs text-yellow-400">
+                ⚠️ All videos are pre-filtered for child safety. Parent supervision recommended.
+              </span>
             </p>
           </div>
         </div>

@@ -25,6 +25,8 @@ export function CareerRoadmapForm() {
     setIsLoading(true)
 
     try {
+      console.log('Submitting career roadmap request:', formData)
+      
       const response = await fetch("/api/career/analyze", {
         method: "POST",
         headers: {
@@ -33,14 +35,20 @@ export function CareerRoadmapForm() {
         body: JSON.stringify(formData),
       })
 
+      console.log('Response status:', response.status)
+
       if (!response.ok) {
-        throw new Error("Failed to analyze career path")
+        const errorText = await response.text()
+        console.error('API Error:', errorText)
+        throw new Error(`Failed to analyze career path: ${response.status}`)
       }
 
       const data = await response.json()
+      console.log('API Response received:', data)
       setResults(data)
     } catch (error) {
       console.error("Error analyzing career path:", error)
+      alert("Failed to generate career roadmap. Please try again.")
     } finally {
       setIsLoading(false)
     }
@@ -114,7 +122,7 @@ export function CareerRoadmapForm() {
             {isLoading ? (
               <div className="flex items-center justify-center gap-2">
                 <div className="cyber-loader"></div>
-                <span>Generating Roadmap...</span>
+                <span>Analyzing career path...</span>
               </div>
             ) : (
               'Generate Career Roadmap'

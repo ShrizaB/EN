@@ -301,21 +301,21 @@ export function CareerRoadmapResults({ results, onReset }: CareerRoadmapResultsP
                   <div className="cyber-section">
                     <h3 className="cyber-section-title flex items-center gap-2 text-sm mb-2">
                       <DollarSign className="h-5 w-5 cyber-icon" />
-                      SALARY INSIGHTS
+                      SALARY INSIGHTS (PER YEAR)
                     </h3>
                     <div className="space-y-4">
                       <div className="cyber-salary-card cyber-stat-primary">
                         <div className="cyber-salary-label">Average Salary Range</div>
-                        <div className="cyber-salary-value">₹{results.averageSalary.toLocaleString()}</div>
+                        <div className="cyber-salary-value">₹{results.averageSalary.toLocaleString()}/year</div>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="cyber-salary-card cyber-stat-secondary">
                           <div className="cyber-salary-label">Entry Level</div>
-                          <div className="cyber-salary-value-sm">₹{results.entrySalary.toLocaleString()}</div>
+                          <div className="cyber-salary-value-sm">₹{results.entrySalary.toLocaleString()}/year</div>
                         </div>
                         <div className="cyber-salary-card cyber-stat-tertiary">
                           <div className="cyber-salary-label">Experienced</div>
-                          <div className="cyber-salary-value-sm">₹{results.experiencedSalary.toLocaleString()}</div>
+                          <div className="cyber-salary-value-sm">₹{results.experiencedSalary.toLocaleString()}/year</div>
                         </div>
                       </div>
                     </div>
@@ -362,58 +362,73 @@ export function CareerRoadmapResults({ results, onReset }: CareerRoadmapResultsP
                         onClick={() => setSelectedCompany(null)}
                         aria-label="Close"
                       >
-                        ×
+                        <span className="cyber-close-icon">✕</span>
                       </button>
                       <h2 className="cyber-modal-title flex items-center gap-2">
-                        <Building className="h-6 w-6" />
-                        {selectedCompany.name || (typeof selectedCompany === "string" ? selectedCompany : "Unknown")}
+                        <Building className="h-6 w-6 text-cyan-400" />
+                        <span className="cyber-company-title">{selectedCompany.name || (typeof selectedCompany === "string" ? selectedCompany : "Unknown")}</span>
                       </h2>
-                      <div className="cyber-modal-content">
-                        {selectedCompany.details && typeof selectedCompany.details === "string" ? (
-                          <>
-                            {selectedCompany.details.split("\n").slice(0, 5).map((line: string, i: number) => (
-                              <div key={i}>{line}</div>
-                            ))}
-                          </>
-                        ) : selectedCompany.description ? (
-                          <div>{selectedCompany.description}</div>
-                        ) : (
-                          <div className="cyber-no-data">No details available for this company yet.</div>
-                        )}
+                      
+                      <div className="cyber-modal-section">
+                        <h3 className="cyber-modal-subtitle">About Company</h3>
+                        <div className="cyber-modal-content">
+                          {selectedCompany.details && typeof selectedCompany.details === "string" ? (
+                            <div className="cyber-company-description">
+                              {selectedCompany.details.split("\n").slice(0, 5).map((line: string, i: number) => (
+                                <p key={i} className="cyber-description-line">{line}</p>
+                              ))}
+                            </div>
+                          ) : selectedCompany.description ? (
+                            <p className="cyber-description-line">{selectedCompany.description}</p>
+                          ) : (
+                            <p className="cyber-no-data">No details available for this company yet.</p>
+                          )}
+                        </div>
                       </div>
-                      <div className="mb-4">
-                        <h4 className="cyber-modal-subtitle">Top 10 Facilities:</h4>
-                        <ul className="cyber-facilities-list">
+
+                      <div className="cyber-modal-section">
+                        <h3 className="cyber-modal-subtitle">Key Facilities & Benefits</h3>
+                        <div className="cyber-facilities-grid">
                           {Array.isArray(selectedCompany.facilities) && selectedCompany.facilities.length > 0 ? (
                             selectedCompany.facilities.slice(0, 10).map((facility: string, i: number) => (
-                              <li key={i}>{facility}</li>
+                              <div key={i} className="cyber-facility-item">
+                                <span className="cyber-facility-icon">•</span>
+                                <span className="cyber-facility-text">{facility}</span>
+                              </div>
                             ))
                           ) : selectedCompany.facility ? (
-                            <li>{selectedCompany.facility}</li>
+                            <div className="cyber-facility-item">
+                              <span className="cyber-facility-icon">•</span>
+                              <span className="cyber-facility-text">{selectedCompany.facility}</span>
+                            </div>
                           ) : (
-                            <li className="cyber-no-data">No facility data available for this company.</li>
+                            <p className="cyber-no-data">No facility data available for this company.</p>
                           )}
-                        </ul>
-                      </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm mt-4">
-                        <div className="cyber-salary-card cyber-salary-entry">
-                          <div className="cyber-salary-label">Entry Level</div>
-                          <div className="cyber-salary-value">₹{selectedCompany.entrySalary?.toLocaleString() || selectedCompany.entry_level_salary?.toLocaleString?.() || selectedCompany.salaryEntry?.toLocaleString?.() || <span className='cyber-no-data'>Not available</span>}</div>
-                        </div>
-                        <div className="cyber-salary-card cyber-salary-exp">
-                          <div className="cyber-salary-label">Experienced</div>
-                          <div className="cyber-salary-value">₹{selectedCompany.experiencedSalary?.toLocaleString() || selectedCompany.experienced_salary?.toLocaleString?.() || selectedCompany.salaryExperienced?.toLocaleString?.() || <span className='cyber-no-data'>Not available</span>}</div>
-                        </div>
-                        <div className="cyber-salary-card cyber-salary-avg">
-                          <div className="cyber-salary-label">Average</div>
-                          <div className="cyber-salary-value">₹{selectedCompany.averageSalary?.toLocaleString() || selectedCompany.average_salary?.toLocaleString?.() || selectedCompany.salaryAverage?.toLocaleString?.() || <span className='cyber-no-data'>Not available</span>}</div>
                         </div>
                       </div>
-                      {!(selectedCompany.entrySalary || selectedCompany.entry_level_salary || selectedCompany.salaryEntry) &&
-                        !(selectedCompany.experiencedSalary || selectedCompany.experienced_salary || selectedCompany.salaryExperienced) &&
-                        !(selectedCompany.averageSalary || selectedCompany.average_salary || selectedCompany.salaryAverage) && (
-                          <div className="mt-4 cyber-no-data">No salary data available for this company.</div>
-                      )}
+
+                      <div className="cyber-modal-section">
+                        <h3 className="cyber-modal-subtitle">Salary Information (Per Year)</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          <div className="cyber-salary-card cyber-salary-entry">
+                            <div className="cyber-salary-label">Entry Level</div>
+                            <div className="cyber-salary-value">₹{selectedCompany.entrySalary?.toLocaleString() || selectedCompany.entry_level_salary?.toLocaleString?.() || selectedCompany.salaryEntry?.toLocaleString?.() || <span className='cyber-no-data'>Not available</span>}/year</div>
+                          </div>
+                          <div className="cyber-salary-card cyber-salary-exp">
+                            <div className="cyber-salary-label">Experienced</div>
+                            <div className="cyber-salary-value">₹{selectedCompany.experiencedSalary?.toLocaleString() || selectedCompany.experienced_salary?.toLocaleString?.() || selectedCompany.salaryExperienced?.toLocaleString?.() || <span className='cyber-no-data'>Not available</span>}/year</div>
+                          </div>
+                          <div className="cyber-salary-card cyber-salary-avg">
+                            <div className="cyber-salary-label">Average</div>
+                            <div className="cyber-salary-value">₹{selectedCompany.averageSalary?.toLocaleString() || selectedCompany.average_salary?.toLocaleString?.() || selectedCompany.salaryAverage?.toLocaleString?.() || <span className='cyber-no-data'>Not available</span>}/year</div>
+                          </div>
+                        </div>
+                        {!(selectedCompany.entrySalary || selectedCompany.entry_level_salary || selectedCompany.salaryEntry) &&
+                          !(selectedCompany.experiencedSalary || selectedCompany.experienced_salary || selectedCompany.salaryExperienced) &&
+                          !(selectedCompany.averageSalary || selectedCompany.average_salary || selectedCompany.salaryAverage) && (
+                            <div className="mt-4 cyber-no-data">No salary data available for this company.</div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 )}
@@ -492,7 +507,6 @@ export function CareerRoadmapResults({ results, onReset }: CareerRoadmapResultsP
                         stroke="#0a0a0f"
                         strokeWidth={1.5}
                         isAnimationActive={false}
-                        activeShape={null}
                       >
                         {displaySkills.map((skill: any, index: number) => (
                           <Cell 
@@ -587,7 +601,6 @@ export function CareerRoadmapResults({ results, onReset }: CareerRoadmapResultsP
                         stroke="#0a0a0f"
                         strokeWidth={1.5}
                         isAnimationActive={false}
-                        activeShape={null}
                       >
                         {displayLocations.map((location: any, index: number) => (
                           <Cell 

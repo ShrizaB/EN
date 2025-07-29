@@ -1399,3 +1399,246 @@
         font-size: 1.75rem;
     }
 }
+
+/* Modal Styles */
+.cyber-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.cyber-modal {
+    background: linear-gradient(135deg, rgba(10, 15, 30, 0.95), rgba(15, 20, 40, 0.95));
+    border: 1px solid #00ffff;
+    border-radius: 8px;
+    padding: 2rem;
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 
+        0 0 30px rgba(0, 255, 255, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: scale(0.9) translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
+}
+
+.cyber-modal::-webkit-scrollbar {
+    width: 6px;
+}
+
+.cyber-modal::-webkit-scrollbar-track {
+    background: rgba(10, 15, 30, 0.5);
+    border-radius: 3px;
+}
+
+.cyber-modal::-webkit-scrollbar-thumb {
+    background: #00ffff;
+    border-radius: 3px;
+}
+
+.cyber-modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(0, 255, 255, 0.1);
+    border: 1px solid #00ffff;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.cyber-modal-close:hover {
+    background: rgba(0, 255, 255, 0.2);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    transform: rotate(90deg);
+}
+
+.cyber-close-icon {
+    color: #00ffff;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.cyber-modal-title {
+    font-family: "Orbitron", sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #00ffff;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.cyber-company-title {
+    background: linear-gradient(45deg, #00ffff, #0099ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.cyber-modal-section {
+    margin-bottom: 1.5rem;
+}
+
+.cyber-modal-subtitle {
+    font-family: "Orbitron", sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #99ccff;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+}
+
+.cyber-modal-subtitle::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 30px;
+    height: 2px;
+    background: linear-gradient(90deg, #00ffff, transparent);
+}
+
+.cyber-modal-content {
+    color: #99ccff;
+    line-height: 1.6;
+}
+
+.cyber-description-line {
+    margin-bottom: 0.5rem;
+    color: #cccccc;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.cyber-description-line:last-child {
+    margin-bottom: 0;
+}
+
+/* Facilities Grid */
+.cyber-facilities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.cyber-facility-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(0, 255, 255, 0.05);
+    border: 1px solid rgba(0, 255, 255, 0.1);
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.cyber-facility-item:hover {
+    background: rgba(0, 255, 255, 0.1);
+    border-color: rgba(0, 255, 255, 0.3);
+    transform: translateX(2px);
+}
+
+.cyber-facility-icon {
+    color: #00ffff;
+    font-weight: bold;
+    margin-top: 0.1rem;
+    flex-shrink: 0;
+}
+
+.cyber-facility-text {
+    color: #cccccc;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* Responsive modal adjustments */
+@media (max-width: 768px) {
+    .cyber-modal {
+        margin: 1rem;
+        padding: 1.5rem;
+        max-height: 85vh;
+    }
+
+    .cyber-modal-title {
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+    }
+
+    .cyber-facilities-grid {
+        grid-template-columns: 1fr;
+        gap: 0.4rem;
+    }
+
+    .cyber-facility-item {
+        padding: 0.4rem;
+    }
+
+    .cyber-modal-close {
+        top: 0.75rem;
+        right: 0.75rem;
+        width: 28px;
+        height: 28px;
+    }
+
+    .cyber-close-icon {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .cyber-modal {
+        margin: 0.5rem;
+        padding: 1rem;
+    }
+
+    .cyber-modal-title {
+        font-size: 1.1rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+}

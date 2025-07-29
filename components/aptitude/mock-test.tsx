@@ -264,12 +264,7 @@ function MockTest({ topic, subject, questions, onFinish, onBack }: MockTestProps
     <div className="cyber-test-container mt-16">
       {/* Animated Background */}
       <div className="cyber-bg">
-        <MatrixRain />
-        <FloatingParticles />
-        <div className="cyber-grid"></div>
-        <div className="cyber-glow"></div>
-        <div className="cyber-scanlines"></div>
-        <div className="circuit-overlay"></div>
+        {/* Removed distracting matrix rain and particles */}
       </div>
 
       <div className={`cyber-main-wrapper ${isFullScreen ? "fullscreen" : ""}`}>
@@ -549,88 +544,11 @@ function MockTest({ topic, subject, questions, onFinish, onBack }: MockTestProps
           width: 100vw;
           height: 100vh;
           z-index: -1;
-          background: radial-gradient(ellipse at center, rgba(0, 255, 0, 0.03) 0%, transparent 70%);
+          background: #000000;
         }
 
         .matrix-canvas, .particle-canvas {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          opacity: 0.1;
-        }
-
-        .cyber-grid {
-          position: absolute;
-          width: 120%;
-          height: 120%;
-          background-image: 
-            linear-gradient(rgba(0, 255, 0, 0.1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0, 255, 0, 0.1) 1px, transparent 1px);
-          background-size: 50px 50px;
-          animation: grid-drift 30s linear infinite;
-          transform: translate(-10%, -10%);
-        }
-
-        @keyframes grid-drift {
-          0% { transform: translate(-10%, -10%); }
-          100% { transform: translate(-60px, -60px); }
-        }
-
-        .cyber-glow {
-          position: absolute;
-          width: 1000px;
-          height: 1000px;
-          border-radius: 50%;
-          background: radial-gradient(circle, rgba(0, 255, 0, 0.05) 0%, transparent 70%);
-          filter: blur(100px);
-          animation: glow-pulse 4s ease-in-out infinite alternate;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-        }
-
-        @keyframes glow-pulse {
-          0% { opacity: 0.3; }
-          100% { opacity: 0.7; }
-        }
-
-        .cyber-scanlines {
-          position: absolute;
-          width: 100%;
-          height: 100%;
-          background: repeating-linear-gradient(
-            to bottom,
-            rgba(0, 255, 0, 0.03),
-            rgba(0, 255, 0, 0.03) 1px,
-            transparent 1px,
-            transparent 4px
-          );
-          animation: scanline-move 10s linear infinite;
-        }
-
-        @keyframes scanline-move {
-          0% { transform: translateY(0); }
-          100% { transform: translateY(8px); }
-        }
-
-        .circuit-overlay {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background-image: 
-            radial-gradient(circle at 20% 20%, rgba(0, 255, 0, 0.1) 0%, transparent 50%),
-            radial-gradient(circle at 80% 80%, rgba(0, 255, 0, 0.1) 0%, transparent 50%);
-          opacity: 0.3;
-          animation: circuit-pulse 8s infinite alternate;
-        }
-
-        @keyframes circuit-pulse {
-          0% { opacity: 0.2; }
-          100% { opacity: 0.4; }
+          display: none;
         }
 
         .cyber-main-wrapper {
@@ -652,11 +570,11 @@ function MockTest({ topic, subject, questions, onFinish, onBack }: MockTestProps
 
         .cyber-test-panel {
           background: rgba(0, 130, 77, 0.5);
-          border: 2px solid #00b344;
+          border: 2px solid #333;
           border-radius: 0;
           box-shadow: 
-            0 0 20px rgba(26, 143, 143, 0.3),
-            inset 0 0 20px rgba(26, 143, 143, 0.1);
+            0 0 20px rgba(0, 0, 0, 0.3),
+            inset 0 0 20px rgba(0, 0, 0, 0.1);
           backdrop-filter: blur(10px);
           height: calc(100vh - 40px);
           position: relative;
@@ -664,19 +582,23 @@ function MockTest({ topic, subject, questions, onFinish, onBack }: MockTestProps
         }
 
         .cyber-test-panel::before {
-          content: '';
-          position: absolute;
+          content: '${topic.toUpperCase()}';
+          position: absolute; 
           top: 0;
           left: 0;
           right: 0;
-          height: 2px;
-          background: linear-gradient(90deg, transparent, #00b344, transparent);
-          animation: border-glow 3s infinite linear;
-        }
-
-        @keyframes border-glow {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
+          height: 60px;
+          background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+          color: #00a86b;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-family: 'Courier New', monospace;
+          font-weight: bold;
+          font-size: 24px;
+          letter-spacing: 3px;
+          text-shadow: 0 0 15px rgba(0, 168, 107, 0.7);
+          z-index: 10;
         }
 
         .cyber-header {
@@ -684,6 +606,7 @@ function MockTest({ topic, subject, questions, onFinish, onBack }: MockTestProps
           border-bottom: 1px solid #00824d;
           padding: 15px 20px;
           position: relative;
+          margin-top: 60px;
         }
 
         .header-content {
@@ -823,7 +746,7 @@ function MockTest({ topic, subject, questions, onFinish, onBack }: MockTestProps
 
         .cyber-content-wrapper {
           display: flex;
-          height: calc(100% - 70px);
+          height: calc(100% - 130px);
         }
 
         .cyber-sidebar {

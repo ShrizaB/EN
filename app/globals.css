@@ -715,3 +715,31 @@
     transform: translateY(100vh);
   }
 }
+
+/* Custom scrollbar styles for visualization panel */
+.mermaid-container {
+  scrollbar-width: thin;
+  scrollbar-color: #10b981 transparent;
+}
+
+.mermaid-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.mermaid-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.mermaid-container::-webkit-scrollbar-thumb {
+  background: #10b981;
+  border-radius: 4px;
+}
+
+.mermaid-container::-webkit-scrollbar-thumb:hover {
+  background: #059669;
+}
+
+.mermaid-container::-webkit-scrollbar-corner {
+  background: transparent;
+}
