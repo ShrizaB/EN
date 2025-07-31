@@ -45,6 +45,7 @@ CRITICAL RESPONSE REQUIREMENTS:
 - Structure information logically with proper formatting
 - For programming topics, provide complete, working code examples
 - Make sure to finish all thoughts and provide comprehensive coverage
+- If coding question is asked then provide code examples, if its about any object or other than coding, dont give code
 
 MANDATORY CODE FORMATTING RULES:
 - For ALL programming code, you MUST use proper markdown code blocks

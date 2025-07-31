@@ -15,6 +15,38 @@
   to { transform: rotate(360deg); }
 }
 
+/* Loading States */
+.cyber-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem;
+}
+
+.cyber-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(0, 255, 255, 0.2);
+  border-radius: 50%;
+  border-top-color: #00ffff;
+  animation: spin 1s ease-in-out infinite;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+}
+
+.cyber-loading .cyber-text {
+  color: #99ccff;
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
 /* Base Cyber Theme */
 .cyber-container {
     min-height: 100vh;
@@ -747,6 +779,16 @@
     aspect-ratio: 16 / 9;
     background: linear-gradient(135deg, rgba(10, 10, 15, 0.9) 0%, rgba(20, 20, 30, 0.9) 100%);
     position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+.cyber-learning-video iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 8px;
 }
 
 .cyber-learning-video-placeholder {
@@ -756,6 +798,7 @@
     align-items: center;
     justify-content: center;
     color: #00ffff;
+    background: linear-gradient(135deg, rgba(10, 10, 15, 0.9) 0%, rgba(20, 20, 30, 0.9) 100%);
 }
 
 .cyber-learning-content {
@@ -799,42 +842,17 @@
 
 .cyber-learning-tags {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
+    align-items: center; /* vertically center child elements */
+    gap: 0.5rem;
 }
 
 .cyber-learning-tag {
-    background: rgba(0, 255, 255, 0.1);
-    border: 1px solid rgba(0, 255, 255, 0.3);
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-    font-size: 0.875rem;
-    color: #66ccff;
+    display: inline-flex;
+    align-items: center; /* vertically center label and text */
 }
 
 .cyber-learning-tag-label {
-    font-weight: 600;
-    color: #00ffff;
-}
-
-.cyber-learning-youtube-link {
-    background: rgba(255, 0, 0, 0.1);
-    border: 1px solid rgba(255, 0, 0, 0.3);
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-    font-size: 0.875rem;
-    color: #ff6666;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    transition: all 0.3s ease;
-}
-
-.cyber-learning-youtube-link:hover {
-    background: rgba(255, 0, 0, 0.2);
-    border-color: rgba(255, 0, 0, 0.5);
-    color: #ff3333;
+    margin-right: 0.25rem;
 }
 
 /* Top Companies Styles */
@@ -914,6 +932,73 @@
     overflow: hidden;
     text-overflow: ellipsis;
     text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+}
+
+/* Expanded Company Card Styles */
+.cyber-company-card.expanded {
+    grid-column: 1 / -1; /* Take full width */
+    background: rgba(10, 15, 30, 0.9);
+    border: 2px solid #00ffff;
+    box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);
+    min-height: auto;
+    max-height: none;
+    overflow: visible;
+    padding: 1.5rem;
+}
+
+.cyber-company-card.expanded::before {
+    width: 8px;
+    background: linear-gradient(to bottom, #00ffff, #ff00ff);
+}
+
+.cyber-company-card.expanded .cyber-company-name {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.cyber-company-expanded-content {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(0, 255, 255, 0.3);
+    animation: expandContent 0.5s ease-out;
+}
+
+@keyframes expandContent {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Mobile responsive for expanded cards */
+@media (max-width: 768px) {
+    .cyber-company-card.expanded {
+        grid-column: 1;
+        padding: 1rem;
+    }
+    
+    .cyber-company-expanded-content {
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .cyber-company-card.expanded {
+        padding: 0.75rem;
+    }
+    
+    .cyber-company-expanded-content {
+        margin-top: 1rem;
+        padding-top: 1rem;
+    }
 }
 
 /* Benefits Section */
@@ -1412,9 +1497,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
+    z-index: 9999;
     padding: 1rem;
     animation: fadeIn 0.3s ease-out;
+    overflow: hidden;
 }
 
 @keyframes fadeIn {
@@ -1430,16 +1516,21 @@
     background: linear-gradient(135deg, rgba(10, 15, 30, 0.95), rgba(15, 20, 40, 0.95));
     border: 1px solid #00ffff;
     border-radius: 8px;
-    padding: 2rem;
-    max-width: 600px;
-    width: 100%;
-    max-height: 90vh;
+    padding: 3rem;
+    max-width: 95vw;
+    width: 95vw;
+    height: 95vh;
     overflow-y: auto;
     position: relative;
+    margin: auto;
     box-shadow: 
         0 0 30px rgba(0, 255, 255, 0.3),
         inset 0 1px 0 rgba(255, 255, 255, 0.1);
     animation: slideIn 0.3s ease-out;
+    backdrop-filter: blur(10px);
+    /* Hide scrollbar */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
 }
 
 @keyframes slideIn {
@@ -1454,17 +1545,16 @@
 }
 
 .cyber-modal::-webkit-scrollbar {
-    width: 6px;
+    width: 0px;
+    background: transparent;
 }
 
 .cyber-modal::-webkit-scrollbar-track {
-    background: rgba(10, 15, 30, 0.5);
-    border-radius: 3px;
+    background: transparent;
 }
 
 .cyber-modal::-webkit-scrollbar-thumb {
-    background: #00ffff;
-    border-radius: 3px;
+    background: transparent;
 }
 
 .cyber-modal-close {
@@ -1517,7 +1607,12 @@
 }
 
 .cyber-modal-section {
-    margin-bottom: 1.5rem;
+    margin-bottom: 3rem;
+    padding: 1.5rem 0;
+}
+
+.cyber-modal-section:last-child {
+    margin-bottom: 0;
 }
 
 .cyber-modal-subtitle {
@@ -1543,14 +1638,68 @@
 
 .cyber-modal-content {
     color: #99ccff;
-    line-height: 1.6;
+    line-height: 1.7;
+    min-height: 40px;
+    font-size: 1rem;
+    padding: 0.5rem 0;
+}
+
+/* Salary Cards in Modal */
+.cyber-salary-card {
+    background: rgba(0, 255, 255, 0.05);
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    border-radius: 10px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.cyber-salary-card:hover {
+    background: rgba(0, 255, 255, 0.1);
+    border-color: rgba(0, 255, 255, 0.4);
+    transform: translateY(-2px);
+}
+
+.cyber-salary-label {
+    font-size: 1rem;
+    color: #99ccff;
+    margin-bottom: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.cyber-salary-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #00ffff;
+    line-height: 1.2;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .cyber-description-line {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
     color: #cccccc;
-    font-size: 0.95rem;
-    line-height: 1.5;
+    font-size: 1rem;
+    line-height: 1.6;
+    padding: 0.25rem 0;
+}
+
+.cyber-company-description {
+    background: rgba(0, 255, 255, 0.03);
+    border: 1px solid rgba(0, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    min-height: 120px;
 }
 
 .cyber-description-line:last-child {
@@ -1560,20 +1709,22 @@
 /* Facilities Grid */
 .cyber-facilities-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 0.5rem;
-    margin-top: 0.75rem;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.25rem;          /* reduced gap between items */
+    margin-top: 0.5rem;     /* smaller top margin */
+    min-height: 50px;       /* reduced minimum height */
 }
 
 .cyber-facility-item {
     display: flex;
-    align-items: flex-start;
-    gap: 0.5rem;
-    padding: 0.5rem;
+    align-items: center;    /* center align icons and text */
+    gap: 0.5rem;            /* tighter gap between icon and text */
+    padding: 0.5rem;        /* smaller padding */
     background: rgba(0, 255, 255, 0.05);
     border: 1px solid rgba(0, 255, 255, 0.1);
-    border-radius: 4px;
+    border-radius: 8px;
     transition: all 0.3s ease;
+    min-height: 40px;       /* reduced minimum height */
 }
 
 .cyber-facility-item:hover {
@@ -1591,16 +1742,34 @@
 
 .cyber-facility-text {
     color: #cccccc;
-    font-size: 0.9rem;
-    line-height: 1.4;
+    font-size: 1rem;
+    line-height: 1.5;
+    font-weight: 400;
 }
 
 /* Responsive modal adjustments */
 @media (max-width: 768px) {
+    .cyber-modal-overlay {
+        align-items: flex-start;
+        padding: 0.25rem;
+        overflow: hidden;
+    }
+    
     .cyber-modal {
-        margin: 1rem;
-        padding: 1.5rem;
-        max-height: 85vh;
+        margin: 0.25rem auto;
+        padding: 2.5rem;
+        height: 98vh;
+        max-width: 98vw;
+        width: 98vw;
+        overflow-y: auto;
+        /* Hide scrollbar on mobile too */
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    
+    .cyber-modal::-webkit-scrollbar {
+        width: 0px;
+        background: transparent;
     }
 
     .cyber-modal-title {
@@ -1610,11 +1779,12 @@
 
     .cyber-facilities-grid {
         grid-template-columns: 1fr;
-        gap: 0.4rem;
+        gap: 1rem;
     }
 
     .cyber-facility-item {
-        padding: 0.4rem;
+        padding: 1rem;
+        min-height: auto;
     }
 
     .cyber-modal-close {
@@ -1627,12 +1797,37 @@
     .cyber-close-icon {
         font-size: 12px;
     }
+    
+    .cyber-modal-section {
+        margin-bottom: 2rem;
+    }
+    
+    .cyber-company-description {
+        padding: 1rem;
+    }
 }
 
 @media (max-width: 480px) {
+    .cyber-modal-overlay {
+        padding: 0.1rem;
+        overflow: hidden;
+    }
+    
     .cyber-modal {
-        margin: 0.5rem;
-        padding: 1rem;
+        margin: 0.1rem auto;
+        padding: 1.5rem;
+        height: 99vh;
+        max-width: 99vw;
+        width: 99vw;
+        overflow-y: auto;
+        /* Hide scrollbar on small mobile too */
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    
+    .cyber-modal::-webkit-scrollbar {
+        width: 0px;
+        background: transparent;
     }
 
     .cyber-modal-title {
@@ -1640,5 +1835,13 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 0.5rem;
+    }
+    
+    .cyber-facilities-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .cyber-salary-card {
+        padding: 1rem;
     }
 }

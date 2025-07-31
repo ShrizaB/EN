@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -17,6 +17,7 @@ import {
   Legend,
 } from "recharts"
 import { ArrowLeft, Award, Briefcase, Building, DollarSign, Download, GraduationCap, MapPin, Youtube } from 'lucide-react'
+import { generateCareerData, generateCareerPath } from '@/lib/gemini-api'
 import './career-roadmap-results.css'
 
 interface CareerRoadmapResultsProps {
@@ -53,7 +54,131 @@ const CustomTooltip = ({ active, payload }: { active?: boolean, payload?: any[] 
 export function CareerRoadmapResults({ results, onReset }: CareerRoadmapResultsProps) {
   const [activeTab, setActiveTab] = useState("overview")
   const [selectedCompany, setSelectedCompany] = useState<any | null>(null)
-  const [activeSector, setActiveSector] = useState<number | null>(null);
+  const [activeSector, setActiveSector] = useState<number | null>(null)
+  const [dynamicData, setDynamicData] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [videoRoadmap, setVideoRoadmap] = useState<any[]>([])
+  const [isVideoLoading, setIsVideoLoading] = useState(true)
+  const [careerPathData, setCareerPathData] = useState<any>(null)
+  const [isCareerPathLoading, setIsCareerPathLoading] = useState(true)
+
+  // Fetch dynamic career data when component mounts
+  useEffect(() => {
+    const fetchCareerData = async () => {
+      setIsLoading(true)
+      try {
+        const jobRole = results?.jobRole || "Full Stack Developer"
+        const sector = results?.sector || "Technology"
+        
+        console.log(`Fetching career data for ${jobRole} in ${sector} sector...`)
+        const data = await generateCareerData(jobRole, sector)
+        
+        if (data) {
+          console.log("Successfully fetched career data:", data)
+          setDynamicData(data)
+        } else {
+          console.log("Failed to fetch career data, using fallback")
+          setDynamicData(null)
+        }
+      } catch (error) {
+        console.error("Error fetching career data:", error)
+        setDynamicData(null)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchCareerData()
+  }, [results?.jobRole, results?.sector])
+
+  // Fetch learning roadmap with videos
+  useEffect(() => {
+    const fetchVideoRoadmap = async () => {
+      setIsVideoLoading(true)
+      try {
+        const jobRole = results?.jobRole || "Full Stack Developer"
+        const sector = results?.sector || "Technology"
+        
+        console.log(`Fetching learning roadmap with videos for ${jobRole} in ${sector} sector...`)
+        
+        const response = await fetch('/api/perplexity/learning-roadmap', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ jobRole, sector })
+        })
+        
+        if (!response.ok) {
+          throw new Error(`API request failed: ${response.status}`)
+        }
+        
+        const data = await response.json()
+        const roadmap = data.roadmap || []
+        
+        if (roadmap && roadmap.length > 0) {
+          console.log("Successfully fetched video roadmap:", roadmap)
+          setVideoRoadmap(roadmap)
+        } else {
+          console.log("Failed to fetch video roadmap, using fallback")
+          setVideoRoadmap([])
+        }
+      } catch (error) {
+        console.error("Error fetching video roadmap:", error)
+        setVideoRoadmap([])
+      } finally {
+        setIsVideoLoading(false)
+      }
+    }
+
+    fetchVideoRoadmap()
+  }, [results?.jobRole, results?.sector])
+
+  // Fetch career path data
+  useEffect(() => {
+    const fetchCareerPath = async () => {
+      setIsCareerPathLoading(true)
+      try {
+        const jobRole = results?.jobRole || "Full Stack Developer"
+        const sector = results?.sector || "Technology"
+        
+        console.log(`Fetching career path data for ${jobRole} in ${sector} sector...`)
+        const data = await generateCareerPath(jobRole, sector)
+        
+        if (data) {
+          console.log("Successfully fetched career path data:", data)
+          setCareerPathData(data)
+        } else {
+          console.log("Failed to fetch career path data, using fallback")
+          setCareerPathData(null)
+        }
+      } catch (error) {
+        console.error("Error fetching career path data:", error)
+        setCareerPathData(null)
+      } finally {
+        setIsCareerPathLoading(false)
+      }
+    }
+
+    fetchCareerPath()
+  }, [results?.jobRole, results?.sector])
+
+  // Comprehensive fallback data to prevent undefined errors
+  const safeResults = {
+    ...results,
+    careerPath: careerPathData?.careerPath || results?.careerPath || [],
+    additionalResources: careerPathData?.additionalResources || results?.additionalResources || [],
+    recommendedVideos: results?.recommendedVideos || [],
+    // Use dynamic data if available, otherwise fallback to results data
+    topSectors: dynamicData?.topSectors || results?.topSectors || [],
+    topCompanies: dynamicData?.topCompanies || results?.topCompanies || [],
+    requiredSkills: dynamicData?.requiredSkills || results?.requiredSkills || [],
+    hiringLocations: dynamicData?.hiringLocations || results?.hiringLocations || [],
+    skillResources: dynamicData?.skillResources || results?.skillResources || [],
+    locationInsights: dynamicData?.locationInsights || results?.locationInsights || [],
+    learningPath: videoRoadmap.length > 0 ? videoRoadmap : (results?.learningPath || results?.roleRoadmap || []),
+    roleRoadmap: videoRoadmap.length > 0 ? videoRoadmap : (results?.roleRoadmap || results?.learningPath || [])
+  };
 
   // Sample/fallback data for demo purposes
   const fallbackSkills = [
@@ -86,54 +211,58 @@ export function CareerRoadmapResults({ results, onReset }: CareerRoadmapResultsP
   ];
 
   // Use fallback data if results data is missing
-  const displaySkills = results.requiredSkills && results.requiredSkills.length > 0 
-    ? results.requiredSkills 
+  const displaySkills = safeResults.requiredSkills && safeResults.requiredSkills.length > 0 
+    ? safeResults.requiredSkills 
     : fallbackSkills;
     
-  const displayLocations = results.hiringLocations && results.hiringLocations.length > 0 
-    ? results.hiringLocations 
+  const displayLocations = safeResults.hiringLocations && safeResults.hiringLocations.length > 0 
+    ? safeResults.hiringLocations 
     : fallbackLocations;
     
-  const displaySkillResources = results.skillResources && results.skillResources.length > 0 
-    ? results.skillResources 
+  const displaySkillResources = safeResults.skillResources && safeResults.skillResources.length > 0 
+    ? safeResults.skillResources 
     : fallbackSkillResources;
     
-  const displayLocationInsights = results.locationInsights && results.locationInsights.length > 0 
-    ? results.locationInsights 
+  const displayLocationInsights = safeResults.locationInsights && safeResults.locationInsights.length > 0 
+    ? safeResults.locationInsights 
     : fallbackLocationInsights;
 
   // Debug logging to see what data we have
+  console.log('Dynamic data loaded:', dynamicData ? 'Yes' : 'No');
+  console.log('Video roadmap loaded:', videoRoadmap.length > 0 ? `Yes (${videoRoadmap.length} videos)` : 'No');
   console.log('Results data:', {
-    requiredSkills: results.requiredSkills,
-    hiringLocations: results.hiringLocations,
-    skillResources: results.skillResources,
-    locationInsights: results.locationInsights
+    requiredSkills: safeResults.requiredSkills?.length || 0,
+    hiringLocations: safeResults.hiringLocations?.length || 0,
+    skillResources: safeResults.skillResources?.length || 0,
+    locationInsights: safeResults.locationInsights?.length || 0,
+    topCompanies: safeResults.topCompanies?.length || 0,
+    topSectors: safeResults.topSectors?.length || 0,
+    roleRoadmap: safeResults.roleRoadmap?.length || 0,
   });
   
   console.log('Display data:', {
-    displaySkills,
-    displayLocations,
-    displaySkillResources,
-    displayLocationInsights
+    displaySkills: displaySkills?.length || 0,
+    displayLocations: displayLocations?.length || 0,
+    displaySkillResources: displaySkillResources?.length || 0,
+    displayLocationInsights: displayLocationInsights?.length || 0,
   });
 
-  // Defensive: fallback to all if filter is empty or data missing
-  // Use original data if filter results in empty array
-  const filteredSectors = Array.isArray(results.topSectors) && results.topSectors.length > 0
-    ? (results.sector === "both"
-        ? results.topSectors
-        : (results.topSectors.filter((sector: any) => sector && sector.category && sector.category.toLowerCase() === results.sector?.toLowerCase())
-            || results.topSectors)
-      )
+  // Improved filtering logic - always show companies if available
+  const filteredSectors = Array.isArray(safeResults.topSectors) && safeResults.topSectors.length > 0
+    ? safeResults.topSectors
     : [];
 
-  const filteredCompanies = Array.isArray(results.topCompanies) && results.topCompanies.length > 0
-    ? (results.sector === "both"
-        ? results.topCompanies
-        : (results.topCompanies.filter((company: any) => company && company.sector && company.sector.toLowerCase() === results.sector?.toLowerCase())
-            || results.topCompanies)
-      )
+  const filteredCompanies = Array.isArray(safeResults.topCompanies) && safeResults.topCompanies.length > 0
+    ? safeResults.topCompanies
     : [];
+
+  console.log('Filtered data:', {
+    sectorsCount: filteredSectors.length,
+    companiesCount: filteredCompanies.length,
+    isLoading,
+    isVideoLoading,
+    videoRoadmapCount: videoRoadmap.length
+  });
 
   // Colors for charts - Cyber theme
   const COLORS = [
@@ -170,14 +299,7 @@ export function CareerRoadmapResults({ results, onReset }: CareerRoadmapResultsP
             <ArrowLeft className="h-4 w-4" />
             <span className="cyber-text">BACK</span>
           </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="cyber-btn cyber-btn-outline gap-1"
-          >
-            <Download className="h-4 w-4" />
-            <span className="cyber-text">DOWNLOAD REPORT</span>
-          </Button>
+          {/* Removed Download Report button */}
         </div>
 
         <div className="text-center mb-6 cyber-title-section">
@@ -185,7 +307,7 @@ export function CareerRoadmapResults({ results, onReset }: CareerRoadmapResultsP
             <span className="cyber-glitch" data-text="YOUR CAREER ROADMAP">YOUR CAREER ROADMAP</span>
           </h2>
           <p className="cyber-subtitle">
-            Based on your preferences for {results.jobRole} in the {results.sector} sector
+            Based on your preferences for {safeResults.jobRole} in the {safeResults.sector} sector
           </p>
         </div>
 
@@ -202,10 +324,10 @@ export function CareerRoadmapResults({ results, onReset }: CareerRoadmapResultsP
             <Card className="cyber-card">
               <CardContent className="pt-6">
                 <h2 className="cyber-title text-2xl md:text-2xl font-bold mb-3">
-                  Your Career Roadmap as a {results.jobRole}
+                  Your Career Roadmap as a {safeResults.jobRole}
                 </h2>
                 <p className="cyber-text mb-4 text-sm">
-                  Based on your interests and skills, here's a comprehensive career path in the {results.sector} sector.
+                  Based on your interests and skills, here's a comprehensive career path in the {safeResults.sector} sector.
                 </p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -301,21 +423,21 @@ export function CareerRoadmapResults({ results, onReset }: CareerRoadmapResultsP
                   <div className="cyber-section">
                     <h3 className="cyber-section-title flex items-center gap-2 text-sm mb-2">
                       <DollarSign className="h-5 w-5 cyber-icon" />
-                      SALARY INSIGHTS (PER YEAR)
+                      SALARY INSIGHTS (PER MONTH)
                     </h3>
                     <div className="space-y-4">
                       <div className="cyber-salary-card cyber-stat-primary">
                         <div className="cyber-salary-label">Average Salary Range</div>
-                        <div className="cyber-salary-value">₹{results.averageSalary.toLocaleString()}/year</div>
+                        <div className="cyber-salary-value">₹{safeResults.averageSalary ? Math.round(safeResults.averageSalary / 12).toLocaleString() : 'N/A'}/month</div>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="cyber-salary-card cyber-stat-secondary">
                           <div className="cyber-salary-label">Entry Level</div>
-                          <div className="cyber-salary-value-sm">₹{results.entrySalary.toLocaleString()}/year</div>
+                          <div className="cyber-salary-value-sm">₹{safeResults.entrySalary ? Math.round(safeResults.entrySalary / 12).toLocaleString() : 'N/A'}/month</div>
                         </div>
                         <div className="cyber-salary-card cyber-stat-tertiary">
                           <div className="cyber-salary-label">Experienced</div>
-                          <div className="cyber-salary-value-sm">₹{results.experiencedSalary.toLocaleString()}/year</div>
+                          <div className="cyber-salary-value-sm">₹{safeResults.experiencedSalary ? Math.round(safeResults.experiencedSalary / 12).toLocaleString() : 'N/A'}/month</div>
                         </div>
                       </div>
                     </div>
@@ -331,12 +453,19 @@ export function CareerRoadmapResults({ results, onReset }: CareerRoadmapResultsP
                   TOP COMPANIES HIRING
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {filteredCompanies.length > 0 ? (
-                    filteredCompanies.slice(0, Math.min(filteredCompanies.length, 9)).map((company: any, index: number) => (
+                  {isLoading ? (
+                    <div className="col-span-full text-center py-8">
+                      <div className="cyber-loading">
+                        <div className="cyber-spinner"></div>
+                        <p className="cyber-text mt-4">Loading companies data...</p>
+                      </div>
+                    </div>
+                  ) : filteredCompanies.length > 0 ? (
+                    filteredCompanies.slice(0, Math.min(filteredCompanies.length, 12)).map((company: any, index: number) => (
                       <div
                         key={index}
-                        className="cyber-company-card"
-                        onClick={() => setSelectedCompany(company)}
+                        className={`cyber-company-card ${selectedCompany === company ? 'expanded' : ''}`}
+                        onClick={() => setSelectedCompany(selectedCompany === company ? null : company)}
                       >
                         <div className="flex items-center gap-3">
                           <div className="cyber-company-avatar">
@@ -346,92 +475,83 @@ export function CareerRoadmapResults({ results, onReset }: CareerRoadmapResultsP
                             {typeof company === "string" ? company : company.name || "Unknown Company"}
                           </div>
                         </div>
+                        
+                        {/* Expanded Content */}
+                        {selectedCompany === company && (
+                          <div className="cyber-company-expanded-content">
+                            <div className="cyber-modal-section">
+                              <h3 className="cyber-modal-subtitle">About Company</h3>
+                              <div className="cyber-modal-content">
+                                {selectedCompany.details && typeof selectedCompany.details === "string" ? (
+                                  <div className="cyber-company-description">
+                                    {selectedCompany.details.split("\n").map((line: string, i: number) => (
+                                      <p key={i} className="cyber-description-line">{line}</p>
+                                    ))}
+                                  </div>
+                                ) : selectedCompany.description ? (
+                                  <p className="cyber-description-line">{selectedCompany.description}</p>
+                                ) : (
+                                  <p className="cyber-no-data">No details available for this company yet.</p>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="cyber-modal-section">
+                              <h3 className="cyber-modal-subtitle">Key Facilities & Benefits</h3>
+                              <div className="cyber-facilities-grid">
+                                {Array.isArray(selectedCompany.facilities) && selectedCompany.facilities.length > 0 ? (
+                                  selectedCompany.facilities.slice(0, 10).map((facility: string, i: number) => (
+                                    <div key={i} className="cyber-facility-item">
+                                      <span className="cyber-facility-icon">•</span>
+                                      <span className="cyber-facility-text">{facility}</span>
+                                    </div>
+                                  ))
+                                ) : selectedCompany.facility ? (
+                                  <div className="cyber-facility-item">
+                                    <span className="cyber-facility-icon">•</span>
+                                    <span className="cyber-facility-text">{selectedCompany.facility}</span>
+                                  </div>
+                                ) : (
+                                  <p className="cyber-no-data">No facility data available for this company.</p>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="cyber-modal-section">
+                              <h3 className="cyber-modal-subtitle">Salary Information (Per Month)</h3>
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div className="cyber-salary-card cyber-salary-entry">
+                                  <div className="cyber-salary-label">Entry Level</div>
+                                  <div className="cyber-salary-value">₹{selectedCompany.entrySalary ? Math.round(selectedCompany.entrySalary / 12).toLocaleString() : selectedCompany.entry_level_salary ? Math.round(selectedCompany.entry_level_salary / 12).toLocaleString() : selectedCompany.salaryEntry ? Math.round(selectedCompany.salaryEntry / 12).toLocaleString() : <span className='cyber-no-data'>Not available</span>}/month</div>
+                                </div>
+                                <div className="cyber-salary-card cyber-salary-exp">
+                                  <div className="cyber-salary-label">Experienced</div>
+                                  <div className="cyber-salary-value">₹{selectedCompany.experiencedSalary ? Math.round(selectedCompany.experiencedSalary / 12).toLocaleString() : selectedCompany.experienced_salary ? Math.round(selectedCompany.experienced_salary / 12).toLocaleString() : selectedCompany.salaryExperienced ? Math.round(selectedCompany.salaryExperienced / 12).toLocaleString() : <span className='cyber-no-data'>Not available</span>}/month</div>
+                                </div>
+                                <div className="cyber-salary-card cyber-salary-avg">
+                                  <div className="cyber-salary-label">Average</div>
+                                  <div className="cyber-salary-value">₹{selectedCompany.averageSalary ? Math.round(selectedCompany.averageSalary / 12).toLocaleString() : selectedCompany.average_salary ? Math.round(selectedCompany.average_salary / 12).toLocaleString() : selectedCompany.salaryAverage ? Math.round(selectedCompany.salaryAverage / 12).toLocaleString() : <span className='cyber-no-data'>Not available</span>}/month</div>
+                                </div>
+                              </div>
+                              {!(selectedCompany.entrySalary || selectedCompany.entry_level_salary || selectedCompany.salaryEntry) &&
+                                !(selectedCompany.experiencedSalary || selectedCompany.experienced_salary || selectedCompany.salaryExperienced) &&
+                                !(selectedCompany.averageSalary || selectedCompany.average_salary || selectedCompany.salaryAverage) && (
+                                  <div className="mt-4 cyber-no-data">No salary data available for this company.</div>
+                              )}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))
                   ) : (
-                    <div className="col-span-full cyber-no-data">No company data available.</div>
-                  )}
-                </div>
-
-                {/* Company Details Modal */}
-                {selectedCompany && (
-                  <div className="cyber-modal-overlay">
-                    <div className="cyber-modal">
-                      <button
-                        className="cyber-modal-close"
-                        onClick={() => setSelectedCompany(null)}
-                        aria-label="Close"
-                      >
-                        <span className="cyber-close-icon">✕</span>
-                      </button>
-                      <h2 className="cyber-modal-title flex items-center gap-2">
-                        <Building className="h-6 w-6 text-cyan-400" />
-                        <span className="cyber-company-title">{selectedCompany.name || (typeof selectedCompany === "string" ? selectedCompany : "Unknown")}</span>
-                      </h2>
-                      
-                      <div className="cyber-modal-section">
-                        <h3 className="cyber-modal-subtitle">About Company</h3>
-                        <div className="cyber-modal-content">
-                          {selectedCompany.details && typeof selectedCompany.details === "string" ? (
-                            <div className="cyber-company-description">
-                              {selectedCompany.details.split("\n").slice(0, 5).map((line: string, i: number) => (
-                                <p key={i} className="cyber-description-line">{line}</p>
-                              ))}
-                            </div>
-                          ) : selectedCompany.description ? (
-                            <p className="cyber-description-line">{selectedCompany.description}</p>
-                          ) : (
-                            <p className="cyber-no-data">No details available for this company yet.</p>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="cyber-modal-section">
-                        <h3 className="cyber-modal-subtitle">Key Facilities & Benefits</h3>
-                        <div className="cyber-facilities-grid">
-                          {Array.isArray(selectedCompany.facilities) && selectedCompany.facilities.length > 0 ? (
-                            selectedCompany.facilities.slice(0, 10).map((facility: string, i: number) => (
-                              <div key={i} className="cyber-facility-item">
-                                <span className="cyber-facility-icon">•</span>
-                                <span className="cyber-facility-text">{facility}</span>
-                              </div>
-                            ))
-                          ) : selectedCompany.facility ? (
-                            <div className="cyber-facility-item">
-                              <span className="cyber-facility-icon">•</span>
-                              <span className="cyber-facility-text">{selectedCompany.facility}</span>
-                            </div>
-                          ) : (
-                            <p className="cyber-no-data">No facility data available for this company.</p>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="cyber-modal-section">
-                        <h3 className="cyber-modal-subtitle">Salary Information (Per Year)</h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                          <div className="cyber-salary-card cyber-salary-entry">
-                            <div className="cyber-salary-label">Entry Level</div>
-                            <div className="cyber-salary-value">₹{selectedCompany.entrySalary?.toLocaleString() || selectedCompany.entry_level_salary?.toLocaleString?.() || selectedCompany.salaryEntry?.toLocaleString?.() || <span className='cyber-no-data'>Not available</span>}/year</div>
-                          </div>
-                          <div className="cyber-salary-card cyber-salary-exp">
-                            <div className="cyber-salary-label">Experienced</div>
-                            <div className="cyber-salary-value">₹{selectedCompany.experiencedSalary?.toLocaleString() || selectedCompany.experienced_salary?.toLocaleString?.() || selectedCompany.salaryExperienced?.toLocaleString?.() || <span className='cyber-no-data'>Not available</span>}/year</div>
-                          </div>
-                          <div className="cyber-salary-card cyber-salary-avg">
-                            <div className="cyber-salary-label">Average</div>
-                            <div className="cyber-salary-value">₹{selectedCompany.averageSalary?.toLocaleString() || selectedCompany.average_salary?.toLocaleString?.() || selectedCompany.salaryAverage?.toLocaleString?.() || <span className='cyber-no-data'>Not available</span>}/year</div>
-                          </div>
-                        </div>
-                        {!(selectedCompany.entrySalary || selectedCompany.entry_level_salary || selectedCompany.salaryEntry) &&
-                          !(selectedCompany.experiencedSalary || selectedCompany.experienced_salary || selectedCompany.salaryExperienced) &&
-                          !(selectedCompany.averageSalary || selectedCompany.average_salary || selectedCompany.salaryAverage) && (
-                            <div className="mt-4 cyber-no-data">No salary data available for this company.</div>
-                        )}
+                    <div className="col-span-full text-center py-8">
+                      <div className="cyber-no-data">
+                        <p>Unable to load company data.</p>
+                        <p className="text-sm mt-2 opacity-75">Please check your internet connection and try refreshing the page.</p>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </CardContent>
             </Card>
 
@@ -471,11 +591,11 @@ export function CareerRoadmapResults({ results, onReset }: CareerRoadmapResultsP
           <TabsContent value="skills" className="space-y-6">
             <Card className="cyber-card">
               <CardContent className="pt-6">
-                <h3 className="cyber-section-title mb-6">Top Skills Required for {results.jobRole}</h3>
+                <h3 className="cyber-section-title mb-6">Top Skills Required for {safeResults.jobRole}</h3>
                 <div className="mb-4">
                   <p className="text-cyber-blue text-sm">
-                    {results.requiredSkills && results.requiredSkills.length > 0 
-                      ? `Showing ${results.requiredSkills.length} skills from analysis` 
+                    {safeResults.requiredSkills && safeResults.requiredSkills.length > 0 
+                      ? `Showing ${safeResults.requiredSkills.length} skills from analysis` 
                       : 'Showing sample skills data'
                     }
                   </p>
@@ -549,9 +669,22 @@ export function CareerRoadmapResults({ results, onReset }: CareerRoadmapResultsP
                     <div key={index} className="cyber-resource-card">
                       <h4 className="cyber-resource-title">{resource.title || `Resource ${index + 1}`}</h4>
                       <p className="cyber-resource-desc">{resource.description || "No description available"}</p>
-                      <Button variant="outline" size="sm" className="cyber-btn cyber-btn-outline">
-                        LEARN MORE
-                      </Button>
+                      {resource.link ? (
+                        <a 
+                          href={resource.link} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="inline-block"
+                        >
+                          <Button variant="outline" size="sm" className="cyber-btn cyber-btn-outline">
+                            LEARN MORE
+                          </Button>
+                        </a>
+                      ) : (
+                        <Button variant="outline" size="sm" className="cyber-btn cyber-btn-outline" disabled>
+                          LEARN MORE
+                        </Button>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -568,8 +701,8 @@ export function CareerRoadmapResults({ results, onReset }: CareerRoadmapResultsP
                 </h3>
                 <div className="mb-4">
                   <p className="text-cyber-blue text-sm">
-                    {results.hiringLocations && results.hiringLocations.length > 0 
-                      ? `Showing ${results.hiringLocations.length} locations from analysis` 
+                    {safeResults.hiringLocations && safeResults.hiringLocations.length > 0 
+                      ? `Showing ${safeResults.hiringLocations.length} locations from analysis` 
                       : 'Showing sample location data'
                     }
                   </p>
@@ -662,7 +795,7 @@ export function CareerRoadmapResults({ results, onReset }: CareerRoadmapResultsP
                   RECOMMENDED LEARNING VIDEOS
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {results.recommendedVideos?.map((video: any, index: number) => (
+                  {safeResults.recommendedVideos?.map((video: any, index: number) => (
                     <div key={index} className="cyber-video-card">
                       <div className="cyber-video-thumbnail">
                         <div className="cyber-video-icon">
@@ -688,124 +821,185 @@ export function CareerRoadmapResults({ results, onReset }: CareerRoadmapResultsP
             <Card className="cyber-card">
               <CardContent className="pt-6">
                 <h3 className="cyber-section-title mb-6">Your Career Path Roadmap</h3>
-                <div className="relative">
-                  {results.careerPath.map((step: any, index: number) => (
-                    <div key={index} className="mb-8 relative cyber-roadmap-step">
-                      <div className="flex">
-                        <div className="flex flex-col items-center mr-4">
-                          <div className="cyber-step-number">
-                            {index + 1}
+                <div className="mb-4">
+                  <p className="text-cyber-blue text-sm">
+                    {isCareerPathLoading 
+                      ? "Loading personalized career path..." 
+                      : careerPathData 
+                        ? `Interactive career progression path with ${safeResults.careerPath?.length || 0} stages`
+                        : "Interactive career progression path with timeline and salary expectations"
+                    }
+                  </p>
+                </div>
+
+                {isCareerPathLoading ? (
+                  <div className="text-center py-12">
+                    <div className="cyber-loading">
+                      <div className="cyber-spinner"></div>
+                      <p className="cyber-text mt-4">Fetching career path...</p>
+                      <p className="text-sm mt-2 opacity-75">This may take a moment as we analyze the best career progression for your role</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="relative">
+                    {safeResults.careerPath?.length > 0 ? (
+                      safeResults.careerPath.map((step: any, index: number) => (
+                        <div key={index} className="mb-8 relative cyber-roadmap-step">
+                          <div className="flex">
+                            <div className="flex flex-col items-center mr-4">
+                              <div className="cyber-step-number">
+                                {index + 1}
+                              </div>
+                              {index < (safeResults.careerPath?.length || 0) - 1 && (
+                                <div className="cyber-step-line"></div>
+                              )}
+                            </div>
+                            <div className="cyber-step-content">
+                              <h4 className="cyber-step-title">{step.title}</h4>
+                              <p className="cyber-step-desc">{step.description}</p>
+                              <div className="cyber-step-stats">
+                                <div className="cyber-step-stat">
+                                  <span className="cyber-step-stat-label">Timeline:</span> {step.timeline}
+                                </div>
+                                <div className="cyber-step-stat">
+                                  <span className="cyber-step-stat-label">Salary Range:</span> ₹{step.salaryRange}
+                                </div>
+                              </div>
+                            </div>
                           </div>
-                          {index < results.careerPath.length - 1 && (
-                            <div className="cyber-step-line"></div>
-                          )}
                         </div>
-                        <div className="cyber-step-content">
-                          <h4 className="cyber-step-title">{step.title}</h4>
-                          <p className="cyber-step-desc">{step.description}</p>
-                          <div className="cyber-step-stats">
-                            <div className="cyber-step-stat">
-                              <span className="cyber-step-stat-label">Timeline:</span> {step.timeline}
-                            </div>
-                            <div className="cyber-step-stat">
-                              <span className="cyber-step-stat-label">Salary Range:</span> ₹{step.salaryRange}
-                            </div>
-                          </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-8">
+                        <div className="cyber-no-data">
+                          <p>Unable to load career path data.</p>
+                          <p className="text-sm mt-2 opacity-75">Please check your internet connection and try refreshing the page.</p>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    )}
+                  </div>
+                )}
               </CardContent>
             </Card>
 
             <Card className="cyber-card">
               <CardContent className="pt-6">
                 <h3 className="cyber-section-title mb-4">Additional Resources</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {results.additionalResources.map((resource: any, index: number) => (
-                    <div key={index} className="cyber-resource-card">
-                      <h4 className="cyber-resource-title">{resource.title}</h4>
-                      <p className="cyber-resource-desc">{resource.description}</p>
-                      <Button variant="outline" size="sm" className="cyber-btn cyber-btn-outline">
-                        EXPLORE
-                      </Button>
+                {isCareerPathLoading ? (
+                  <div className="text-center py-8">
+                    <div className="cyber-loading">
+                      <div className="cyber-spinner"></div>
+                      <p className="cyber-text mt-4">Loading resources...</p>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {safeResults.additionalResources?.length > 0 ? (
+                      safeResults.additionalResources.map((resource: any, index: number) => (
+                        <div key={index} className="cyber-resource-card">
+                          <h4 className="cyber-resource-title">{resource.title}</h4>
+                          <p className="cyber-resource-desc">{resource.description}</p>
+                          {resource.link ? (
+                            <a 
+                              href={resource.link} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="inline-block"
+                            >
+                              <Button variant="outline" size="sm" className="cyber-btn cyber-btn-outline">
+                                EXPLORE
+                              </Button>
+                            </a>
+                          ) : (
+                            <Button variant="outline" size="sm" className="cyber-btn cyber-btn-outline" disabled>
+                              EXPLORE
+                            </Button>
+                          )}
+                        </div>
+                      ))
+                    ) : (
+                      <div className="col-span-full text-center py-8">
+                        <div className="cyber-no-data">
+                          <p>No additional resources available.</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
 
           <TabsContent value="role-roadmap" className="space-y-6">
-            {results.youtubeApiError && (
-              <div className="cyber-error-card">
-                <strong>YouTube videos could not be loaded:</strong> {results.youtubeApiError}
-                <br />
-                <span className="cyber-error-sub">You may have reached the API quota or there is a configuration issue. Video links may be missing or incomplete.</span>
-              </div>
-            )}
-
             <Card className="cyber-card">
               <CardContent className="pt-6">
-                <h3 className="cyber-section-title mb-6">Learning Roadmap for {results.jobRole}</h3>
-                <div className="grid grid-cols-1 gap-8">
-                  {results.roleRoadmap?.map((step: any, index: number) => (
-                    <div key={index} className="cyber-learning-card">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {/* Video Section */}
-                        <div className="cyber-learning-video">
-                          {step.videoId ? (
-                            <iframe
-                              className="w-full h-full"
-                              src={`https://www.youtube.com/embed/${step.videoId}`}
-                              title={step.videoTitle || step.title}
-                              frameBorder="0"
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                              allowFullScreen
-                            ></iframe>
-                          ) : (
-                            <div className="cyber-learning-video-placeholder">
-                              <Youtube className="h-12 w-12" />
+                <h3 className="cyber-section-title mb-6">Learning Roadmap for {safeResults.jobRole}</h3>
+                <div className="mb-4">
+                  <p className="text-cyber-blue text-sm">
+                    {isVideoLoading 
+                      ? "Loading personalized learning path from Perplexity AI..." 
+                      : videoRoadmap.length > 0 
+                        ? `Interactive learning path with ${videoRoadmap.length} YouTube videos and estimated timeframes`
+                        : "Interactive learning path with embedded YouTube videos and estimated timeframes"
+                    }
+                  </p>
+                </div>
+
+                {isVideoLoading ? (
+                  <div className="text-center py-12">
+                    <div className="cyber-loading">
+                      <div className="cyber-spinner"></div>
+                      <p className="cyber-text mt-4">Fetching learning videos from Perplexity AI...</p>
+                      <p className="text-sm mt-2 opacity-75">This may take a moment as we search for the best educational content</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 gap-8">
+                    {(safeResults.learningPath || safeResults.roleRoadmap)?.length > 0 ? (
+                      (safeResults.learningPath || safeResults.roleRoadmap)?.map((step: any, index: number) => (
+                        <div key={index} className="cyber-learning-card">
+                          <div className="cyber-learning-content">
+                            <div className="cyber-learning-header">
+                              <div className="cyber-learning-number">
+                                {index + 1}
+                              </div>
+                              <h4 className="cyber-learning-title">{step.title}</h4>
                             </div>
-                          )}
-                        </div>
-                        {/* Content Section */}
-                        <div className="cyber-learning-content md:col-span-2">
-                          <div className="cyber-learning-header">
-                            <div className="cyber-learning-number">
-                              {index + 1}
+                            <p className="cyber-learning-desc">{step.description}</p>
+                            <div className="cyber-learning-tags items-center">
+                              <div className="cyber-learning-tag">
+                                <span className="cyber-learning-tag-label">Estimated Time:</span> {step.estimatedTime}
+                              </div>
+                              {step.videoId && (
+                                <a
+                                  href={`https://www.youtube.com/watch?v=${step.videoId}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="cyber-btn px-4 py-2 cyber-btn-outline"
+                                >
+                                  Watch on YouTube
+                                </a>
+                              )}
                             </div>
-                            <h4 className="cyber-learning-title">{step.title}</h4>
-                          </div>
-                          <p className="cyber-learning-desc">{step.description}</p>
-                          <div className="cyber-learning-tags">
-                            <div className="cyber-learning-tag">
-                              <span className="cyber-learning-tag-label">Estimated Time:</span> {step.estimatedTime}
-                            </div>
-                            {step.videoId && (
-                              <a
-                                href={`https://www.youtube.com/watch?v=${step.videoId}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="cyber-learning-youtube-link"
-                              >
-                                <Youtube className="h-3.5 w-3.5" />
-                                <span>Watch on YouTube</span>
-                              </a>
+                            {index < (safeResults.learningPath || safeResults.roleRoadmap).length - 1 && (
+                              <div className="cyber-learning-next">
+                                <span>Next:</span>{" "}
+                                <span className="cyber-learning-next-title">{(safeResults.learningPath || safeResults.roleRoadmap)[index + 1].title}</span>
+                              </div>
                             )}
                           </div>
-                          {index < results.roleRoadmap.length - 1 && (
-                            <div className="cyber-learning-next">
-                              <span>Next:</span>{" "}
-                              <span className="cyber-learning-next-title">{results.roleRoadmap[index + 1].title}</span>
-                            </div>
-                          )}
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-8">
+                        <div className="cyber-no-data">
+                          <p>Unable to load learning videos from Perplexity AI.</p>
+                          <p className="text-sm mt-2 opacity-75">Please check your internet connection and try refreshing the page.</p>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    )}
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -996,16 +1190,109 @@ const mockResults = {
   ],
   roleRoadmap: [
     {
+      title: "Programming Fundamentals",
+      description: "Start with basic programming concepts, logic building, and problem-solving approaches",
+      estimatedTime: "2-3 weeks",
+      videoId: "zOjov-2OZ0E",
+      videoTitle: "Programming for Beginners - Learn to Code"
+    },
+    {
       title: "Learn JavaScript Basics",
-      description: "Master the fundamentals of JavaScript programming",
+      description: "Master the fundamentals of JavaScript programming language including variables, functions, objects, and ES6+ features",
       estimatedTime: "4-6 weeks",
-      videoId: "PkZNo7MFNFg"
+      videoId: "PkZNo7MFNFg",
+      videoTitle: "JavaScript Full Course - Learn JavaScript in 12 Hours"
+    },
+    {
+      title: "HTML & CSS Fundamentals",
+      description: "Build solid foundation in web markup and styling for creating beautiful web pages",
+      estimatedTime: "3-4 weeks",
+      videoId: "mU6anWqZJcc",
+      videoTitle: "HTML & CSS Full Course - Build a Website Tutorial"
+    },
+    {
+      title: "Git & Version Control",
+      description: "Learn essential version control skills for collaborative development and code management",
+      estimatedTime: "1-2 weeks",
+      videoId: "8JJ101D3knE",
+      videoTitle: "Git Tutorial for Beginners: Learn Git in 1 Hour"
+    },
+    {
+      title: "JavaScript DOM Manipulation",
+      description: "Learn to make interactive web pages by manipulating the Document Object Model",
+      estimatedTime: "2-3 weeks",
+      videoId: "y17RuWkWdn8",
+      videoTitle: "JavaScript DOM Manipulation Full Course"
     },
     {
       title: "React Development",
-      description: "Build interactive user interfaces with React",
+      description: "Build interactive user interfaces with React including components, state management, hooks, and modern patterns",
       estimatedTime: "6-8 weeks",
-      videoId: "bMknfKXIFA8"
+      videoId: "bMknfKXIFA8",
+      videoTitle: "React Course - Beginner's Tutorial for React JavaScript Library"
+    },
+    {
+      title: "TypeScript Fundamentals",
+      description: "Add type safety to your JavaScript applications with TypeScript for better development experience",
+      estimatedTime: "3-4 weeks",
+      videoId: "BwuLxPH8IDs",
+      videoTitle: "TypeScript Course for Beginners - Learn TypeScript"
+    },
+    {
+      title: "Node.js Backend Development",
+      description: "Learn server-side development with Node.js, Express.js, and building RESTful APIs",
+      estimatedTime: "4-6 weeks",
+      videoId: "f2EqECiTBL8",
+      videoTitle: "Node.js Full Course for Beginners"
+    },
+    {
+      title: "Express.js Framework",
+      description: "Master the most popular Node.js framework for building web applications and APIs",
+      estimatedTime: "3-4 weeks",
+      videoId: "L72fhGm1tfE",
+      videoTitle: "Express.js Tutorial - Node.js Framework"
+    },
+    {
+      title: "Database Management with MongoDB",
+      description: "Master NoSQL database concepts with MongoDB, data modeling, and database operations",
+      estimatedTime: "3-4 weeks",
+      videoId: "ExcRbA7fy_A",
+      videoTitle: "MongoDB Full Course - Learn MongoDB in 3 Hours"
+    },
+    {
+      title: "SQL & Relational Databases",
+      description: "Learn structured query language and relational database management with MySQL/PostgreSQL",
+      estimatedTime: "4-5 weeks",
+      videoId: "HXV3zeQKqGY",
+      videoTitle: "SQL Tutorial - Full Database Course for Beginners"
+    },
+    {
+      title: "API Development & Testing",
+      description: "Build robust APIs and learn testing strategies using tools like Postman and Jest",
+      estimatedTime: "3-4 weeks",
+      videoId: "VywxIQ2ZXw4",
+      videoTitle: "REST API Tutorial - How to Build a REST API"
+    },
+    {
+      title: "Frontend State Management",
+      description: "Master advanced state management with Redux, Context API, and modern patterns",
+      estimatedTime: "4-5 weeks",
+      videoId: "CVpUuw9XSjY",
+      videoTitle: "Redux Tutorial - Learn Redux from Scratch"
+    },
+    {
+      title: "Full Stack Project Development",
+      description: "Build a complete full-stack application integrating frontend, backend, and database components",
+      estimatedTime: "8-10 weeks",
+      videoId: "98BzS5Oz5E4",
+      videoTitle: "Full Stack Web Development Project Tutorial"
+    },
+    {
+      title: "Deployment and DevOps",
+      description: "Learn to deploy applications using cloud platforms, CI/CD pipelines, and containerization with Docker",
+      estimatedTime: "3-4 weeks",
+      videoId: "3c-iBn73dDE",
+      videoTitle: "DevOps Tutorial for Beginners - Learn DevOps in 7 Hours"
     }
   ]
 }

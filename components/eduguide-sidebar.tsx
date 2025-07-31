@@ -16,6 +16,8 @@ import {
   MapPin,
   Users,
   Code,
+  FileText,
+  Search,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTheme } from "next-themes"
@@ -29,6 +31,7 @@ interface EduGuideSidebarProps {
 export function EduGuideSidebar({ isOpen, setIsOpen }: EduGuideSidebarProps) {
   const [isHovering, setIsHovering] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [isClosing, setIsClosing] = useState(false)
   const { theme, setTheme } = useTheme()
   const pathname = usePathname()
   const { user, logout } = useAuth()
@@ -39,7 +42,12 @@ export function EduGuideSidebar({ isOpen, setIsOpen }: EduGuideSidebarProps) {
   }, [])
 
   const closeSidebar = () => {
+    setIsClosing(true)
     setIsOpen(false)
+    // Reset the closing flag after a short delay to prevent immediate reopening
+    setTimeout(() => {
+      setIsClosing(false)
+    }, 500)
   }
 
   const handleProfileClick = () => {
@@ -92,6 +100,24 @@ export function EduGuideSidebar({ isOpen, setIsOpen }: EduGuideSidebarProps) {
       color: "text-fuchsia-400",
       hoverColor: "hover:text-fuchsia-300",
       bgColor: "bg-fuchsia-900/30",
+    },
+    {
+      name: "Resume Builder",
+      href: "/eduguide/resume-builder",
+      active: pathname === "/eduguide/resume-builder",
+      icon: FileText,
+      color: "text-yellow-400",
+      hoverColor: "hover:text-yellow-300",
+      bgColor: "bg-yellow-900/30",
+    },
+    {
+      name: "Resume Analyzer",
+      href: "/eduguide/resume-analyzer",
+      active: pathname === "/eduguide/resume-analyzer",
+      icon: Search,
+      color: "text-orange-400",
+      hoverColor: "hover:text-orange-300",
+      bgColor: "bg-orange-900/30",
     },
   ]
 
@@ -150,13 +176,13 @@ export function EduGuideSidebar({ isOpen, setIsOpen }: EduGuideSidebarProps) {
     <>
       {/* Sidebar Trigger Area */}
       <div
-        className="fixed left-0 top-0 h-screen w-4 z-40 hover:w-8 transition-all duration-400"
-        onMouseEnter={() => setIsHovering(true)}
+        className="fixed left-0 top-0 h-screen w-4 z-[9999] hover:w-8 transition-all duration-400"
+        onMouseEnter={() => !isClosing && setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
       />
 
       {/* Cyber Grid Background */}
-      <div className={`fixed top-0 left-0 h-screen w-64 z-20 ${isOpen ? 'block' : 'hidden'}`}>
+      <div className={`fixed top-0 left-0 h-screen w-64 z-[9998] ${isOpen ? 'block' : 'hidden'}`}>
         {/* Hide scrollbar for all browsers */}
         <style jsx global>{`
           .no-scrollbar::-webkit-scrollbar {
@@ -193,10 +219,10 @@ export function EduGuideSidebar({ isOpen, setIsOpen }: EduGuideSidebarProps) {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-screen z-30 bg-black/95 backdrop-blur-sm transition-all duration-300 ease-in-out 
+        className={`fixed top-0 left-0 h-screen z-[9999] bg-black/95 backdrop-blur-sm transition-all duration-300 ease-in-out 
           ${isOpen ? 'w-64' : 'w-0 overflow-hidden'} 
-          ${isHovering ? 'w-72' : ''}`}
-        onMouseEnter={() => setIsHovering(true)}
+          ${isHovering && !isClosing ? 'w-72' : ''}`}
+        onMouseEnter={() => !isClosing && setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
       >
         <div className="h-full overflow-y-auto no-scrollbar">
@@ -216,11 +242,11 @@ export function EduGuideSidebar({ isOpen, setIsOpen }: EduGuideSidebarProps) {
               type="button"
               variant="ghost"
               size="icon"
-              className="rounded-md text-gray-400 hover:text-green-400 hover:bg-green-400/10 border border-transparent hover:border-green-400/30"
+              className="rounded-md text-gray-400 hover:text-green-400 hover:bg-green-400/10 border border-transparent hover:border-green-400/30 relative z-50"
               onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setIsOpen(false);
+                e.preventDefault()
+                e.stopPropagation()
+                closeSidebar()
               }}
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

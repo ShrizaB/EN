@@ -293,11 +293,11 @@ export default function AICodeChallenge() {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <Skeleton className="h-8 w-40" />
-          <Skeleton className="h-4 w-1/3" />
+          <div className="hacker-skeleton h-8 w-40" />
+          <div className="hacker-skeleton h-4 w-1/3" />
         </div>
-        <Skeleton className="h-40 w-full" />
-        <Skeleton className="h-80 w-full" />
+        <div className="hacker-skeleton h-40 w-full" />
+        <div className="hacker-skeleton h-80 w-full" />
       </div>
     )
   }
@@ -305,16 +305,15 @@ export default function AICodeChallenge() {
   // Error state
   if (error) {
     return (
-      <div className="p-6 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
-        <h3 className="text-lg font-medium text-red-800 dark:text-red-200 mb-2">Error Loading Questions</h3>
-        <p className="text-red-700 dark:text-red-300">{error}</p>
-        <Button
+      <div className="hacker-card p-6 border-red-500/30 bg-red-950/20">
+        <h3 className="text-lg font-medium cyber-text mb-2">[ERROR] System Malfunction</h3>
+        <p className="text-red-300 terminal-text">{error}</p>
+        <button
           onClick={() => window.location.reload()}
-          variant="outline"
-          className="mt-4 border-red-300 dark:border-red-700 text-red-700 dark:text-red-300"
+          className="hacker-button mt-4 px-4 py-2 rounded"
         >
-          Try Again
-        </Button>
+          [RETRY_CONNECTION]
+        </button>
       </div>
     )
   }
@@ -322,18 +321,17 @@ export default function AICodeChallenge() {
   // No questions loaded
   if (!questions.length) {
     return (
-      <div className="p-6 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
-        <h3 className="text-lg font-medium text-yellow-800 dark:text-yellow-200 mb-2">No Questions Available</h3>
-        <p className="text-yellow-700 dark:text-yellow-300">
-          We couldn't load any programming questions at this time. Please try again later.
+      <div className="hacker-card p-6 border-yellow-500/30 bg-yellow-950/20">
+        <h3 className="text-lg font-medium cyber-text mb-2">[WARNING] No Data Available</h3>
+        <p className="text-yellow-300 terminal-text">
+          Programming challenge database is currently offline. Please try again later.
         </p>
-        <Button
+        <button
           onClick={() => window.location.reload()}
-          variant="outline"
-          className="mt-4 border-yellow-300 dark:border-yellow-700 text-yellow-700 dark:text-yellow-300"
+          className="hacker-button mt-4 px-4 py-2 rounded"
         >
-          Refresh
-        </Button>
+          [REFRESH_DATABASE]
+        </button>
       </div>
     )
   }
@@ -347,64 +345,86 @@ export default function AICodeChallenge() {
   if (!challengeStarted) {
     // Show language and difficulty selection form
     return (
-      <div className="flex flex-col items-center justify-center min-h-[300px] gap-6">
-        <h2 className="text-2xl font-bold">Choose your programming language</h2>
-        <select
-          value={selectedLanguage}
-          onChange={e => setSelectedLanguage(e.target.value)}
-          className="px-4 py-2 rounded bg-gray-200 dark:bg-gray-700 text-lg"
-        >
-          {supportedLanguages.map(lang => (
-            <option key={lang.value} value={lang.value}>{lang.label}</option>
-          ))}
-        </select>
-        <h2 className="text-xl font-semibold mt-4">Choose difficulty for each question</h2>
-        <form className="flex flex-col gap-2 w-full max-w-xs">
-          {[0,1,2].map(i => (
-            <div key={i} className="flex items-center gap-4">
-              <span className="w-6">{i+1}.</span>
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-8">
+        <div className="hacker-card p-8 max-w-2xl w-full">
+          <h2 className="text-3xl font-bold cyber-text text-center mb-2">[SYSTEM_CONFIG]</h2>
+          <p className="terminal-text text-center mb-8 text-purple-300">Initialize your programming environment</p>
+          
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium cyber-text mb-3">Select Programming Language:</label>
               <select
-                value={selectedDifficulties[i]}
-                onChange={e => {
-                  const newDiffs = [...selectedDifficulties]
-                  newDiffs[i] = e.target.value as 'easy'|'medium'|'hard'
-                  setSelectedDifficulties(newDiffs)
-                }}
-                className="flex-1 px-2 py-1 rounded bg-gray-100 dark:bg-gray-800"
+                value={selectedLanguage}
+                onChange={e => setSelectedLanguage(e.target.value)}
+                className="hacker-input w-full px-4 py-3 text-lg"
               >
-                <option value="easy">Easy</option>
-                <option value="medium">Medium</option>
-                <option value="hard">Hard</option>
+                {supportedLanguages.map(lang => (
+                  <option key={lang.value} value={lang.value} className="bg-gray-900">
+                    {lang.label}
+                  </option>
+                ))}
               </select>
             </div>
-          ))}
-        </form>
-        <Button
-          onClick={async () => {
-            // Fetch 3 unique questions for the selected language and each selected difficulty
-            setLoading(true);
-            try {
-              const fetchedQuestions = await Promise.all(
-                selectedDifficulties.map(async (diff, i) => {
-                  // Add a random param to avoid caching and encourage unique questions
-                  const res = await fetch(`/api/eduguide/ai-code/generate-questions?difficulty=${diff}&language=${selectedLanguage}&rnd=${Math.random()}`);
-                  const q = await res.json();
-                  // Ensure id is unique per question
-                  return { ...q, id: i + 1, difficulty: diff, language: selectedLanguage };
-                })
-              );
-              setQuestions(fetchedQuestions);
-              setCode(getDefaultStarterCode(selectedLanguage));
-              setChallengeStarted(true);
-            } finally {
-              setLoading(false);
-            }
-          }}
-          disabled={!selectedLanguage}
-          className="text-lg px-6 py-2 mt-4"
-        >
-          Start Challenge
-        </Button>
+            
+            <div>
+              <h3 className="text-xl font-semibold cyber-text mb-4">Configure Challenge Difficulty:</h3>
+              <div className="space-y-3">
+                {[0,1,2].map(i => (
+                  <div key={i} className="flex items-center gap-4 hacker-card p-4">
+                    <span className="cyber-text font-bold w-16">Level {i+1}:</span>
+                    <select
+                      value={selectedDifficulties[i]}
+                      onChange={e => {
+                        const newDiffs = [...selectedDifficulties]
+                        newDiffs[i] = e.target.value as 'easy'|'medium'|'hard'
+                        setSelectedDifficulties(newDiffs)
+                      }}
+                      className="hacker-input flex-1 px-3 py-2"
+                    >
+                      <option value="easy" className="bg-gray-900">Easy - Fundamentals</option>
+                      <option value="medium" className="bg-gray-900">Medium - Intermediate</option>
+                      <option value="hard" className="bg-gray-900">Hard - Advanced</option>
+                    </select>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          
+          <button
+            onClick={async () => {
+              // Fetch 3 unique questions for the selected language and each selected difficulty
+              setLoading(true);
+              try {
+                const fetchedQuestions = await Promise.all(
+                  selectedDifficulties.map(async (diff, i) => {
+                    // Add a random param to avoid caching and encourage unique questions
+                    const res = await fetch(`/api/eduguide/ai-code/generate-questions?difficulty=${diff}&language=${selectedLanguage}&rnd=${Math.random()}`);
+                    const q = await res.json();
+                    // Ensure id is unique per question
+                    return { ...q, id: i + 1, difficulty: diff, language: selectedLanguage };
+                  })
+                );
+                setQuestions(fetchedQuestions);
+                setCode(getDefaultStarterCode(selectedLanguage));
+                setChallengeStarted(true);
+              } finally {
+                setLoading(false);
+              }
+            }}
+            disabled={!selectedLanguage || loading}
+            className="hacker-button w-full text-lg px-6 py-4 mt-8 rounded font-bold"
+          >
+            {loading ? (
+              <>
+                <span className="animate-spin mr-2">⟳</span>
+                [INITIALIZING_SYSTEM...]
+              </>
+            ) : (
+              '[START_CHALLENGE] ▶'
+            )}
+          </button>
+        </div>
       </div>
     )
   }
@@ -413,70 +433,104 @@ export default function AICodeChallenge() {
   const currentQuestion = questions[currentQuestionIndex]
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <span className="text-lg font-medium">
-            Question {currentQuestionIndex + 1}/{questions.length}
-          </span>
-          <span
-            className={`px-3 py-1 rounded-full text-sm ${
-              currentQuestion.difficulty === "easy"
-                ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                : currentQuestion.difficulty === "medium"
-                  ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-                  : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-            }`}
-          >
-            {currentQuestion.difficulty.charAt(0).toUpperCase() + currentQuestion.difficulty.slice(1)}
-          </span>
+    <div className="space-y-8">
+      {/* Progress Header */}
+      <div className="hacker-card p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-6">
+            <span className="text-xl font-bold cyber-text">
+              [CHALLENGE_{currentQuestionIndex + 1}/{questions.length}]
+            </span>
+            <span
+              className={`px-4 py-2 rounded-full text-sm font-bold ${
+                currentQuestion.difficulty === "easy"
+                  ? "difficulty-easy"
+                  : currentQuestion.difficulty === "medium"
+                    ? "difficulty-medium"
+                    : "difficulty-hard"
+              }`}
+            >
+              {currentQuestion.difficulty.toUpperCase()}
+            </span>
+          </div>
+          <div className="flex-1 mx-6">
+            <div className="hacker-progress h-3 rounded-full overflow-hidden">
+              <div 
+                className="hacker-progress-fill h-full transition-all duration-500"
+                style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
+              />
+            </div>
+          </div>
         </div>
-        <Progress value={(currentQuestionIndex / (questions.length - 1)) * 100} className="w-1/3" />
+        
+        <div className="text-sm terminal-text text-purple-300">
+          System Status: {status === "idle" ? "Ready" : status === "checking" ? "Validating..." : status === "running" ? "Processing..." : "Analyzing..."}
+        </div>
       </div>
 
-      {/* Only show question/examples for selected language */}
-      <QuestionDisplay question={currentQuestion} />
+      {/* Question Display */}
+      <div className="hacker-card p-6">
+        <QuestionDisplay question={currentQuestion} />
+      </div>
 
-      <Card className="p-4">
-        <div className="mb-2 flex items-center gap-2">
-          <span className="font-medium">Language:</span>
-          <span className="px-2 py-1 rounded bg-gray-200 dark:bg-gray-700 text-sm">{selectedLanguage}</span>
+      {/* Code Editor Section */}
+      <div className="hacker-card p-6">
+        <div className="mb-4 flex items-center gap-4">
+          <span className="font-medium cyber-text">[LANG]:</span>
+          <span className="hacker-card px-3 py-1 text-sm terminal-text">
+            {selectedLanguage.toUpperCase()}
+          </span>
         </div>
-        {/* Always show only the starter structure for the selected language */}
-        <CodeEditor code={code} language={selectedLanguage} onChange={handleCodeChange} />
-        <div className="mt-4">
-          <label className="block font-medium mb-1" htmlFor="custom-input">Custom Input for Check Output:</label>
+        
+        <div className="hacker-terminal p-4 rounded-lg mb-4">
+          <CodeEditor code={code} language={selectedLanguage} onChange={handleCodeChange} />
+        </div>
+        
+        <div className="mb-4">
+          <label className="block font-medium cyber-text mb-3" htmlFor="custom-input">
+            [DEBUG_INPUT]:
+          </label>
           <textarea
             id="custom-input"
-            className="w-full border rounded px-2 py-1 text-sm bg-gray-50 dark:bg-gray-900"
-            rows={2}
+            className="hacker-input w-full px-3 py-2 text-sm"
+            rows={3}
             value={customInput}
             onChange={e => setCustomInput(e.target.value)}
-            placeholder="Enter input for your code here..."
+            placeholder="Enter test input for debugging..."
           />
         </div>
+        
         {output && (
-          <div className="mt-4 p-4 bg-gray-100 dark:bg-gray-800 rounded-md">
-            <h3 className="text-sm font-medium mb-2">Output:</h3>
-            <pre className="whitespace-pre-wrap text-sm">{output}</pre>
+          <div className="hacker-code-output p-4 rounded-md mb-4">
+            <h3 className="text-sm font-medium cyber-text mb-2">[OUTPUT]:</h3>
+            <pre className="whitespace-pre-wrap text-sm terminal-text">{output}</pre>
           </div>
         )}
-        <div className="flex justify-between mt-4">
-          <Button onClick={handleCheckCode} variant="outline" disabled={status !== "idle" || !code.trim()}>
-            Check Output
-          </Button>
-          <Button onClick={handleSubmitCode} disabled={status !== "idle" || !code.trim()}>
+        
+        <div className="flex justify-between gap-4">
+          <button 
+            onClick={handleCheckCode} 
+            className="hacker-button px-6 py-3 rounded font-medium flex-1"
+            disabled={status !== "idle" || !code.trim()}
+          >
+            [TEST_CODE]
+          </button>
+          <button 
+            onClick={handleSubmitCode} 
+            className="hacker-button px-6 py-3 rounded font-medium flex-1"
+            disabled={status !== "idle" || !code.trim()}
+          >
             {status === "running" || status === "analyzing" ? (
               <>
                 <span className="animate-spin mr-2">⟳</span>
-                {status === "running" ? "Running..." : "Analyzing..."}
+                {status === "running" ? "[EXECUTING...]" : "[AI_ANALYZING...]"}
               </>
             ) : (
-              "Submit Solution"
+              "[SUBMIT_SOLUTION] →"
             )}
-          </Button>
+          </button>
         </div>
-      </Card>
+      </div>
     </div>
   );
 }

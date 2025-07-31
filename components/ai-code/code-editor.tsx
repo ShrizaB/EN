@@ -53,9 +53,14 @@ export default function CodeEditor({ code, language, onChange }: CodeEditorProps
         options={{
           minimap: { enabled: false },
           scrollBeyondLastLine: false,
-          fontSize: 14,
+          fontSize: 16,
           tabSize: 2,
           automaticLayout: true,
+          lineNumbers: "on",
+          lineNumbersMinChars: 4,
+          glyphMargin: false,
+          folding: false,
+          lineDecorationsWidth: 10,
         }}
       />
     </div>

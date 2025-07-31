@@ -146,7 +146,7 @@ export function FileUploader({ onFileProcessed, maxSizeMB = 5 }: FileUploaderPro
             type="file"
             ref={fileInputRef}
             className="hidden"
-            accept="image/*,application/pdf"
+            accept="application/pdf"
             onChange={handleFileChange}
             disabled={isUploading}
           />

@@ -1,0 +1,329 @@
+/* Professional Dark Purple Hacker Theme */
+
+@keyframes bg-pan {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes neon-flicker {
+  0%, 19.999%, 22%, 62.999%, 64%, 100% { 
+    opacity: 1; 
+    text-shadow: 0 0 15px #a855f7, 0 0 30px #a855f7, 0 0 45px #a855f7, 0 0 60px #6366f1;
+  }
+  20%, 21.999%, 63%, 63.999%, 65%, 69.999% { 
+    opacity: 0.7; 
+    text-shadow: 0 0 5px #a855f7;
+  }
+}
+
+@keyframes cursor-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@keyframes matrix-fall {
+  0% { transform: translateY(-100vh); opacity: 1; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+
+@keyframes scan-line-move {
+  0% { top: -2px; opacity: 1; }
+  50% { opacity: 0.8; }
+  100% { top: 100%; opacity: 0; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { 
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.3), 0 0 20px rgba(168, 85, 247, 0.1);
+    border-color: rgba(168, 85, 247, 0.3);
+  }
+  50% { 
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.6), 0 0 40px rgba(168, 85, 247, 0.3), 0 0 60px rgba(99, 102, 241, 0.2);
+    border-color: rgba(168, 85, 247, 0.6);
+  }
+}
+
+@keyframes code-rain {
+  0% { transform: translateY(-100vh) rotate(0deg); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+}
+
+/* CSS Classes */
+.hacker-bg-animate {
+  background: linear-gradient(135deg, #000000 0%, #0a0a0a 25%, #0f0a14 50%, #0a0a0a 75%, #000000 100%);
+  background-size: 400% 400%;
+  animation: bg-pan 30s ease-in-out infinite;
+  position: relative;
+}
+
+.hacker-bg-animate::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(168, 85, 247, 0.02) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(99, 102, 241, 0.015) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.neon-flicker {
+  animation: neon-flicker 3s infinite;
+  color: #e879f9;
+}
+
+.cursor-blink {
+  color: #a855f7;
+  font-weight: bold;
+  animation: cursor-blink 1.2s step-end infinite;
+}
+
+/* Matrix Rain Effect - Simplified */
+.matrix-rain {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  background-image: 
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 200px,
+      rgba(168, 85, 247, 0.005) 202px,
+      rgba(168, 85, 247, 0.005) 204px,
+      transparent 206px
+    );
+}
+
+/* Scanning Line Effect */
+.scan-line {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(168, 85, 247, 0.3), 
+    rgba(168, 85, 247, 0.8), 
+    rgba(99, 102, 241, 0.8), 
+    rgba(99, 102, 241, 0.3), 
+    transparent
+  );
+  animation: scan-line-move 4s linear infinite;
+  box-shadow: 
+    0 0 10px rgba(168, 85, 247, 0.5),
+    0 0 20px rgba(168, 85, 247, 0.3);
+}
+
+/* Professional card styling */
+.hacker-card {
+  background: rgba(0, 0, 0, 0.95);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.8),
+    0 0 0 1px rgba(168, 85, 247, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.02);
+  transition: all 0.3s ease;
+}
+
+.hacker-card:hover {
+  border-color: rgba(168, 85, 247, 0.4);
+  box-shadow: 
+    0 8px 30px rgba(0, 0, 0, 0.9),
+    0 0 20px rgba(168, 85, 247, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transform: translateY(-1px);
+}
+
+/* Button styling */
+.hacker-button {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.8) 0%, rgba(99, 102, 241, 0.8) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.5);
+  color: #ffffff;
+  font-weight: 600;
+  text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+  box-shadow: 
+    0 4px 15px rgba(168, 85, 247, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.hacker-button:hover {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 1) 0%, rgba(99, 102, 241, 1) 100%);
+  box-shadow: 
+    0 6px 20px rgba(168, 85, 247, 0.4),
+    0 0 30px rgba(168, 85, 247, 0.3);
+  transform: translateY(-1px);
+}
+
+.hacker-button:disabled {
+  background: rgba(55, 65, 81, 0.8);
+  border-color: rgba(107, 114, 128, 0.3);
+  color: rgba(156, 163, 175, 0.8);
+  text-shadow: none;
+  box-shadow: none;
+}
+
+/* Input and select styling */
+.hacker-input {
+  background: rgba(15, 15, 35, 0.8);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  color: #e5e7eb;
+  border-radius: 6px;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.hacker-input:focus {
+  border-color: rgba(168, 85, 247, 0.8);
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1);
+  outline: none;
+}
+
+/* Progress bar styling */
+.hacker-progress {
+  background: rgba(15, 15, 35, 0.8);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.hacker-progress-fill {
+  background: linear-gradient(90deg, rgba(168, 85, 247, 0.8) 0%, rgba(99, 102, 241, 0.8) 100%);
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+  transition: width 0.3s ease;
+}
+
+/* Terminal and code styling */
+.hacker-terminal {
+  background: rgba(0, 0, 0, 0.98);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  border-radius: 8px;
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  color: #e5e7eb;
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(168, 85, 247, 0.05);
+}
+
+.hacker-code-output {
+  background: rgba(0, 0, 0, 0.98);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  color: #10b981;
+  font-family: 'Share Tech Mono', monospace;
+  border-radius: 6px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* Difficulty badges */
+.difficulty-easy {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.8), rgba(5, 150, 105, 0.8));
+  color: #ffffff;
+  border: 1px solid rgba(16, 185, 129, 0.5);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+}
+
+.difficulty-medium {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.8), rgba(217, 119, 6, 0.8));
+  color: #ffffff;
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+}
+
+.difficulty-hard {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.8), rgba(220, 38, 38, 0.8));
+  color: #ffffff;
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+}
+
+/* Loading states */
+.hacker-loading {
+  background: linear-gradient(90deg, 
+    rgba(168, 85, 247, 0.1) 0%, 
+    rgba(168, 85, 247, 0.3) 50%, 
+    rgba(168, 85, 247, 0.1) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Text effects */
+.cyber-text {
+  color: #e879f9;
+  text-shadow: 
+    0 0 5px rgba(168, 85, 247, 0.5),
+    0 0 10px rgba(168, 85, 247, 0.3),
+    0 0 15px rgba(168, 85, 247, 0.2);
+}
+
+.terminal-text {
+  font-family: 'Share Tech Mono', monospace;
+  color: #d1d5db;
+  text-shadow: 0 0 3px currentColor;
+}
+
+/* Glitch effect for errors or special states */
+@keyframes glitch {
+  0%, 100% { transform: translate(0); }
+  10% { transform: translate(-2px, -1px); }
+  20% { transform: translate(2px, 1px); }
+  30% { transform: translate(-1px, 2px); }
+  40% { transform: translate(1px, -1px); }
+  50% { transform: translate(-2px, 1px); }
+  60% { transform: translate(2px, -2px); }
+  70% { transform: translate(-1px, -1px); }
+  80% { transform: translate(1px, 2px); }
+  90% { transform: translate(-2px, -1px); }
+}
+
+.glitch-effect {
+  animation: glitch 0.5s infinite;
+}
+
+/* Data visualization elements */
+.data-stream {
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(168, 85, 247, 0.8), 
+    transparent
+  );
+  animation: data-flow 3s linear infinite;
+  box-shadow: 0 0 5px rgba(168, 85, 247, 0.5);
+}
+
+@keyframes data-flow {
+  0% { transform: translateX(-100%); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateX(100%); opacity: 0; }
+}
+
+/* Professional skeleton loading */
+.hacker-skeleton {
+  background: linear-gradient(90deg, 
+    rgba(168, 85, 247, 0.1) 0%, 
+    rgba(168, 85, 247, 0.2) 50%, 
+    rgba(168, 85, 247, 0.1) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.2s infinite;
+  border-radius: 4px;
+}

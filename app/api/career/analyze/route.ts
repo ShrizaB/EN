@@ -1,12 +1,19 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { GoogleGenerativeAI } from "@google/generative-ai"
+import { PerplexityAPI } from "@/lib/perplexity-api"
 
-// Initialize the Gemini API with the API key
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY
-if (!GEMINI_API_KEY) {
-  console.error('GEMINI_API_KEY environment variable is not set')
+// Initialize the Perplexity API with the API key
+const PERPLEXITY_API_KEY = process.env.PERPLEXITY_API_KEY
+let perplexityAPI: PerplexityAPI | null = null
+
+if (PERPLEXITY_API_KEY) {
+  try {
+    perplexityAPI = new PerplexityAPI(PERPLEXITY_API_KEY)
+  } catch (error) {
+    console.error('Failed to initialize Perplexity API:', error)
+  }
+} else {
+  console.warn('PERPLEXITY_API_KEY environment variable is not set')
 }
-const genAI = new GoogleGenerativeAI(GEMINI_API_KEY || "AIzaSyCgYno9IqtTqF3rmxQpsV4gIypk7tWtbD4")
 
 export async function POST(req: NextRequest) {
   let jobRole = "Software Engineer"
@@ -37,10 +44,12 @@ export async function POST(req: NextRequest) {
       }
 
       try {
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
-        const result = await model.generateContent(prompt)
-        const response = await result.response
-        const text = response.text()
+        if (!perplexityAPI) {
+          throw new Error('Perplexity API not available')
+        }
+        
+        const result = await perplexityAPI.generateContent(prompt)
+        const text = result.text()
         
         let questions: any[] = []
         try {
@@ -73,94 +82,100 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Create a model with simplified config for faster response
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash",
-      generationConfig: {
-        temperature: 0.7,
-        topK: 20,
-        topP: 0.8,
-        maxOutputTokens: 4096, // Reduced for faster response
-      },
-    })
-
-    // Simplified prompt for faster generation
+    // Use Perplexity API for career analysis - simplified prompt to avoid truncation
     const prompt = `
-  Generate a career roadmap analysis for someone interested in the role of "${jobRole}" 
-  in the "${sector}" sector.
-  
-  IMPORTANT: Provide REAL, RELEVANT companies for the specified job role and sector. 
-  DO NOT use generic companies like TCS, Infosys, Wipro unless they are actually relevant to the specific role.
-  
-  Provide the following information in a structured JSON format:
-  1. Top sectors hiring for this role with percentages
-  2. Top 6 REAL companies hiring for this role specifically (for each company, include: name, sector, details, facilities array, entrySalary, averageSalary, experiencedSalary)
-  3. Required skills (list of 5-6 skills with importance percentage)
-  4. Top hiring locations in India with hiring percentage
-  5. Average salary, entry-level salary, and experienced salary for this specific role
-  6. Benefits and perks besides salary
-  7. Skill development resources (3 resources with title and description)
-  8. Location insights (3 locations with description, average salary, and cost of living)
-  9. Career path (4 steps with title, description, timeline, and salary range)
-  10. Additional resources (3 resources with title and description)
-  11. Role roadmap (10-12 learning steps with title, description, and estimated learning time)
+Generate a concise career analysis for "${jobRole}" in "${sector}" sector.
 
-  Format the response as a valid JSON object with the following structure:
-  {
-    "jobRole": "${jobRole}",
-    "sector": "${sector}",
-    "averageSalary": number,
-    "entrySalary": number,
-    "experiencedSalary": number,
-    "topSectors": [{"name": string, "percentage": number, "category": "government" | "private"}],
-    "requiredSkills": [{"name": string, "importance": number}],
-    "hiringLocations": [{"name": string, "percentage": number}],
-    "topCompanies": [{"name": string, "sector": "government" | "private", "details": string, "facilities": [string], "entrySalary": number, "averageSalary": number, "experiencedSalary": number}],
-    "benefits": [string],
-    "skillResources": [{"title": string, "description": string}],
-    "locationInsights": [{"location": string, "description": string, "averageSalary": number, "costOfLiving": string}],
-    "careerPath": [{"title": string, "description": string, "timeline": string, "salaryRange": string}],
-    "additionalResources": [{"title": string, "description": string}],
-    "roleRoadmap": [{"title": string, "description": string, "estimatedTime": string}]
-  }
+Provide this as valid JSON:
+{
+  "jobRole": "${jobRole}",
+  "sector": "${sector}",
+  "averageSalary": 600000,
+  "entrySalary": 300000,
+  "experiencedSalary": 1200000,
+  "topSectors": [
+    {"name": "IT Services", "percentage": 40, "category": "private"},
+    {"name": "Startups", "percentage": 25, "category": "private"},
+    {"name": "E-commerce", "percentage": 20, "category": "private"},
+    {"name": "Government", "percentage": 15, "category": "government"}
+  ],
+  "learningPath": [
+    {
+      "step": 1,
+      "title": "Foundation Skills",
+      "description": "Learn basic technical skills and fundamentals",
+      "duration": "2-3 weeks",
+      "resources": ["Documentation", "Tutorials"],
+      "videoId": "PkZNo7MFNFg"
+    },
+    {
+      "step": 2,
+      "title": "Intermediate Development",
+      "description": "Build projects and gain practical experience", 
+      "duration": "4-6 weeks",
+      "resources": ["Project guides", "Practice platforms"],
+      "videoId": "bMknfKXIFA8"
+    },
+    {
+      "step": 3,
+      "title": "Advanced Concepts",
+      "description": "Master advanced techniques and best practices",
+      "duration": "6-8 weeks", 
+      "resources": ["Advanced courses", "Industry standards"],
+      "videoId": "Ke90Tje7VS0"
+    },
+    {
+      "step": 4,
+      "title": "Real-world Projects",
+      "description": "Build portfolio projects and gain experience",
+      "duration": "8-10 weeks",
+      "resources": ["Project templates", "Industry examples"],
+      "videoId": "fBNz5xF-Kx4"
+    }
+  ]
+}
 
-  Ensure all salaries are realistic numbers (in INR) for the Indian job market in 2024.
-  Ensure all companies are real and actually hire for the specified role.
-  Keep responses concise but informative.
-  Respond ONLY with the JSON object, no additional text.
-`
+Customize the learningPath steps for ${jobRole} with relevant skills and realistic timeframes.`
 
-    // Simplified API call with shorter timeout
-    let result
+    // Improved API call with longer timeout and better error handling
+    let result: any
     
     try {
-      console.log('Starting Gemini API call...')
+      console.log('Starting Perplexity API call...')
       
-      // Reduced timeout to prevent hanging
+      if (!perplexityAPI) {
+        throw new Error('Perplexity API not available')
+      }
+      
+      // Increased timeout to 60 seconds for more stable API calls
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Gemini API timeout after 15 seconds')), 15000)
+        setTimeout(() => reject(new Error('Perplexity API timeout after 60 seconds')), 60000)
       })
       
-      const apiPromise = model.generateContent(prompt)
+      const apiPromise = perplexityAPI.generateContent(prompt, {
+        model: 'sonar',
+        maxTokens: 1200, // Further reduced to prevent truncation
+        temperature: 0.7
+      })
       result = await Promise.race([apiPromise, timeoutPromise])
       
-      console.log('Gemini API call successful')
+      console.log('Perplexity API call successful')
     } catch (apiError) {
-      console.error('Gemini API call failed:', apiError)
+      console.error('Perplexity API call failed:', apiError)
+      console.log('Using fallback mock data due to API failure')
       // Return fallback immediately instead of retrying
       return NextResponse.json(generateMockCareerData(jobRole, sector))
     }
 
     if (!result) {
-      console.log('No result from Gemini API, using fallback')
+      console.log('No result from Perplexity API, using fallback')
       return NextResponse.json(generateMockCareerData(jobRole, sector))
     }
 
-    const response = await (result as any).response
-    const text = response.text()
+    const text = result.text()
 
     if (!text || text.trim().length === 0) {
-      console.log('Empty response from Gemini API, using fallback')
+      console.log('Empty response from Perplexity API, using fallback')
       return NextResponse.json(generateMockCareerData(jobRole, sector))
     }
     
@@ -186,20 +201,136 @@ export async function POST(req: NextRequest) {
       } catch (parseError) {
         console.error('Initial JSON parse failed, attempting to fix common issues...')
         
-        // Try to fix common JSON issues
+        // Try to fix common JSON issues and handle truncated responses
         let fixedJson = jsonString
           .replace(/,\s*}/g, '}') // Remove trailing commas in objects
           .replace(/,\s*]/g, ']') // Remove trailing commas in arrays
           .replace(/[\u201C\u201D]/g, '"') // Replace smart quotes with regular quotes
           .replace(/[\u2018\u2019]/g, "'") // Replace smart single quotes
 
+        // Check if JSON is truncated and try to complete it
+        if (!fixedJson.endsWith('}') && !fixedJson.endsWith(']')) {
+          console.log('Detected truncated JSON, attempting to complete...')
+          
+          // Handle incomplete strings by closing them
+          if (fixedJson.includes('"') && !fixedJson.endsWith('"')) {
+            // Check if we're in the middle of a string value
+            const lastQuoteIndex = fixedJson.lastIndexOf('"');
+            const afterLastQuote = fixedJson.substring(lastQuoteIndex + 1);
+            
+            // If there's content after the last quote that doesn't contain a closing quote
+            if (afterLastQuote && !afterLastQuote.includes('"')) {
+              // Find if we're in a property value by looking for ': "'
+              const colonQuotePattern = /:\s*"[^"]*$/;
+              if (colonQuotePattern.test(fixedJson)) {
+                fixedJson += '"'; // Close the string
+                console.log('Closed incomplete string value');
+              }
+            }
+          }
+          
+          // Remove any trailing incomplete content (like incomplete numbers or words)
+          fixedJson = fixedJson.replace(/,\s*"[^"]*:\s*[^",}\]]*$/, '');
+          fixedJson = fixedJson.replace(/,\s*[^",}\]]*$/, '');
+          
+          // Count open braces vs closed braces
+          const openBraces = (fixedJson.match(/{/g) || []).length;
+          const closedBraces = (fixedJson.match(/}/g) || []).length;
+          const missingBraces = openBraces - closedBraces;
+          
+          // Add missing closing braces
+          for (let i = 0; i < missingBraces; i++) {
+            fixedJson += '}';
+          }
+          
+          // Also check for unclosed arrays
+          const openBrackets = (fixedJson.match(/\[/g) || []).length;
+          const closedBrackets = (fixedJson.match(/\]/g) || []).length;
+          const missingBrackets = openBrackets - closedBrackets;
+          
+          for (let i = 0; i < missingBrackets; i++) {
+            fixedJson += ']';
+          }
+          
+          // Remove any trailing commas before closing
+          fixedJson = fixedJson.replace(/,(\s*[}\]])/g, '$1');
+        }
+
         try {
           jsonResponse = JSON.parse(fixedJson)
           console.log('JSON parsing successful after fixes')
         } catch (secondParseError) {
           console.error('JSON parsing failed even after fixes:', secondParseError)
-          console.error('Raw response:', text.substring(0, 500) + '...')
-          throw new Error(`Failed to parse JSON response: ${secondParseError}`)
+          console.error('Raw response length:', text.length)
+          console.error('Fixed JSON length:', fixedJson.length)
+          console.error('Last 200 chars of response:', text.slice(-200))
+          
+          // If JSON parsing still fails, return mock data instead of throwing error
+          console.log('Falling back to mock data due to JSON parsing failure')
+          return NextResponse.json({
+            jobRole: jobRole,
+            sector: "private",
+            averageSalary: 600000,
+            entrySalary: 300000,
+            experiencedSalary: 1200000,
+            topSectors: [
+              {"name": "Information Technology & Services", "percentage": 45, "category": "private"},
+              {"name": "E-commerce", "percentage": 20, "category": "private"},
+              {"name": "Financial Services", "percentage": 10, "category": "private"},
+              {"name": "Startups", "percentage": 15, "category": "private"},
+              {"name": "Government", "percentage": 10, "category": "government"}
+            ],
+            learningPath: [
+              {
+                "step": 1,
+                "title": "HTML & CSS Fundamentals",
+                "description": "Master the building blocks of web development with HTML structure and CSS styling.",
+                "duration": "2-3 weeks",
+                "resources": ["HTML5 documentation", "CSS3 tutorials", "Responsive design guides"],
+                "videoId": "PkZNo7MFNFg"
+              },
+              {
+                "step": 2,
+                "title": "JavaScript Essentials",
+                "description": "Learn core JavaScript concepts including variables, functions, and DOM manipulation.",
+                "duration": "3-4 weeks",
+                "resources": ["JavaScript MDN docs", "ES6+ features", "Browser DevTools"],
+                "videoId": "bMknfKXIFA8"
+              },
+              {
+                "step": 3,
+                "title": "Frontend Framework",
+                "description": "Choose and master a modern framework like React, Vue, or Angular.",
+                "duration": "4-6 weeks",
+                "resources": ["React documentation", "Component lifecycle", "State management"],
+                "videoId": "Ke90Tje7VS0"
+              },
+              {
+                "step": 4,
+                "title": "Backend Development",
+                "description": "Learn server-side programming with Node.js, Python, or PHP.",
+                "duration": "4-5 weeks",
+                "resources": ["Node.js tutorials", "Express.js framework", "API development"],
+                "videoId": "fBNz5xF-Kx4"
+              },
+              {
+                "step": 5,
+                "title": "Database Management",
+                "description": "Understand SQL and NoSQL databases for data storage and retrieval.",
+                "duration": "3-4 weeks",
+                "resources": ["MySQL tutorials", "MongoDB basics", "Database design"],
+                "videoId": "HXV3zeQKqGY"
+              },
+              {
+                "step": 6,
+                "title": "Version Control & Deployment",
+                "description": "Master Git for version control and learn deployment strategies.",
+                "duration": "2-3 weeks",
+                "resources": ["Git documentation", "GitHub workflow", "CI/CD pipelines"],
+                "videoId": "RGOj5yH7evk"
+              }
+            ]
+          });
         }
       }
 
@@ -245,35 +376,132 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// Update the mock data function to include role roadmap
+// Update the mock data function to include role roadmap and realistic salaries
 function generateMockCareerData(jobRole: string, sector: string) {
-  const salaryRange = 50000; // Fixed salary range for mock data
+  // Base salary multipliers based on job role (in thousands)
+  const baseSalaryMap: { [key: string]: number } = {
+    "Software Engineer": 600, // 6 LPA base
+    "Data Scientist": 800, // 8 LPA base  
+    "Marketing Manager": 700, // 7 LPA base
+    "Financial Analyst": 650, // 6.5 LPA base
+    "Civil Engineer": 500, // 5 LPA base
+    "Business Analyst": 650, // 6.5 LPA base
+    "Product Manager": 1200, // 12 LPA base
+    "DevOps Engineer": 800, // 8 LPA base
+    "UI/UX Designer": 550, // 5.5 LPA base
+  }
+  
+  // Get base salary for the role, default to Software Engineer if not found
+  const baseSalary = baseSalaryMap[jobRole] || baseSalaryMap["Software Engineer"]
+  
+  // Convert to proper annual amounts (multiply by 1000 since base is in thousands)
+  const annualBaseSalary = baseSalary * 1000
   
   // Generate dynamic companies based on job role and sector
-  const generateCompaniesForRole = (role: string, sectorType: string) => {
+  const generateCompaniesForRole = (role: string, sectorType: string, baseSalary: number) => {
     const allCompanies = {
       "Software Engineer": {
         private: [
-          { name: "Google", sector: "private" },
-          { name: "Microsoft", sector: "private" },
-          { name: "Amazon", sector: "private" },
-          { name: "Apple", sector: "private" },
-          { name: "Meta", sector: "private" },
-          { name: "Netflix", sector: "private" }
+          { 
+            name: "Google", 
+            sector: "private",
+            details: "Global technology leader specializing in internet-related services and products, revolutionizing how people access and interact with information worldwide.\n\nKnown for its innovative work culture, cutting-edge technology, and commitment to solving complex global challenges through technology. Google offers exceptional career growth opportunities for software engineers across multiple domains including AI, machine learning, cloud computing, mobile technologies, and web development.\n\nThe company provides a highly competitive compensation package, comprehensive benefits, and an environment that encourages creativity, collaboration, and continuous learning. Engineers work on products used by billions of people worldwide, making a real impact on global scale.\n\nGoogle's engineering culture emphasizes technical excellence, innovation, and the famous '20% time' policy that allows engineers to pursue passion projects. The company is committed to diversity, inclusion, and creating technology that benefits everyone.",
+            facilities: ["Free meals and snacks", "On-site gym and fitness center", "Comprehensive health insurance", "Stock options and equity", "Flexible working hours", "Learning and development programs", "Childcare facilities", "Transportation services", "Wellness programs", "Recreation areas"]
+          },
+          { 
+            name: "Microsoft", 
+            sector: "private",
+            details: "Leading technology company focused on productivity software, cloud services, and empowering every person and organization on the planet to achieve more.\n\nMicrosoft offers a unique blend of enterprise and consumer product development opportunities, with strong emphasis on work-life balance and employee development. Engineers work on world-class products including Windows, Office 365, Azure cloud platform, Xbox gaming, and cutting-edge AI technologies.\n\nThe company is a leader in cloud computing with Azure platform, artificial intelligence, and enterprise solutions. Microsoft's culture promotes growth mindset, inclusion, and continuous learning, making it an ideal place for engineers who want to make a significant impact while maintaining work-life balance.\n\nWith a commitment to diversity and inclusion initiatives, Microsoft provides an environment where every engineer can thrive and contribute to technologies that transform how people work, learn, and connect globally.",
+            facilities: ["Health and dental insurance", "Retirement savings plan", "Flexible work arrangements", "Professional development budget", "Employee discounts", "Wellness programs", "Parental leave benefits", "Volunteer time off", "Stock purchase plan", "Modern office facilities"]
+          },
+          { 
+            name: "Amazon", 
+            sector: "private",
+            details: "Amazon is a global e-commerce and cloud computing giant that has revolutionized how people shop, consume digital content, and build scalable technology infrastructure worldwide.\n\nFrom a customer perspective, Amazon provides an unparalleled shopping experience with millions of products, lightning-fast delivery through Prime, streaming services, smart home devices like Alexa, and cloud storage solutions. The company has transformed retail, entertainment, and digital services globally.\n\nFrom an employee perspective, Amazon offers an incredibly dynamic and challenging work environment where engineers work on cutting-edge technologies that serve hundreds of millions of customers. You'll be part of teams building massive-scale distributed systems, artificial intelligence, machine learning algorithms, robotics, and cloud computing solutions through AWS (Amazon Web Services).\n\nAmazon's culture is built on 16 Leadership Principles including Customer Obsession, Ownership, and Invent and Simplify. Engineers have opportunities to work across diverse domains including e-commerce platforms, AWS cloud services, Prime Video streaming, Alexa AI, logistics and supply chain optimization, advertising technology, and emerging technologies like drone delivery.\n\nThe company offers exceptional career growth opportunities, competitive compensation including stock options, and the chance to make a real impact on billions of customers worldwide while working with some of the most talented engineers in the industry.",
+            facilities: ["Career advancement programs", "Health insurance coverage", "Stock options", "Employee discounts", "Flexible schedules", "Learning opportunities", "Wellness benefits", "Parental benefits", "Transportation allowance", "Food services"]
+          },
+          { 
+            name: "Apple", 
+            sector: "private",
+            details: "Apple is the world's most valuable technology company, renowned for creating revolutionary consumer electronics, software, and digital services that have fundamentally changed how people interact with technology.\n\nFrom a customer perspective, Apple delivers premium products and experiences through the iPhone, iPad, Mac, Apple Watch, AirPods, and services like App Store, Apple Music, iCloud, and Apple TV+. The company is synonymous with innovation, elegant design, user privacy, and seamless integration across all devices and services.\n\nFrom an employee perspective, Apple offers engineers the opportunity to work on products used and loved by over a billion people worldwide. You'll be part of teams that push the boundaries of hardware and software engineering, working on everything from custom silicon chips and advanced cameras to iOS, macOS, machine learning frameworks, and augmented reality technologies.\n\nApple's engineering culture emphasizes perfectionism, attention to detail, and collaborative innovation. Engineers work in small, focused teams on highly confidential projects that often define entire product categories. The company provides unmatched opportunities to work on cutting-edge technologies including custom processors, advanced materials, computer vision, natural language processing, and health technologies.\n\nWith a strong commitment to environmental responsibility, user privacy, and accessibility, Apple offers engineers the chance to make meaningful contributions to technology while maintaining the highest standards of ethics and social responsibility. The compensation and benefits are among the best in the industry, including substantial stock options that have created significant wealth for long-term employees.",
+            facilities: ["Comprehensive health benefits", "Stock purchase program", "Employee product discounts", "Wellness and fitness programs", "Professional development", "Flexible work options", "Commuter benefits", "Food and beverage services", "Recreation facilities", "Learning resources"]
+          },
+          { 
+            name: "Meta", 
+            sector: "private",
+            details: "Meta (formerly Facebook) is a leading social technology company that's building the next generation of social connection and immersive digital experiences, including the ambitious metaverse vision.\n\nFrom a customer perspective, Meta operates some of the world's most popular social platforms including Facebook (connecting 3+ billion users), Instagram (visual storytelling and social commerce), WhatsApp (global messaging), and is pioneering virtual and augmented reality through Meta Quest VR headsets and AR glasses. These platforms enable people to connect, share, discover content, and build communities across the globe.\n\nFrom an employee perspective, Meta offers software engineers the opportunity to work on technologies that connect billions of people worldwide while pioneering the future of digital interaction. Engineers work on massive-scale distributed systems, advanced AI and machine learning algorithms, computer vision, virtual and augmented reality, social algorithms, and cutting-edge hardware-software integration.\n\nMeta's engineering culture emphasizes bold innovation, rapid iteration, and 'Move Fast' mentality. Engineers have access to some of the world's largest datasets and most challenging technical problems in areas like social networking, content recommendation, real-time communications, immersive technologies, and privacy-preserving technologies.\n\nThe company is heavily investing in the metaverse - a shared virtual environment where people can work, play, and socialize. This includes developing VR/AR hardware, spatial computing, haptic feedback systems, and creating entirely new paradigms for human-computer interaction. Meta offers competitive compensation, excellent benefits, and the unique opportunity to shape the future of how humanity connects and interacts digitally.",
+            facilities: ["Health and wellness benefits", "Stock options", "Free meals", "Fitness facilities", "Learning and development", "Flexible work arrangements", "Parental leave", "Mental health support", "Transportation benefits", "Recreation activities"]
+          },
+          { 
+            name: "Netflix", 
+            sector: "private",
+            details: "Netflix is the world's leading streaming entertainment service, revolutionizing how people consume and discover movies, TV shows, and original content across more than 190 countries with over 230 million subscribers.\n\nFrom a customer perspective, Netflix provides an unparalleled entertainment experience with a vast library of content, award-winning original series and movies, personalized recommendations powered by sophisticated algorithms, and seamless streaming across all devices. The platform has fundamentally changed entertainment consumption patterns and created new forms of storytelling.\n\nFrom an employee perspective, Netflix offers engineers the opportunity to work on cutting-edge technology that delivers entertainment to hundreds of millions of users globally. Engineers build and maintain one of the world's largest content delivery networks, develop sophisticated recommendation algorithms using machine learning, create innovative user interfaces, and solve complex problems in video encoding, streaming optimization, and global content distribution.\n\nNetflix's unique culture emphasizes 'Freedom and Responsibility,' unlimited vacation, and treating employees like adults. The engineering teams work on fascinating challenges including real-time video streaming optimization, A/B testing at massive scale, content personalization algorithms, global CDN management, microservices architecture, and data analytics that guide billion-dollar content investments.\n\nThe company's data-driven approach means engineers work with enormous datasets to understand viewing patterns, optimize streaming quality, and predict content success. Netflix also pioneers new technologies in video compression, adaptive streaming, and content production workflows. With competitive compensation, stock options, and a culture that values high performance and innovation, Netflix offers engineers the chance to impact how the world enjoys entertainment.",
+            facilities: ["Unlimited vacation policy", "Health insurance", "Stock options", "Professional development budget", "Flexible work arrangements", "Wellness programs", "Parental leave", "Learning resources", "Team building activities", "Modern office spaces"]
+          }
         ],
         government: [
-          { name: "ISRO", sector: "government" },
-          { name: "DRDO", sector: "government" },
-          { name: "CDAC", sector: "government" },
-          { name: "NIC", sector: "government" }
+          { 
+            name: "ISRO", 
+            sector: "government",
+            details: "Indian Space Research Organisation - India's national space agency.\nOpportunities to work on satellite technology and space missions.\nPrestigious government organization with cutting-edge research.\nContributes to national space programs and scientific advancement.\nOffers stable career with government benefits.",
+            facilities: ["Government health scheme", "Provident fund", "Pension benefits", "Medical facilities", "Canteen services", "Transportation", "Housing allowance", "Leave travel concession", "Educational facilities", "Research opportunities"]
+          },
+          { 
+            name: "DRDO", 
+            sector: "government",
+            details: "Defence Research and Development Organisation.\nWorks on advanced defense technologies and systems.\nOpportunities in aerospace, electronics, and combat systems.\nContributes to national security and defense capabilities.\nFocus on indigenous technology development.",
+            facilities: ["Government medical benefits", "Provident fund", "Pension scheme", "Canteen facilities", "Transportation services", "Housing assistance", "Educational support", "Research facilities", "Library access", "Sports facilities"]
+          },
+          { 
+            name: "CDAC", 
+            sector: "government",
+            details: "Centre for Development of Advanced Computing.\nLeading R&D organization in IT and electronics.\nWork on supercomputing, cyber security, and emerging technologies.\nBridge between academic research and industry applications.\nFocus on indigenous technology development.",
+            facilities: ["Health insurance", "Provident fund", "Flexible working hours", "Training programs", "Canteen services", "Library facilities", "Conference participation", "Research support", "Modern labs", "Transportation"]
+          },
+          { 
+            name: "NIC", 
+            sector: "government",
+            details: "National Informatics Centre - Premier IT organization of Government of India.\nWorks on e-governance and digital India initiatives.\nOpportunities in software development and system integration.\nContributes to digitalization of government services.\nStable career with government perks.",
+            facilities: ["Medical benefits", "Provident fund", "Pension benefits", "Training opportunities", "Canteen facilities", "Transportation allowance", "Housing support", "Leave benefits", "Educational assistance", "IT infrastructure"]
+          }
         ],
         both: [
-          { name: "Google", sector: "private" },
-          { name: "Microsoft", sector: "private" },
-          { name: "Amazon", sector: "private" },
-          { name: "ISRO", sector: "government" },
-          { name: "DRDO", sector: "government" },
-          { name: "TCS", sector: "private" }
+          { 
+            name: "Google", 
+            sector: "private",
+            details: "Global technology leader specializing in internet-related services and products.\nKnown for innovative work culture and cutting-edge technology.\nOffers excellent career growth opportunities for software engineers.\nFocus on AI, cloud computing, and mobile technologies.\nHighly competitive compensation and benefits package.",
+            facilities: ["Free meals and snacks", "On-site gym and fitness center", "Comprehensive health insurance", "Stock options and equity", "Flexible working hours", "Learning and development programs", "Childcare facilities", "Transportation services", "Wellness programs", "Recreation areas"]
+          },
+          { 
+            name: "Microsoft", 
+            sector: "private",
+            details: "Leading technology company focused on productivity software and cloud services.\nStrong emphasis on work-life balance and employee development.\nOpportunities to work on enterprise and consumer products.\nLeader in cloud computing with Azure platform.\nCommitted to diversity and inclusion initiatives.",
+            facilities: ["Health and dental insurance", "Retirement savings plan", "Flexible work arrangements", "Professional development budget", "Employee discounts", "Wellness programs", "Parental leave benefits", "Volunteer time off", "Stock purchase plan", "Modern office facilities"]
+          },
+          { 
+            name: "Amazon", 
+            sector: "private",
+            details: "E-commerce giant with strong presence in cloud computing and AI.\nFast-paced work environment with focus on customer obsession.\nOpportunities across various domains including AWS, retail, and logistics.\nEmphasis on innovation and ownership mindset.\nGlobal scale operations with diverse project opportunities.",
+            facilities: ["Career advancement programs", "Health insurance coverage", "Stock options", "Employee discounts", "Flexible schedules", "Learning opportunities", "Wellness benefits", "Parental benefits", "Transportation allowance", "Food services"]
+          },
+          { 
+            name: "ISRO", 
+            sector: "government",
+            details: "Indian Space Research Organisation - India's national space agency.\nOpportunities to work on satellite technology and space missions.\nPrestigious government organization with cutting-edge research.\nContributes to national space programs and scientific advancement.\nOffers stable career with government benefits.",
+            facilities: ["Government health scheme", "Provident fund", "Pension benefits", "Medical facilities", "Canteen services", "Transportation", "Housing allowance", "Leave travel concession", "Educational facilities", "Research opportunities"]
+          },
+          { 
+            name: "DRDO", 
+            sector: "government",
+            details: "Defence Research and Development Organisation.\nWorks on advanced defense technologies and systems.\nOpportunities in aerospace, electronics, and combat systems.\nContributes to national security and defense capabilities.\nFocus on indigenous technology development.",
+            facilities: ["Government medical benefits", "Provident fund", "Pension scheme", "Canteen facilities", "Transportation services", "Housing assistance", "Educational support", "Research facilities", "Library access", "Sports facilities"]
+          },
+          { 
+            name: "TCS", 
+            sector: "private",
+            details: "Tata Consultancy Services - India's largest IT services company.\nGlobal presence with opportunities in various technology domains.\nStrong focus on innovation and digital transformation.\nExcellent training programs for fresh graduates.\nPart of the prestigious Tata Group with strong values.",
+            facilities: ["Health insurance", "Provident fund", "Performance bonuses", "Learning platforms", "Flexible work options", "Employee assistance programs", "Recreation facilities", "Canteen services", "Transportation", "Career development"]
+          }
         ]
       },
       "Data Scientist": {
@@ -377,22 +605,31 @@ function generateMockCareerData(jobRole: string, sector: string) {
     // Get companies for the specific role, or fallback to Software Engineer
     const roleCompanies = allCompanies[role as keyof typeof allCompanies] || allCompanies["Software Engineer"]
     
-    // Return companies based on sector preference
+    // Return companies based on sector preference and add salary information
+    let selectedCompanies
     if (sectorType === "government") {
-      return roleCompanies.government
+      selectedCompanies = roleCompanies.government
     } else if (sectorType === "private") {
-      return roleCompanies.private
+      selectedCompanies = roleCompanies.private
     } else {
-      return roleCompanies.both
+      selectedCompanies = roleCompanies.both
     }
+
+    // Add realistic salary information to each company
+    return selectedCompanies.map((company: any) => ({
+      ...company,
+      entrySalary: Math.round(baseSalary * (0.6 + Math.random() * 0.3)), // 60-90% of base
+      averageSalary: Math.round(baseSalary * (1.0 + Math.random() * 0.5)), // 100-150% of base  
+      experiencedSalary: Math.round(baseSalary * (1.8 + Math.random() * 0.8)) // 180-260% of base
+    }))
   }
 
   const mockData = {
     jobRole: jobRole,
     sector: sector,
-    averageSalary: salaryRange * 1.2,
-    entrySalary: salaryRange * 0.8,
-    experiencedSalary: salaryRange * 2,
+    averageSalary: Math.round(annualBaseSalary * 1.2), // 20% above base
+    entrySalary: Math.round(annualBaseSalary * 0.7), // 30% below base for entry level
+    experiencedSalary: Math.round(annualBaseSalary * 2.2), // 2.2x base for experienced
     topSectors: [
       { name: "IT Services", percentage: 40, category: "private" },
       { name: "Product Companies", percentage: 30, category: "private" },
@@ -415,7 +652,7 @@ function generateMockCareerData(jobRole: string, sector: string) {
       { name: "Delhi NCR", percentage: 15 },
       { name: "Pune", percentage: 5 },
     ],
-    topCompanies: generateCompaniesForRole(jobRole, sector),
+    topCompanies: generateCompaniesForRole(jobRole, sector, annualBaseSalary),
     benefits: [
       "Health insurance coverage for employees and dependents",
       "Retirement plans with employer matching",
@@ -442,19 +679,19 @@ function generateMockCareerData(jobRole: string, sector: string) {
       {
         location: "Bangalore",
         description: "India's Silicon Valley with the highest concentration of tech companies and startups.",
-        averageSalary: salaryRange * 1.3,
+        averageSalary: Math.round(annualBaseSalary * 1.3),
         costOfLiving: "High",
       },
       {
         location: "Hyderabad",
         description: "Growing tech hub with many multinational companies and a reasonable cost of living.",
-        averageSalary: salaryRange * 1.2,
+        averageSalary: Math.round(annualBaseSalary * 1.2),
         costOfLiving: "Medium",
       },
       {
         location: "Mumbai",
         description: "Financial capital with diverse job opportunities across sectors.",
-        averageSalary: salaryRange * 1.4,
+        averageSalary: Math.round(annualBaseSalary * 1.4),
         costOfLiving: "Very High",
       },
     ],
@@ -463,25 +700,25 @@ function generateMockCareerData(jobRole: string, sector: string) {
         title: "Entry Level Position",
         description: "Start your career with foundational responsibilities and learning opportunities.",
         timeline: "0-2 years",
-        salaryRange: `${(salaryRange * 0.8).toLocaleString()} - ${(salaryRange * 1.2).toLocaleString()}`,
+        salaryRange: `₹${Math.round(annualBaseSalary * 0.7).toLocaleString()} - ₹${Math.round(annualBaseSalary * 1.0).toLocaleString()}`,
       },
       {
         title: "Mid-Level Position",
         description: "Take on more complex projects and begin to specialize in your area of interest.",
         timeline: "2-5 years",
-        salaryRange: `${(salaryRange * 1.2).toLocaleString()} - ${(salaryRange * 1.8).toLocaleString()}`,
+        salaryRange: `₹${Math.round(annualBaseSalary * 1.0).toLocaleString()} - ₹${Math.round(annualBaseSalary * 1.5).toLocaleString()}`,
       },
       {
         title: "Senior Position",
         description: "Lead projects and mentor junior team members while deepening your expertise.",
         timeline: "5-8 years",
-        salaryRange: `${(salaryRange * 1.8).toLocaleString()} - ${(salaryRange * 2.5).toLocaleString()}`,
+        salaryRange: `₹${Math.round(annualBaseSalary * 1.5).toLocaleString()} - ₹${Math.round(annualBaseSalary * 2.2).toLocaleString()}`,
       },
       {
         title: "Management Role",
         description: "Transition to managing teams and departments, focusing on strategic initiatives.",
         timeline: "8+ years",
-        salaryRange: `${(salaryRange * 2.5).toLocaleString()}+`,
+        salaryRange: `₹${Math.round(annualBaseSalary * 2.2).toLocaleString()}+`,
       },
     ],
     additionalResources: [

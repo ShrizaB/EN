@@ -1,62 +1,29 @@
 import { NextRequest, NextResponse } from "next/server"
 import { GoogleGenerativeAI } from "@google/generative-ai"
+import { PerplexityAPI } from '@/lib/perplexity-api'
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY
-const PERPLEXITY_API_KEY = process.env.PERPLEXITY_API_KEY || "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"
+const PERPLEXITY_API_KEY = process.env.PERPLEXITY_API_KEY || ''
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY || "")
+let perplexityAPI: PerplexityAPI | null = null
+if (PERPLEXITY_API_KEY) {
+  try { perplexityAPI = new PerplexityAPI(PERPLEXITY_API_KEY) } catch (e) { console.error('Perplexity init error:', e) }
+}
 
 // Function to search for Sketchfab models using Perplexity
 async function searchSketchfabModel(topic: string): Promise<string | null> {
+  // Use PerplexityAI 'sonar' to find Sketchfab model ID
+  if (!perplexityAPI) return null
   try {
-    const response = await fetch('https://api.perplexity.ai/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${PERPLEXITY_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'llama-3.1-sonar-small-128k-online',
-        messages: [
-          {
-            role: 'user',
-            content: `Find a specific Sketchfab 3D model for "${topic}". 
-            
-            Instructions:
-            1. Search for 3D models on Sketchfab.com related to "${topic}"
-            2. Look for models that are free to view and educational
-            3. Return ONLY the Sketchfab model ID from the URL
-            4. The model ID is the long string in URLs like: https://sketchfab.com/3d-models/[model-name]-[MODEL_ID]
-            5. If you find multiple models, choose the most educational/detailed one
-            
-            Response format: Return ONLY the model ID (the long alphanumeric string), nothing else.
-            
-            Example: If you find https://sketchfab.com/3d-models/human-heart-anatomy-1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p
-            Return: 1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p`
-          }
-        ],
-        max_tokens: 150,
-        temperature: 0.1
-      })
-    })
-
-    if (!response.ok) {
-      console.error('Perplexity API error:', response.status, response.statusText)
-      return null
-    }
-
-    const data = await response.json()
-    const modelId = data.choices?.[0]?.message?.content?.trim()
-    
-    // Validate that we got a model ID (should be alphanumeric string)
-    if (modelId && /^[a-zA-Z0-9]{20,}$/.test(modelId)) {
-      return modelId
-    }
-    
-    console.warn('Invalid or no model ID returned from Perplexity:', modelId)
+    const prompt = `Find a Sketchfab 3D model for "${topic}". Return ONLY the model UID from the URL (https://sketchfab.com/3d-models/...-[UID]) as plain text.`
+    const result = await perplexityAPI.generateContent(prompt, { model: 'sonar', maxTokens: 50, temperature: 0.1 })
+    const text = result.text().trim()
+    const match = text.match(/([A-Za-z0-9_-]{20,})/)
+    if (match) return match[1]
+    console.warn('Perplexity did not return a valid Sketchfab UID:', text)
     return null
-    
   } catch (error) {
-    console.error('Error searching Sketchfab model:', error)
+    console.error('Perplexity search error:', error)
     return null
   }
 }
@@ -332,36 +299,25 @@ export async function POST(req: NextRequest) {
       `
       
       const mermaidResult = await model.generateContent(fullPrompt)
+      // Extract and clean Mermaid code, preserving syntax
       let mermaidCode = mermaidResult.response.text().trim()
-      
-      // Clean up the mermaid code - remove any markdown formatting
-      mermaidCode = mermaidCode.replace(/```mermaid/g, '')
-      mermaidCode = mermaidCode.replace(/```/g, '')
-      mermaidCode = mermaidCode.trim()
-      
-      // Fix single-line format to proper multi-line format
-      if (!mermaidCode.includes('\n') && mermaidCode.includes('-->')) {
-        // Split the single line into proper Mermaid format with newlines
-        mermaidCode = mermaidCode.replace(/^flowchart TD\s*/, 'flowchart TD\n    ')
-        mermaidCode = mermaidCode.replace(/\s+([A-Z]\w*)\s*-->/g, '\n    $1 -->')
-        mermaidCode = mermaidCode.replace(/\s+([A-Z]\w*)\s*--\s*([^-]+)\s*-->/g, '\n    $1 -- $2 -->')
+      // Remove markdown fences
+      mermaidCode = mermaidCode.replace(/```mermaid/g, '').replace(/```/g, '').trim()
+      // Extract from first 'flowchart' keyword if present
+      const idx = mermaidCode.indexOf('flowchart')
+      if (idx > 0) {
+        mermaidCode = mermaidCode.slice(idx)
       }
-      
-      // Additional cleaning for common issues
-      mermaidCode = mermaidCode
-        // Remove problematic characters from labels
-        .replace(/\[([^\]]*)"([^"]*)"([^\]]*)\]/g, '[$1$2$3]')
-        .replace(/\[([^\]]*)\(([^)]*)\)([^\]]*)\]/g, '[$1$2$3]')
-        // Clean up special characters that cause parsing issues
-        .replace(/[^\w\s\[\](){}<>|&;:.,!?+=*\-/\n]/g, ' ')
-        // Fix excessive whitespace but preserve line structure
-        .replace(/[ \t]+/g, ' ')
-        .replace(/\n\s*\n/g, '\n')
-      
-      // Ensure it starts with flowchart TD
-      if (!mermaidCode.startsWith('flowchart TD')) {
+      // Ensure valid flowchart TD start
+      if (!/^flowchart\s+TD/.test(mermaidCode)) {
         mermaidCode = `flowchart TD\n${mermaidCode}`
       }
+      // Trim each line
+      mermaidCode = mermaidCode
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line.length > 0)
+        .join('\n')
       
       // Validate basic mermaid syntax
       if (!mermaidCode.includes('-->') && !mermaidCode.includes('flowchart')) {

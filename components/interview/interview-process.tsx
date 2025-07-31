@@ -180,7 +180,7 @@ export default function InterviewProcess() {
               <div className="mt-8 text-center">
                 <Button 
                   onClick={resetProcess}
-                  className={`${orbitron.className} bg-yellow-400 text-black font-bold tracking-wider border-2 border-yellow-400 rounded-none px-8 py-4`}
+                  className={`${orbitron.className} hover:bg-transparent hover:text-yellow-400 bg-yellow-400 text-black font-bold tracking-wider border-2 border-yellow-400 rounded-none px-8 py-4`}
                 >
                   RESTART_PROTOCOL
                 </Button>

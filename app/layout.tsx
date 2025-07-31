@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { AuthProvider } from "@/contexts/auth-context"
 import { Footer } from "@/components/footer"
 import { EduPlayNavbar } from "@/components/eduplay-navbar"
+import { EduGuideNavbar } from "@/components/eduguide-navbar"
 import { TopNavBar } from "@/components/TopNavBar"
 import { usePathname } from "next/navigation"
 
@@ -74,8 +75,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AuthProvider>
             <div className="flex min-h-screen flex-col">
-              {/* Only show TopNavBar and EduPlayNavbar if not on / or /eduguide */}
-              {pathname !== "/" && !pathname.startsWith("/eduguide") && (
+              {/* Show EduGuide navbar for eduguide and interview routes */}
+              {(pathname.startsWith("/eduguide") || pathname.startsWith("/interview")) && (
+                <EduGuideNavbar />
+              )}
+              
+              {/* Show EduPlay navbar for other routes (except home) */}
+              {pathname !== "/" && !pathname.startsWith("/eduguide") && !pathname.startsWith("/interview") && (
                 <>
                   <TopNavBar onMenuClick={() => setIsSidebarOpen(true)} />
                   <EduPlayNavbar

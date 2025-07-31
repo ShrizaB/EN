@@ -53,18 +53,18 @@ export async function generateQuestions(subject: string, topic: string, difficul
     // Parse the response to get the questions
     try {
       // Find JSON array in the response
-      const jsonMatch = text.match(/\[\s*\{.*\}\s*\]/s)
+      const jsonMatch = text.match(/\[\s*\{[\s\S]*\}\s*\]/)
       if (jsonMatch) {
         const jsonStr = jsonMatch[0]
         const questions = JSON.parse(jsonStr)
 
         // Validate and fix the questions format
-        const validatedQuestions = questions.map((q) => {
+        const validatedQuestions = questions.map((q: any) => {
           // Ensure correctAnswer is a number (index)
           let correctAnswerIndex =
             typeof q.correctAnswer === "number"
               ? q.correctAnswer
-              : q.options.findIndex((opt) => opt === q.correctAnswer)
+              : q.options.findIndex((opt: any) => opt === q.correctAnswer)
 
           // If still not found, default to 0
           if (correctAnswerIndex < 0) correctAnswerIndex = 0
@@ -116,6 +116,160 @@ export async function generateChat(messages: { role: string; content: string }[]
   } catch (error) {
     console.error("Error in chat:", error)
     return "I'm sorry, I couldn't process your request at this time. Please try again later."
+  }
+}
+
+export async function generateCareerData(jobRole: string, sector: string) {
+  try {
+    const prompt = `Generate comprehensive career data for a ${jobRole} in the ${sector} sector. 
+    Please return a JSON object with the following structure:
+
+    {
+      "topCompanies": [
+        {
+          "name": "Company Name",
+          "sector": "${sector.toLowerCase()}",
+          "details": "Multi-line company description",
+          "facilities": ["facility1", "facility2", "facility3", "facility4", "facility5"],
+          "entrySalary": 500000,
+          "experiencedSalary": 1500000,
+          "averageSalary": 1000000
+        }
+      ],
+      "topSectors": [
+        {
+          "name": "Sector Name",
+          "percentage": 45,
+          "category": "${sector.toLowerCase()}"
+        }
+      ],
+      "requiredSkills": [
+        {
+          "name": "Skill Name",
+          "importance": 95
+        }
+      ],
+      "hiringLocations": [
+        {
+          "name": "City Name",
+          "percentage": 35
+        }
+      ],
+      "skillResources": [
+        {
+          "title": "Resource Title",
+          "description": "Resource description",
+          "link": "https://example.com - actual working website URL"
+        }
+      ],
+      "locationInsights": [
+        {
+          "location": "City Name",
+          "description": "City description for job market",
+          "averageSalary": 900000,
+          "costOfLiving": "High/Medium/Low"
+        }
+      ]
+    }
+
+    Requirements:
+    - Include at least 8-12 top companies hiring for ${jobRole} in ${sector}
+    - Include realistic salary ranges in INR (Indian Rupees)
+    - Include at least 4-6 sectors related to ${jobRole}
+    - Include 8-10 essential skills for ${jobRole}
+    - Include top 6-8 Indian cities for ${jobRole} jobs
+    - Include practical skill development resources with REAL working website links
+    - Include detailed location insights for job market
+    - For skillResources, provide actual working website URLs like:
+      * Educational platforms (Coursera, Udemy, edX, Pluralsight, etc.)
+      * Documentation sites (MDN, official docs)
+      * GitHub repositories for practice
+      * Tutorial websites
+      * Certification providers
+    - Make sure all links are real, working URLs that provide value for ${jobRole} skill development
+
+    Make sure to return ONLY valid JSON without any markdown formatting or additional text.`
+
+    const result = await model.generateContent(prompt)
+    const response = await result.response
+    const text = response.text()
+
+    try {
+      // Clean the response to extract JSON
+      const cleanedText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
+      const careerData = JSON.parse(cleanedText)
+      
+      return careerData
+    } catch (parseError) {
+      console.error("Error parsing career data:", parseError)
+      console.error("Raw response:", text)
+      return null
+    }
+  } catch (error) {
+    console.error("Error generating career data:", error)
+    return null
+  }
+}
+
+export async function generateCareerPath(jobRole: string, sector: string) {
+  try {
+    const prompt = `Generate a detailed career path roadmap for a ${jobRole} position in the ${sector} sector. 
+
+    Return a JSON object with the following structure:
+    {
+      "careerPath": [
+        {
+          "title": "Job Title",
+          "description": "Detailed description of the role and responsibilities",
+          "timeline": "Experience timeline (e.g., 0-2 years, 2-5 years)",
+          "salaryRange": "Salary range in LPA format (e.g., 3-6 LPA, 8-15 LPA)"
+        }
+      ],
+      "additionalResources": [
+        {
+          "title": "Resource Title",
+          "description": "Description of the resource and how it helps in career development",
+          "link": "https://example.com - actual working website URL"
+        }
+      ]
+    }
+
+    Requirements:
+    - Include 5-7 career progression steps from entry level to senior level
+    - Include realistic salary ranges in LPA (Lakhs Per Annum) for Indian market
+    - Include practical timeline expectations
+    - Include 4-6 additional resources for career development with REAL working website links
+    - Focus on ${sector} sector specific career progression for ${jobRole}
+    - Include detailed descriptions for each career stage
+    - For additionalResources, provide actual working website URLs like:
+      * Educational platforms (Coursera, Udemy, edX, Pluralsight, etc.)
+      * Documentation sites
+      * GitHub repositories
+      * Industry blogs and websites
+      * Certification providers
+      * Professional communities
+    - Make sure all links are real, working URLs that provide value for ${jobRole} learning
+
+    Make sure to return ONLY valid JSON without any markdown formatting or additional text.`
+
+    const result = await model.generateContent(prompt)
+    const response = await result.response
+    const text = response.text()
+
+    try {
+      // Clean the response to extract JSON
+      const cleanedText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
+      const careerPathData = JSON.parse(cleanedText)
+      
+      return careerPathData
+    } catch (parseError) {
+      console.error("Error parsing career path data:", parseError)
+      console.error("Raw response:", text)
+      return null
+    }
+  } catch (error) {
+    console.error("Error generating career path data:", error)
+    return null
   }
 }
 

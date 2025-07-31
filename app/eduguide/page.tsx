@@ -333,7 +333,7 @@ export default function EduGuidePage() {
       {/* Main content */}
       <div className="relative z-10">
         {/* Hero Section */}
-        <section className="relative py-28 overflow-hidden bg-gradient-to-b from-gray-950 to-gray-900">
+        <section className="relative h-screen overflow-hidden bg-gradient-to-b from-gray-950 to-gray-900 flex items-center">
           {/* Binary Rain Background */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
             {[...Array(30)].map((_, i) => (
@@ -357,7 +357,7 @@ export default function EduGuidePage() {
           <div className="container px-4 md:px-6">
             <div className="flex flex-col lg:flex-row items-center gap-12">
               {/* Main Hero Content */}
-              <div className="flex-1 text-center lg:text-left">
+              <div className="flex-1 text-center lg:text-left lg:pl-8">
                 <div className="relative inline-block mb-6">
                   <div className="absolute rounded-lg blur opacity-75 animate-pulse"></div>
                   <div className="relative px-4 py-2 bg-black rounded-[6px] leading-none flex items-center border border-green-400/20">
@@ -369,7 +369,7 @@ export default function EduGuidePage() {
                 </div>
 
                 <h1 className="text-5xl md:text-6xl font-bold tracking-tighter mb-6 text-transparent bg-clip-text bg-[linear-gradient(90deg,#86efac,#5eead4,#22d3ee)]">
-                  EduGuide Professional
+                   EduGuide Professional
                 </h1>
 
                 <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto lg:mx-0">
